@@ -168,7 +168,7 @@ final class AppDataStore: ObservableObject {
         let mlBeforeNine = waterEntries.filter { $0.date < nineAM }.reduce(0) { $0 + $1.amountMl }
 
         challengeManager?.onWaterUpdated(
-            totalTodayMl:     todayWaterMl,
+            totalTodayMl:     todayWaterMlRaw,  // ← CORRIGÉ
             dailyGoalMl:      dailyGoalMl,
             dailyGoalReached: todayGoalReached,
             drinkCount:       waterEntries.count,
@@ -176,7 +176,7 @@ final class AppDataStore: ObservableObject {
             waterEntries:     waterEntries,
             alcoholCount:     cachedAlcoholEntries().count
         )
-
+        
         fetchAndCacheTodaySteps { [weak self] steps in
             guard let self else { return }
             self.achievementManager?.onMarathonienCheck(
