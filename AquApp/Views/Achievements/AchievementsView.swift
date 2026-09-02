@@ -18,7 +18,9 @@ struct Achievement: Identifiable {
 
     var progressRatio: Double {
         guard targetProgress > 0 else { return 0 }
-        return min(currentProgress / targetProgress, 1.0)
+        let ratio = currentProgress / targetProgress
+        guard ratio.isFinite else { return 0 }
+        return min(max(ratio, 0), 1.0)
     }
 
     var progressLabel: String {
@@ -55,15 +57,24 @@ struct Achievement: Identifiable {
     }
 }
 
+// MARK: - ChallengeStatus
+
+enum ChallengeStatus {
+    case locked
+    case available
+    case inProgress
+    case completed
+}
+
 // MARK: - AchievementManager
 
 final class AchievementManager: ObservableObject {
 
-    @Published var achievements:        [Achievement] = []
+    @Published var achievements: [Achievement] = []
     @Published var monthlyAchievements: [Achievement] = []
 
     weak var confettiManager: ConfettiManager?
-    weak var xpManager:       XPManager?
+    weak var xpManager: XPManager?
 
     var isPremiumUser: Bool = UserDefaults.standard.bool(forKey: "isPremiumUser") {
         didSet {
@@ -74,7 +85,7 @@ final class AchievementManager: ObservableObject {
     }
 
     private let healthStore = HKHealthStore()
-    private let defaults    = UserDefaults.standard
+    private let defaults = UserDefaults.standard
 
     init() {
         loadAchievements()
@@ -88,8 +99,6 @@ final class AchievementManager: ObservableObject {
 
     private func loadAchievements() {
         achievements = [
-
-            // ── Quotidiens / hebdomadaires ────────────────────────────────────
             Achievement(
                 id: "constance", sfSymbol: "checkmark.seal.fill", symbolColor: .blue,
                 title: String(localized: "achievement.constance.title"),
@@ -120,8 +129,6 @@ final class AchievementManager: ObservableObject {
                 description: String(localized: "achievement.perfect_week.desc"),
                 isPro: false, targetProgress: 7
             ),
-
-            // ── Long terme ────────────────────────────────────────────────────
             Achievement(
                 id: "marathonien", sfSymbol: "figure.run", symbolColor: Color(hex: "10B981"),
                 title: String(localized: "achievement.marathonien.title"),
@@ -146,16 +153,12 @@ final class AchievementManager: ObservableObject {
                 description: String(localized: "achievement.legende.desc"),
                 isPro: false, targetProgress: 1_000_000
             ),
-
-            // ── Légendaire ultime ─────────────────────────────────────────────
             Achievement(
                 id: "aqua_addict", sfSymbol: "drop.fill", symbolColor: Color(hex: "4DA8F5"),
                 title: String(localized: "achievement.aqua_addict.title"),
                 description: String(localized: "achievement.aqua_addict.desc"),
                 isPro: false, targetProgress: 1_000_000_000
             ),
-
-            // ── Premium ───────────────────────────────────────────────────────
             Achievement(
                 id: "iron_month", sfSymbol: "flame.fill", symbolColor: .orange,
                 title: String(localized: "achievement.iron_month.title"),
@@ -201,11 +204,11 @@ final class AchievementManager: ObservableObject {
             ),
         ]
         monthlyAchievements = list.map { ach in
-            var a        = ach
+            var a = ach
             let progress = defaults.double(forKey: "ach_progress_\(a.id)")
-            let done     = defaults.bool(forKey: "ach_completed_\(a.id)")
+            let done = defaults.bool(forKey: "ach_completed_\(a.id)")
             a.currentProgress = progress
-            if done              { a.status = .completed  }
+            if done { a.status = .completed }
             else if progress > 0 { a.status = .inProgress }
             return a
         }
@@ -214,15 +217,15 @@ final class AchievementManager: ObservableObject {
     // MARK: - API publique
 
     func onGoalReached(streak: Int, totalDays: Int) {
-        updateProgress(id: "constance",      value: Double(streak))
-        updateProgress(id: "perfect_week",   value: Double(streak))
-        updateProgress(id: "iron_month",     value: Double(streak))
+        updateProgress(id: "constance", value: Double(streak))
+        updateProgress(id: "perfect_week", value: Double(streak))
+        updateProgress(id: "iron_month", value: Double(streak))
         updateProgress(id: "indestructible", value: Double(streak))
-        updateProgress(id: "centurion",      value: Double(totalDays))
+        updateProgress(id: "centurion", value: Double(totalDays))
 
-        if streak    >= 7   { completeAchievement(id: "constance");    completeAchievement(id: "perfect_week") }
-        if streak    >= 30  { completeAchievement(id: "iron_month") }
-        if streak    >= 60  { completeAchievement(id: "indestructible") }
+        if streak >= 7 { completeAchievement(id: "constance"); completeAchievement(id: "perfect_week") }
+        if streak >= 30 { completeAchievement(id: "iron_month") }
+        if streak >= 60 { completeAchievement(id: "indestructible") }
         if totalDays >= 100 { completeAchievement(id: "centurion") }
     }
 
@@ -238,8 +241,8 @@ final class AchievementManager: ObservableObject {
         }
 
         let month = Calendar.current.component(.month, from: Date())
-        if month == 1  { updateProgress(id: "dry_january",         value: min(Double(streak), 31)); if streak >= 31 { completeAchievement(id: "dry_january") } }
-        if month == 10 { updateProgress(id: "sober_october",       value: min(Double(streak), 31)); if streak >= 31 { completeAchievement(id: "sober_october") } }
+        if month == 1 { updateProgress(id: "dry_january", value: min(Double(streak), 31)); if streak >= 31 { completeAchievement(id: "dry_january") } }
+        if month == 10 { updateProgress(id: "sober_october", value: min(Double(streak), 31)); if streak >= 31 { completeAchievement(id: "sober_october") } }
         if month == 11 { updateProgress(id: "no_alcohol_november", value: min(Double(streak), 30)); if streak >= 30 { completeAchievement(id: "no_alcohol_november") } }
     }
 
@@ -263,8 +266,8 @@ final class AchievementManager: ObservableObject {
     func onDailyGoalReached(totalMl: Double, goalMl: Double) {
         let month = Calendar.current.component(.month, from: Date())
         guard month == 7 || month == 8, goalMl > 0, totalMl >= goalMl * 1.5 else { return }
-        let year  = Calendar.current.component(.year, from: Date())
-        let key   = "summer_hydration_days_\(year)"
+        let year = Calendar.current.component(.year, from: Date())
+        let key = "summer_hydration_days_\(year)"
         let count = defaults.double(forKey: key) + 1
         defaults.set(count, forKey: key)
         updateProgress(id: "summer_hydration", value: min(count, 7))
@@ -272,17 +275,14 @@ final class AchievementManager: ObservableObject {
     }
 
     func onMarathonienCheck(drinkCount: Int, goalReached: Bool, steps: Double) {
-        let c1    = drinkCount >= 5
-        let c2    = goalReached
-        let c3    = steps >= 8000
+        let c1 = drinkCount >= 5
+        let c2 = goalReached
+        let c3 = steps >= 8000
         let count = [c1, c2, c3].filter { $0 }.count
         updateProgress(id: "marathonien", value: Double(count))
         if c1 && c2 && c3 { completeAchievement(id: "marathonien") }
     }
 
-    /// Restaure la progression canicule depuis UserDefaults sans déclencher
-    /// de confettis si le succès est déjà complété. Appelé au démarrage
-    /// depuis AppDataStore.recalculateAllAchievementsFromHistory().
     func restoreHeatwaveProgress(days: Double) {
         updateProgress(id: "heatwave", value: min(days, 3))
         if days >= 3 { completeAchievement(id: "heatwave") }
@@ -306,7 +306,7 @@ final class AchievementManager: ObservableObject {
         guard HKHealthStore.isHealthDataAvailable() else { return }
         let sleepType = HKObjectType.categoryType(forIdentifier: .sleepAnalysis)!
         let waterType = HKQuantityType.quantityType(forIdentifier: .dietaryWater)!
-        let stepType  = HKQuantityType.quantityType(forIdentifier: .stepCount)!
+        let stepType = HKQuantityType.quantityType(forIdentifier: .stepCount)!
         healthStore.requestAuthorization(toShare: [], read: [sleepType, waterType, stepType]) { [weak self] granted, error in
             guard let self, granted, error == nil else { return }
             DispatchQueue.main.async { self.performSleepHydrationCheck() }
@@ -314,10 +314,10 @@ final class AchievementManager: ObservableObject {
     }
 
     private func performSleepHydrationCheck() {
-        let sleepType    = HKObjectType.categoryType(forIdentifier: .sleepAnalysis)!
-        let waterType    = HKQuantityType.quantityType(forIdentifier: .dietaryWater)!
+        let sleepType = HKObjectType.categoryType(forIdentifier: .sleepAnalysis)!
+        let waterType = HKQuantityType.quantityType(forIdentifier: .dietaryWater)!
         let sevenDaysAgo = Calendar.current.date(byAdding: .day, value: -7, to: Date())!
-        let predicate    = HKQuery.predicateForSamples(withStart: sevenDaysAgo, end: Date())
+        let predicate = HKQuery.predicateForSamples(withStart: sevenDaysAgo, end: Date())
         guard healthStore.authorizationStatus(for: sleepType) == .sharingAuthorized else { return }
         let sleepQuery = HKSampleQuery(
             sampleType: sleepType, predicate: predicate, limit: HKObjectQueryNoLimit,
@@ -332,14 +332,14 @@ final class AchievementManager: ObservableObject {
                 .map { $0.startDate }
             guard !sleepStarts.isEmpty else { return }
             guard self.healthStore.authorizationStatus(for: waterType) == .sharingAuthorized else { return }
-            let group      = DispatchGroup()
+            let group = DispatchGroup()
             let countQueue = DispatchQueue(label: "aquapp.sleepHydration.count")
             var hydratedNights = 0
             for sleepStart in sleepStarts.prefix(7) {
                 group.enter()
                 let windowStart = Calendar.current.date(byAdding: .hour, value: -2, to: sleepStart)!
-                let windowPred  = HKQuery.predicateForSamples(withStart: windowStart, end: sleepStart)
-                let waterQuery  = HKStatisticsQuery(
+                let windowPred = HKQuery.predicateForSamples(withStart: windowStart, end: sleepStart)
+                let waterQuery = HKStatisticsQuery(
                     quantityType: waterType, quantitySamplePredicate: windowPred, options: .cumulativeSum
                 ) { _, result, _ in
                     let ml = result?.sumQuantity()?.doubleValue(for: .literUnit(with: .milli)) ?? 0
@@ -366,9 +366,9 @@ final class AchievementManager: ObservableObject {
                 if achievements[i].status == .locked {
                     let p = defaults.double(forKey: "ach_progress_\(achievements[i].id)")
                     let c = defaults.bool(forKey: "ach_completed_\(achievements[i].id)")
-                    if c        { achievements[i].status = .completed;  achievements[i].currentProgress = achievements[i].targetProgress }
-                    else if p>0 { achievements[i].status = .inProgress; achievements[i].currentProgress = p }
-                    else        { achievements[i].status = .available }
+                    if c { achievements[i].status = .completed; achievements[i].currentProgress = achievements[i].targetProgress }
+                    else if p > 0 { achievements[i].status = .inProgress; achievements[i].currentProgress = p }
+                    else { achievements[i].status = .available }
                 }
             } else {
                 achievements[i].status = .locked
@@ -380,18 +380,18 @@ final class AchievementManager: ObservableObject {
 
     private func saveProgress() {
         for a in achievements + monthlyAchievements {
-            defaults.set(a.currentProgress,      forKey: "ach_progress_\(a.id)")
+            defaults.set(a.currentProgress, forKey: "ach_progress_\(a.id)")
             defaults.set(a.status == .completed, forKey: "ach_completed_\(a.id)")
         }
     }
 
     private func restoreProgress() {
         for i in achievements.indices {
-            let id       = achievements[i].id
+            let id = achievements[i].id
             let progress = defaults.double(forKey: "ach_progress_\(id)")
-            let done     = defaults.bool(forKey: "ach_completed_\(id)")
+            let done = defaults.bool(forKey: "ach_completed_\(id)")
             achievements[i].currentProgress = progress
-            if done              { achievements[i].status = .completed  }
+            if done { achievements[i].status = .completed }
             else if progress > 0 { achievements[i].status = .inProgress }
         }
     }
@@ -416,12 +416,12 @@ final class AchievementManager: ObservableObject {
         if let idx = achievements.firstIndex(where: { $0.id == id }) {
             guard achievements[idx].status != .locked,
                   achievements[idx].status != .completed else { return }
-            achievements[idx].status          = .completed
+            achievements[idx].status = .completed
             achievements[idx].currentProgress = achievements[idx].targetProgress
             title = achievements[idx].title
         } else if let idx = monthlyAchievements.firstIndex(where: { $0.id == id }) {
             guard monthlyAchievements[idx].status != .completed else { return }
-            monthlyAchievements[idx].status          = .completed
+            monthlyAchievements[idx].status = .completed
             monthlyAchievements[idx].currentProgress = monthlyAchievements[idx].targetProgress
             title = monthlyAchievements[idx].title
         }
@@ -439,15 +439,14 @@ final class AchievementManager: ObservableObject {
 
 struct AchievementsView: View {
 
-    @EnvironmentObject var manager:         AchievementManager
+    @EnvironmentObject var manager: AchievementManager
     @EnvironmentObject var confettiManager: ConfettiManager
-    @EnvironmentObject var storeKit:        StoreKitManager
+    @EnvironmentObject var storeKit: StoreKitManager
     @AppStorage("isPremiumUser") private var isPremiumUser: Bool = false
     @Environment(\.colorScheme) private var colorScheme
 
     @State private var showPremiumSheet = false
 
-    // MARK: - Scroll-to-top
     var scrollToTopID: UUID = UUID()
 
     init(scrollToTopID: UUID = UUID()) {
@@ -456,7 +455,7 @@ struct AchievementsView: View {
 
     var allForCount: [Achievement] { manager.achievements + manager.monthlyAchievements }
     var completedCount: Int { allForCount.filter { $0.status == .completed }.count }
-    var totalCount: Int     { allForCount.count }
+    var totalCount: Int { allForCount.count }
 
     var legendaryAchievement: Achievement? {
         manager.achievements.first { $0.id == "aqua_addict" }
@@ -471,117 +470,117 @@ struct AchievementsView: View {
         NavigationStack {
             ScrollViewReader { proxy in
                 ScrollView {
-                VStack(alignment: .leading, spacing: 24) {
-                    Color.clear.frame(height: 0).id("top")
+                    VStack(alignment: .leading, spacing: 24) {
+                        Color.clear.frame(height: 0).id("top")
 
-                    // Header
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text(L10n.achievementsTitle)
-                            .font(.system(size: 32, weight: .bold))
-                        Text(L10n.achievementsSub)
-                            .font(.subheadline)
-                            .foregroundColor(.secondary)
-                    }
-                    .padding(.horizontal)
-                    .padding(.top, 8)
-
-                    // Résumé progression
-                    SummaryCard(completed: completedCount, total: totalCount)
-                        .padding(.horizontal)
-
-                    // ── Défis du mois ─────────────────────────────────────────
-                    VStack(alignment: .leading, spacing: 12) {
-                        AchievementSectionTitle(
-                            sfSymbol: "calendar.badge.clock",
-                            color: Color(hex: "4DA8F5"),
-                            label: String(localized: "achievements.monthly_section")
-                        )
-                        .padding(.horizontal)
-
-                        LazyVGrid(columns: columns, spacing: 16) {
-                            ForEach(manager.monthlyAchievements) { ach in
-                                AchievementBadge(achievement: ach) { showPremiumSheet = true }
-                            }
+                        // Header
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text(L10n.achievementsTitle)
+                                .font(.system(size: 32, weight: .bold))
+                            Text(L10n.achievementsSub)
+                                .font(.subheadline)
+                                .foregroundColor(.secondary)
                         }
                         .padding(.horizontal)
-                    }
+                        .padding(.top, 8)
 
-                    // ── Succès ────────────────────────────────────────────────
-                    VStack(alignment: .leading, spacing: 12) {
-                        AchievementSectionTitle(
-                            sfSymbol: "rosette",
-                            color: Color(hex: "2B87E8"),
-                            label: String(localized: "achievements.all_title")
-                        )
-                        .padding(.horizontal)
-
-                        LazyVGrid(columns: columns, spacing: 16) {
-                            ForEach(regularAchievements) { ach in
-                                AchievementBadge(achievement: ach) { showPremiumSheet = true }
-                            }
-                        }
-                        .padding(.horizontal)
-                    }
-
-                    // ── Aqua'ddict — bannière légendaire ──────────────────────
-                    if let legendary = legendaryAchievement {
-                        AquaAddictBanner(achievement: legendary)
+                        // Résumé progression
+                        SummaryCard(completed: completedCount, total: totalCount)
                             .padding(.horizontal)
-                    }
 
-                    // ── Bannière Premium ──────────────────────────────────────
-                    if !isPremiumUser {
-                        Button { showPremiumSheet = true } label: {
-                            HStack(spacing: 12) {
-                                ZStack {
-                                    Circle()
-                                        .fill(Color.orange.opacity(colorScheme == .dark ? 0.18 : 0.15))
-                                        .frame(width: 44, height: 44)
-                                    Image(systemName: "crown.fill")
-                                        .font(.system(size: 20)).foregroundColor(.orange)
+                        // Défis du mois
+                        VStack(alignment: .leading, spacing: 12) {
+                            AchievementSectionTitle(
+                                sfSymbol: "calendar.badge.clock",
+                                color: Color(hex: "4DA8F5"),
+                                label: String(localized: "achievements.monthly_section")
+                            )
+                            .padding(.horizontal)
+
+                            LazyVGrid(columns: columns, spacing: 16) {
+                                ForEach(manager.monthlyAchievements) { ach in
+                                    AchievementBadge(achievement: ach) { showPremiumSheet = true }
                                 }
-                                VStack(alignment: .leading, spacing: 2) {
-                                    Text(String(localized: "achievements.unlock_pro_title"))
-                                        .font(.system(size: 15, weight: .bold))
-                                        .foregroundColor(colorScheme == .dark ? Color(hex: "FCD34D") : Color(hex: "92400E"))
-                                    Text(String(localized: "achievements.unlock_pro_detail"))
-                                        .font(.system(size: 13))
-                                        .foregroundColor(colorScheme == .dark ? Color(hex: "F59E0B").opacity(0.75) : Color(hex: "B45309"))
-                                }
-                                Spacer()
-                                Image(systemName: "chevron.right")
-                                    .font(.system(size: 13, weight: .semibold))
-                                    .foregroundColor(colorScheme == .dark ? Color(hex: "F59E0B") : Color(hex: "B45309"))
                             }
-                            .padding(16)
-                            .background(colorScheme == .dark ? Color(hex: "2D1F00") : Color(hex: "FFF7ED"))
-                            .cornerRadius(16)
-                            .overlay(RoundedRectangle(cornerRadius: 16).stroke(Color.orange.opacity(colorScheme == .dark ? 0.35 : 0.30), lineWidth: 1))
+                            .padding(.horizontal)
                         }
-                        .padding(.horizontal)
+
+                        // Succès
+                        VStack(alignment: .leading, spacing: 12) {
+                            AchievementSectionTitle(
+                                sfSymbol: "rosette",
+                                color: Color(hex: "2B87E8"),
+                                label: String(localized: "achievements.all_title")
+                            )
+                            .padding(.horizontal)
+
+                            LazyVGrid(columns: columns, spacing: 16) {
+                                ForEach(regularAchievements) { ach in
+                                    AchievementBadge(achievement: ach) { showPremiumSheet = true }
+                                }
+                            }
+                            .padding(.horizontal)
+                        }
+
+                        // Aqua'ddict — bannière légendaire
+                        if let legendary = legendaryAchievement {
+                            AquaAddictBanner(achievement: legendary)
+                                .padding(.horizontal)
+                        }
+
+                        // Bannière Premium
+                        if !isPremiumUser {
+                            Button { showPremiumSheet = true } label: {
+                                HStack(spacing: 12) {
+                                    ZStack {
+                                        Circle()
+                                            .fill(Color.orange.opacity(colorScheme == .dark ? 0.18 : 0.15))
+                                            .frame(width: 44, height: 44)
+                                        Image(systemName: "crown.fill")
+                                            .font(.system(size: 20)).foregroundColor(.orange)
+                                    }
+                                    VStack(alignment: .leading, spacing: 2) {
+                                        Text(String(localized: "achievements.unlock_pro_title"))
+                                            .font(.system(size: 15, weight: .bold))
+                                            .foregroundColor(colorScheme == .dark ? Color(hex: "FCD34D") : Color(hex: "92400E"))
+                                        Text(String(localized: "achievements.unlock_pro_detail"))
+                                            .font(.system(size: 13))
+                                            .foregroundColor(colorScheme == .dark ? Color(hex: "F59E0B").opacity(0.75) : Color(hex: "B45309"))
+                                    }
+                                    Spacer()
+                                    Image(systemName: "chevron.right")
+                                        .font(.system(size: 13, weight: .semibold))
+                                        .foregroundColor(colorScheme == .dark ? Color(hex: "F59E0B") : Color(hex: "B45309"))
+                                }
+                                .padding(16)
+                                .background(colorScheme == .dark ? Color(hex: "2D1F00") : Color(hex: "FFF7ED"))
+                                .cornerRadius(16)
+                                .overlay(RoundedRectangle(cornerRadius: 16).stroke(Color.orange.opacity(colorScheme == .dark ? 0.35 : 0.30), lineWidth: 1))
+                            }
+                            .padding(.horizontal)
+                        }
                     }
+                    .padding(.bottom, 32)
                 }
-                .padding(.bottom, 32)
+                .background(Color("AppBackground"))
+                .navigationBarHidden(true)
+                .onChange(of: scrollToTopID) { _, _ in
+                    withAnimation(.easeOut(duration: 0.3)) { proxy.scrollTo("top") }
+                }
             }
-            .background(Color("AppBackground"))
-            .navigationBarHidden(true)
-            .onChange(of: scrollToTopID) { _, _ in
-                withAnimation(.easeOut(duration: 0.3)) { proxy.scrollTo("top") }
+            .sheet(isPresented: $showPremiumSheet) {
+                PremiumSheet(isPremiumUser: $isPremiumUser, isPresented: $showPremiumSheet)
+                    .environmentObject(storeKit)
+                    .presentationDetents([.large])
+                    .presentationDragIndicator(.hidden)
+                    .presentationCornerRadius(24)
             }
-            } // ScrollViewReader
-        }
-        .sheet(isPresented: $showPremiumSheet) {
-            PremiumSheet(isPremiumUser: $isPremiumUser, isPresented: $showPremiumSheet)
-                .environmentObject(storeKit)
-                .presentationDetents([.large])
-                .presentationDragIndicator(.hidden)
-                .presentationCornerRadius(24)
-        }
-        .onChange(of: isPremiumUser) { _, newValue in manager.isPremiumUser = newValue }
-        .onAppear {
-            manager.isPremiumUser   = isPremiumUser
-            manager.confettiManager = confettiManager
-            manager.loadMonthlyAchievements()
+            .onChange(of: isPremiumUser) { _, newValue in manager.isPremiumUser = newValue }
+            .onAppear {
+                manager.isPremiumUser = isPremiumUser
+                manager.confettiManager = confettiManager
+                manager.loadMonthlyAchievements()
+            }
         }
     }
 }
@@ -591,8 +590,11 @@ struct AchievementsView: View {
 private struct AquaAddictBanner: View {
     let achievement: Achievement
 
-    var isCompleted: Bool  { achievement.status == .completed }
-    var litersProgress: Int { Int(achievement.currentProgress / 1000) }
+    var isCompleted: Bool { achievement.status == .completed }
+    var litersProgress: Int {
+        guard achievement.currentProgress.isFinite else { return 0 }
+        return Int(achievement.currentProgress / 1000)
+    }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 14) {
@@ -671,8 +673,8 @@ private struct AquaAddictBanner: View {
 
 private struct AchievementSectionTitle: View {
     let sfSymbol: String
-    let color:    Color
-    let label:    String
+    let color: Color
+    let label: String
     var body: some View {
         HStack(spacing: 8) {
             Image(systemName: sfSymbol)
@@ -689,7 +691,11 @@ private struct AchievementSectionTitle: View {
 struct SummaryCard: View {
     let completed: Int
     let total: Int
-    var ratio: Double { total > 0 ? Double(completed) / Double(total) : 0 }
+    var ratio: Double {
+        guard total > 0 else { return 0 }
+        let r = Double(completed) / Double(total)
+        return r.isFinite ? r : 0
+    }
 
     var body: some View {
         VStack(spacing: 16) {
@@ -744,12 +750,12 @@ struct AchievementBadge: View {
     let achievement: Achievement
     let onUnlock: () -> Void
 
-    var isLocked:    Bool { achievement.status == .locked }
+    var isLocked: Bool { achievement.status == .locked }
     var isCompleted: Bool { achievement.status == .completed }
 
     var badgeBackground: Color {
         if isCompleted { return achievement.symbolColor.opacity(0.12) }
-        if isLocked    { return Color(UIColor.systemGray6) }
+        if isLocked { return Color(UIColor.systemGray6) }
         return Color("AppCardBackground")
     }
 
@@ -789,8 +795,10 @@ struct AchievementBadge: View {
                         GeometryReader { geo in
                             ZStack(alignment: .leading) {
                                 RoundedRectangle(cornerRadius: 3).fill(Color(UIColor.systemGray5)).frame(height: 4)
-                                RoundedRectangle(cornerRadius: 3).fill(achievement.symbolColor)
-                                    .frame(width: geo.size.width * achievement.progressRatio, height: 4)
+                                if achievement.progressRatio.isFinite {
+                                    RoundedRectangle(cornerRadius: 3).fill(achievement.symbolColor)
+                                        .frame(width: geo.size.width * achievement.progressRatio, height: 4)
+                                }
                             }
                         }
                         .frame(height: 4)
@@ -823,7 +831,7 @@ struct AchievementBadge: View {
     }
 
     private var accessibilityValue: String {
-        if isLocked    { return String(localized: "accessibility.locked_premium") }
+        if isLocked { return String(localized: "accessibility.locked_premium") }
         if isCompleted { return String(localized: "accessibility.completed") }
         if achievement.status == .inProgress {
             return String(format: String(localized: "accessibility.in_progress"), achievement.progressLabel)
@@ -835,7 +843,7 @@ struct AchievementBadge: View {
 // MARK: - Preview
 
 #Preview {
-    let manager         = AchievementManager()
+    let manager = AchievementManager()
     let confettiManager = ConfettiManager()
     AchievementsView()
         .environmentObject(manager)
