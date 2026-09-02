@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+
+    <!--
+        PrivacyInfo.xcprivacy — AquApp
+        Généré conformément aux exigences Apple (WWDC 2023 / iOS 17+).
+        À placer à la racine du projet Xcode (target principale).
+        Une copie identique est nécessaire dans la target Widget Extension.
+    -->
+
+    <!-- ═══════════════════════════════════════════════════════════
+         1. COLLECTE DE DONNÉES (NSPrivacyCollectedDataTypes)
+         AquApp ne collecte, ne vend et ne partage aucune donnée
+         avec des tiers. Toutes les données restent sur l'appareil
+         ou dans iCloud privé de l'utilisateur.
+    ═══════════════════════════════════════════════════════════ -->
+    <key>NSPrivacyCollectedDataTypes</key>
+    <array>
+
+        <!-- Données de santé & forme physique (HealthKit — lecture seule) -->
+        <dict>
+            <key>NSPrivacyCollectedDataType</key>
+            <string>NSPrivacyCollectedDataTypeHealth</string>
+            <!-- Utilisé pour : vérifier les pas (défis), eau bue, qualité du sommeil -->
+            <key>NSPrivacyCollectedDataTypeLinked</key>
+            <false/>
+            <!-- Non liées à l'identité de l'utilisateur -->
+            <key>NSPrivacyCollectedDataTypeTracking</key>
+            <false/>
+            <!-- Pas utilisées pour du tracking publicitaire -->
+            <key>NSPrivacyCollectedDataTypePurposes</key>
+            <array>
+                <string>NSPrivacyCollectedDataTypePurposeAppFunctionality</string>
+            </array>
+        </dict>
+
+        <!-- Localisation approximative (CoreLocation — météo canicule) -->
+        <dict>
+            <key>NSPrivacyCollectedDataType</key>
+            <string>NSPrivacyCollectedDataTypeCoarseLocation</string>
+            <!-- Utilisé pour : obtenir la température locale (Open-Meteo) -->
+            <key>NSPrivacyCollectedDataTypeLinked</key>
+            <false/>
+            <key>NSPrivacyCollectedDataTypeTracking</key>
+            <false/>
+            <key>NSPrivacyCollectedDataTypePurposes</key>
+            <array>
+                <string>NSPrivacyCollectedDataTypePurposeAppFunctionality</string>
+            </array>
+        </dict>
+
+        <!-- Données utilisateur (prénom, objectif, profil physique) -->
+        <dict>
+            <key>NSPrivacyCollectedDataType</key>
+            <string>NSPrivacyCollectedDataTypeOtherUserContent</string>
+            <!-- Utilisé pour : personnalisation (prénom, poids, taille, genre) -->
+            <key>NSPrivacyCollectedDataTypeLinked</key>
+            <false/>
+            <key>NSPrivacyCollectedDataTypeTracking</key>
+            <false/>
+            <key>NSPrivacyCollectedDataTypePurposes</key>
+            <array>
+                <string>NSPrivacyCollectedDataTypePurposeAppFunctionality</string>
+            </array>
+        </dict>
+
+    </array>
+
+    <!-- ═══════════════════════════════════════════════════════════
+         2. SUIVI (NSPrivacyTracking)
+         AquApp ne fait pas de tracking publicitaire cross-app.
+    ═══════════════════════════════════════════════════════════ -->
+    <key>NSPrivacyTracking</key>
+    <false/>
+
+    <!-- ═══════════════════════════════════════════════════════════
+         3. DOMAINES DE SUIVI (NSPrivacyTrackingDomains)
+         Vide — aucun SDK publicitaire, aucun tracker.
+    ═══════════════════════════════════════════════════════════ -->
+    <key>NSPrivacyTrackingDomains</key>
+    <array/>
+
+    <!-- ═══════════════════════════════════════════════════════════
+         4. APIs REQUISES (NSPrivacyAccessedAPITypes)
+         Déclaration obligatoire des APIs "required reason".
+         Apple vérifie que chaque raison correspond à l'usage réel.
+    ═══════════════════════════════════════════════════════════ -->
+    <key>NSPrivacyAccessedAPITypes</key>
+    <array>
+
+        <!-- UserDefaults — stockage local des préférences et données app -->
+        <dict>
+            <key>NSPrivacyAccessedAPIType</key>
+            <string>NSPrivacyAccessedAPICategoryUserDefaults</string>
+            <key>NSPrivacyAccessedAPITypeReasons</key>
+            <array>
+                <!-- CA92.1 : Lire/écrire les préférences gérées par l'app elle-même -->
+                <string>CA92.1</string>
+            </array>
+        </dict>
+
+        <!-- FileTimestamp — SwiftData lit les timestamps des fichiers de base de données -->
+        <dict>
+            <key>NSPrivacyAccessedAPIType</key>
+            <string>NSPrivacyAccessedAPICategoryFileTimestamp</string>
+            <key>NSPrivacyAccessedAPITypeReasons</key>
+            <array>
+                <!-- C617.1 : Accès aux fichiers créés par l'app (base SwiftData) -->
+                <string>C617.1</string>
+            </array>
+        </dict>
+
+        <!-- SystemBootTime — utilisé par WidgetKit pour planifier les rafraîchissements -->
+        <dict>
+            <key>NSPrivacyAccessedAPIType</key>
+            <string>NSPrivacyAccessedAPICategorySystemBootTime</string>
+            <key>NSPrivacyAccessedAPITypeReasons</key>
+            <array>
+                <!-- 35F9.1 : Mesurer le temps écoulé pour les timelines widget -->
+                <string>35F9.1</string>
+            </array>
+        </dict>
+
+        <!-- DiskSpace — SwiftData vérifie l'espace disque avant d'écrire -->
+        <dict>
+            <key>NSPrivacyAccessedAPIType</key>
+            <string>NSPrivacyAccessedAPICategoryDiskSpace</string>
+            <key>NSPrivacyAccessedAPITypeReasons</key>
+            <array>
+                <!-- E174.1 : Vérifier l'espace disponible avant d'écrire des données utilisateur -->
+                <string>E174.1</string>
+            </array>
+        </dict>
+
+    </array>
+
+</dict>
+</plist>
