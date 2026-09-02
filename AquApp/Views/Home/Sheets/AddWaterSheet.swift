@@ -7,24 +7,24 @@ struct AddWaterSheet: View {
     var onGoalReached: (() -> Void)? = nil
     @EnvironmentObject var store: AppDataStore
 
-    @State private var customAmount:        String = ""
-    @State private var sliderValue:         Double = 250
-    @State private var showSlider:          Bool   = false
-    @State private var showRemove:          Bool   = false
-    @State private var removeAmount:        String = ""
-    @State private var lastHapticThreshold: Int    = 0  // palier haptique actuel
+    @State private var customAmount: String = ""
+    @State private var sliderValue: Double = 250
+    @State private var showSlider: Bool = false
+    @State private var showRemove: Bool = false
+    @State private var removeAmount: String = ""
+    @State private var lastHapticThreshold: Int = 0
 
     @FocusState private var isCustomFocused: Bool
     @FocusState private var isRemoveFocused: Bool
 
     var presets: [(label: String, sublabel: String, ml: Double)] {
         [
-            (UnitFormatter.volume(150),  String(localized: "water.preset.small_sip"),    150),
-            (UnitFormatter.volume(250),  String(localized: "water.preset.glass"),        250),
-            (UnitFormatter.volume(330),  String(localized: "water.preset.can"),          330),
-            (UnitFormatter.volume(500),  String(localized: "water.preset.large_bottle"), 500),
-            (UnitFormatter.volume(750),  String(localized: "water.preset.sport_bottle"), 750),
-            (UnitFormatter.volume(1000), String(localized: "water.preset.full_litre"),   1000),
+            (UnitFormatter.volume(150), String(localized: "water.preset.small_sip"), 150),
+            (UnitFormatter.volume(250), String(localized: "water.preset.glass"), 250),
+            (UnitFormatter.volume(330), String(localized: "water.preset.can"), 330),
+            (UnitFormatter.volume(500), String(localized: "water.preset.large_bottle"), 500),
+            (UnitFormatter.volume(750), String(localized: "water.preset.sport_bottle"), 750),
+            (UnitFormatter.volume(1000), String(localized: "water.preset.full_litre"), 1000),
         ]
     }
 
@@ -74,9 +74,9 @@ struct AddWaterSheet: View {
                     LazyVGrid(columns: columns, spacing: 12) {
                         ForEach(presets, id: \.ml) { preset in
                             PresetButton(
-                                label:    preset.label,
+                                label: preset.label,
                                 sublabel: preset.sublabel,
-                                ml:       preset.ml
+                                ml: preset.ml
                             ) {
                                 HapticManager.shared.selectionTap()
                                 addWater(ml: preset.ml)
@@ -129,12 +129,12 @@ struct AddWaterSheet: View {
                                         .onChange(of: sliderValue) { _, newValue in
                                             let threshold: Int
                                             switch newValue {
-                                            case ..<250:        threshold = 0
-                                            case 250..<500:     threshold = 1
-                                            case 500..<750:     threshold = 2
-                                            case 750..<1000:    threshold = 3
-                                            case 1000..<1500:   threshold = 4
-                                            default:            threshold = 5
+                                            case ..<250: threshold = 0
+                                            case 250..<500: threshold = 1
+                                            case 500..<750: threshold = 2
+                                            case 750..<1000: threshold = 3
+                                            case 1000..<1500: threshold = 4
+                                            default: threshold = 5
                                             }
                                             if threshold != lastHapticThreshold {
                                                 lastHapticThreshold = threshold
@@ -210,6 +210,7 @@ struct AddWaterSheet: View {
                                         .background(Color(UIColor.systemGray6))
                                         .cornerRadius(12)
                                         .font(.system(size: 15))
+                                        .withDoneButton() // ← BOUTON "TERMINÉ" AJOUTÉ
 
                                     Button {
                                         if let ml = Double(removeAmount), ml > 0 {
@@ -259,6 +260,7 @@ struct AddWaterSheet: View {
                             .background(Color(UIColor.systemGray6))
                             .cornerRadius(12)
                             .font(.system(size: 15))
+                            .withDoneButton() // ← BOUTON "TERMINÉ" AJOUTÉ
 
                         Button {
                             if let ml = Double(customAmount), ml > 0 {
@@ -315,21 +317,20 @@ struct AddWaterSheet: View {
 }
 
 // MARK: - Bouton preset
-
 struct PresetButton: View {
-    let label:    String
+    let label: String
     let sublabel: String
-    let ml:       Double
-    let action:   () -> Void
+    let ml: Double
+    let action: () -> Void
 
     var dropSize: CGFloat {
         switch ml {
-        case ..<200:  return 28
-        case ..<400:  return 34
-        case ..<600:  return 40
-        case ..<800:  return 44
+        case ..<200: return 28
+        case ..<400: return 34
+        case ..<600: return 40
+        case ..<800: return 44
         case ..<1000: return 48
-        default:      return 52
+        default: return 52
         }
     }
 

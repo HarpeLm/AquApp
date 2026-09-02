@@ -5,14 +5,14 @@ import SwiftData
 
 struct HomeView: View {
     @AppStorage("userFirstName") private var userName: String = ""
-    @EnvironmentObject var store:          AppDataStore
+    @EnvironmentObject var store: AppDataStore
     @EnvironmentObject var confettiManager: ConfettiManager
     @EnvironmentObject var weatherManager: WeatherManager
 
     @Binding var openAddWater: Bool
     var scrollToTopID: UUID
 
-    @State private var showAddWater  = false
+    @State private var showAddWater = false
     @State private var showAddAlcool = false
     @State private var pendingConfettiEvent: ConfettiEvent? = nil
 
@@ -25,100 +25,100 @@ struct HomeView: View {
         NavigationStack {
             ScrollViewReader { proxy in
                 ScrollView {
-                VStack(alignment: .leading, spacing: 24) {
-                    Color.clear.frame(height: 0).id("top")
+                    VStack(alignment: .leading, spacing: 24) {
+                        Color.clear.frame(height: 0).id("top")
 
-                    // MARK: Header
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text(L10n.homeGoodMorning)
-                            .font(.system(size: 18))
-                            .foregroundColor(.secondary)
-                        HStack(spacing: 8) {
-                            Text(userName)
-                                .font(.system(size: 32, weight: .bold))
-                            Image(systemName: "hand.wave.fill")
-                                .accessibilityHidden(true)
-                                .font(.system(size: 28))
-                                .foregroundColor(.orange)
+                        // MARK: Header
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text(L10n.homeGoodMorning)
+                                .font(.system(size: 18))
+                                .foregroundColor(.secondary)
+                            HStack(spacing: 8) {
+                                Text(userName)
+                                    .font(.system(size: 32, weight: .bold))
+                                Image(systemName: "hand.wave.fill")
+                                    .accessibilityHidden(true)
+                                    .font(.system(size: 28))
+                                    .foregroundColor(.orange)
+                            }
                         }
-                    }
-                    .padding(.horizontal)
-                    .padding(.top, 8)
+                        .padding(.horizontal)
+                        .padding(.top, 8)
 
-                    // MARK: Bannière canicule
-                    if weatherManager.isHeatwave, let adapted = weatherManager.adaptedGoalMl {
-                        HeatwaveBanner(
-                            tempC:     weatherManager.currentTemperatureC ?? 32,
-                            adaptedMl: adapted
+                        // MARK: Bannière canicule
+                        if weatherManager.isHeatwave, let adapted = weatherManager.adaptedGoalMl {
+                            HeatwaveBanner(
+                                tempC: weatherManager.currentTemperatureC ?? 32,
+                                adaptedMl: adapted
+                            )
+                            .padding(.horizontal)
+                            .transition(.move(edge: .top).combined(with: .opacity))
+                        }
+
+                        // MARK: Carte progression
+                        ProgressCard(
+                            current: store.todayWaterMl,
+                            goal: store.effectiveGoalMl,
+                            progress: store.todayProgress,
+                            percent: Int(store.todayProgress * 100),
+                            compensation: store.todayAlcoholCompensationMl
                         )
                         .padding(.horizontal)
-                        .transition(.move(edge: .top).combined(with: .opacity))
+
+                        // MARK: Boutons d'action
+                        HStack(spacing: 12) {
+                            ActionButton(
+                                label: L10n.homeAddWater,
+                                sfSymbol: "drop.fill",
+                                gradient: [Color(hex: "4DA8F5"), Color(hex: "2B87E8")]
+                            ) { showAddWater = true }
+
+                            ActionButton(
+                                label: L10n.homeAddAlcohol,
+                                sfSymbol: "wineglass.fill",
+                                gradient: [Color(hex: "9B59B6"), Color(hex: "6C3483")]
+                            ) { showAddAlcool = true }
+                        }
+                        .padding(.horizontal)
+
+                        // MARK: Stats rapides
+                        HStack(spacing: 12) {
+                            StatCard(
+                                sfSymbol: "flame.fill",
+                                symbolColor: .orange,
+                                label: L10n.homeStreakLabel,
+                                value: "\(store.currentStreak)",
+                                unit: L10n.homeDays
+                            )
+                            StatCard(
+                                sfSymbol: "leaf.fill",
+                                symbolColor: .green,
+                                label: L10n.homeSoberLabel,
+                                value: "\(store.soberDaysStreak)",
+                                unit: L10n.homeDays
+                            )
+                        }
+                        .padding(.horizontal)
+
+                        // MARK: Activité récente
+                        RecentActivitySection(
+                            waterEntries: store.todayWaterEntries(),
+                            alcoholEntries: store.todayAlcoholEntries()
+                        ) { entry in
+                            store.deleteWater(entry)
+                        } onDeleteAlcohol: { entry in
+                            store.deleteAlcohol(entry)
+                        }
+                        .padding(.horizontal)
                     }
-
-                    // MARK: Carte progression
-                    ProgressCard(
-                        current:      store.todayWaterMl,
-                        goal:         store.effectiveGoalMl,
-                        progress:     store.todayProgress,
-                        percent:      Int(store.todayProgress * 100),
-                        compensation: store.todayAlcoholCompensationMl
-                    )
-                    .padding(.horizontal)
-
-                    // MARK: Boutons d'action
-                    HStack(spacing: 12) {
-                        ActionButton(
-                            label:    L10n.homeAddWater,
-                            sfSymbol: "drop.fill",
-                            gradient: [Color(hex: "4DA8F5"), Color(hex: "2B87E8")]
-                        ) { showAddWater = true }
-
-                        ActionButton(
-                            label:    L10n.homeAddAlcohol,
-                            sfSymbol: "wineglass.fill",
-                            gradient: [Color(hex: "9B59B6"), Color(hex: "6C3483")]
-                        ) { showAddAlcool = true }
-                    }
-                    .padding(.horizontal)
-
-                    // MARK: Stats rapides
-                    HStack(spacing: 12) {
-                        StatCard(
-                            sfSymbol:    "flame.fill",
-                            symbolColor: .orange,
-                            label:       L10n.homeStreakLabel,
-                            value:       "\(store.currentStreak)",
-                            unit:        L10n.homeDays
-                        )
-                        StatCard(
-                            sfSymbol:    "leaf.fill",
-                            symbolColor: .green,
-                            label:       L10n.homeSoberLabel,
-                            value:       "\(store.soberDaysStreak)",
-                            unit:        L10n.homeDays
-                        )
-                    }
-                    .padding(.horizontal)
-
-                    // MARK: Activité récente
-                    RecentActivitySection(
-                        waterEntries:   store.todayWaterEntries(),
-                        alcoholEntries: store.todayAlcoholEntries()
-                    ) { entry in
-                        store.deleteWater(entry)
-                    } onDeleteAlcohol: { entry in
-                        store.deleteAlcohol(entry)
-                    }
-                    .padding(.horizontal)
+                    .padding(.bottom, 32)
                 }
-                .padding(.bottom, 32)
+                .background(Color("AppBackground"))
+                .navigationBarHidden(true)
+                .onChange(of: scrollToTopID) { _, _ in
+                    withAnimation(.easeOut(duration: 0.3)) { proxy.scrollTo("top") }
+                }
             }
-            .background(Color("AppBackground"))
-            .navigationBarHidden(true)
-            .onChange(of: scrollToTopID) { _, _ in
-                withAnimation(.easeOut(duration: 0.3)) { proxy.scrollTo("top") }
-            }
-            } // ScrollViewReader
             .sheet(isPresented: $showAddWater) {
                 AddWaterSheet(
                     isPresented: $showAddWater,
@@ -146,8 +146,8 @@ struct HomeView: View {
             }
             .onChange(of: openAddWater) { _, shouldOpen in
                 if shouldOpen {
-                    showAddWater  = true
-                    openAddWater  = false
+                    showAddWater = true
+                    openAddWater = false
                 }
             }
         }
@@ -157,7 +157,7 @@ struct HomeView: View {
 // MARK: - Bannière canicule
 
 struct HeatwaveBanner: View {
-    let tempC:     Double
+    let tempC: Double
     let adaptedMl: Double
 
     var body: some View {
@@ -202,10 +202,10 @@ struct HeatwaveBanner: View {
 // MARK: - Carte de progression
 
 struct ProgressCard: View {
-    let current:      Double
-    let goal:         Double
-    let progress:     Double
-    let percent:      Int
+    let current: Double
+    let goal: Double
+    let progress: Double
+    let percent: Int
     var compensation: Double = 0
 
     var body: some View {
@@ -288,10 +288,10 @@ struct ProgressCard: View {
 // MARK: - Bouton d'action
 
 struct ActionButton: View {
-    let label:    String
+    let label: String
     let sfSymbol: String
     let gradient: [Color]
-    let action:   () -> Void
+    let action: () -> Void
 
     var body: some View {
         Button(action: action) {
@@ -324,11 +324,11 @@ struct ActionButton: View {
 // MARK: - Carte statistique
 
 struct StatCard: View {
-    let sfSymbol:    String
+    let sfSymbol: String
     let symbolColor: Color
-    let label:       String
-    let value:       String
-    let unit:        String
+    let label: String
+    let value: String
+    let unit: String
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
@@ -368,17 +368,74 @@ struct StatCard: View {
     }
 }
 
-// MARK: - Activité récente
+// MARK: - SwipeToDeleteView
+struct SwipeToDeleteView<Content: View>: View {
+    let content: Content
+    let onDelete: () -> Void
 
+    @State private var offset: CGFloat = 0
+
+    init(@ViewBuilder content: () -> Content, onDelete: @escaping () -> Void) {
+        self.content = content()
+        self.onDelete = onDelete
+    }
+
+    var body: some View {
+        ZStack(alignment: .leading) {
+            Rectangle()
+                .fill(Color.red.opacity(0.2))
+                .frame(height: 50)
+                .overlay(
+                    Image(systemName: "trash.fill")
+                        .font(.system(size: 18, weight: .bold))
+                        .foregroundColor(.red)
+                        .padding(.leading, 24)
+                        .opacity(offset < -40 ? 1 : 0)
+                )
+                .cornerRadius(16)
+                .padding(.horizontal, 16)
+
+            content
+                .offset(x: offset)
+                .gesture(
+                    DragGesture()
+                        .onChanged { value in
+                            if value.translation.width < 0 {
+                                offset = value.translation.width
+                            }
+                        }
+                        .onEnded { value in
+                            if value.translation.width < -80 {
+                                withAnimation(.easeInOut(duration: 0.2)) {
+                                    offset = -UIScreen.main.bounds.width
+                                }
+                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                                    onDelete()
+                                    withAnimation(.easeInOut(duration: 0.2)) {
+                                        offset = 0
+                                    }
+                                }
+                            } else {
+                                withAnimation(.spring()) {
+                                    offset = 0
+                                }
+                            }
+                        }
+                )
+        }
+    }
+}
+
+// MARK: - Activité récente
 struct RecentActivitySection: View {
-    let waterEntries:    [WaterEntry]
-    let alcoholEntries:  [WaterAlcoholEntry]
-    let onDeleteWater:   (WaterEntry) -> Void
+    let waterEntries: [WaterEntry]
+    let alcoholEntries: [WaterAlcoholEntry]
+    let onDeleteWater: (WaterEntry) -> Void
     let onDeleteAlcohol: (WaterAlcoholEntry) -> Void
 
     private let timeFormatter: DateFormatter = {
         let f = DateFormatter()
-        f.locale     = Locale.current
+        f.locale = Locale.current
         f.dateFormat = "HH:mm"
         return f
     }()
@@ -386,20 +443,20 @@ struct RecentActivitySection: View {
     private var items: [ActivityItem] {
         let water = waterEntries.map {
             ActivityItem(
-                id:    $0.id.uuidString,
+                id: $0.id.uuidString,
                 label: String(format: String(localized: "activity.water_entry"), Int($0.amountMl)),
-                time:  timeFormatter.string(from: $0.date),
-                date:  $0.date,
-                kind:  .water($0)
+                time: timeFormatter.string(from: $0.date),
+                date: $0.date,
+                kind: .water($0)
             )
         }
         let alcohol = alcoholEntries.map {
             ActivityItem(
-                id:    $0.id.uuidString,
+                id: $0.id.uuidString,
                 label: "\(UnitFormatter.volume($0.amountMl)) \($0.alcoholType.localizedName)",
-                time:  timeFormatter.string(from: $0.date),
-                date:  $0.date,
-                kind:  .alcohol($0)
+                time: timeFormatter.string(from: $0.date),
+                date: $0.date,
+                kind: .alcohol($0)
             )
         }
         return (water + alcohol).sorted { $0.date > $1.date }
@@ -435,44 +492,48 @@ struct RecentActivitySection: View {
             } else {
                 VStack(spacing: 0) {
                     ForEach(Array(items.enumerated()), id: \.element.id) { index, item in
-                        HStack(spacing: 16) {
-                            ZStack {
-                                Circle()
-                                    .fill(item.isWater
-                                          ? Color(hex: "EEF4FF")
-                                          : Color(hex: "F3E5F5"))
-                                    .frame(width: 40, height: 40)
-                                Image(systemName: item.isWater ? "drop.fill" : "wineglass.fill")
-                                    .accessibilityHidden(true)
-                                    .font(.system(size: 16, weight: .medium))
-                                    .foregroundColor(item.isWater
-                                                     ? Color(hex: "4DA8F5")
-                                                     : Color(hex: "8B5CF6"))
-                            }
-                            VStack(alignment: .leading, spacing: 2) {
-                                Text(item.label)
-                                    .font(.system(size: 15, weight: .semibold))
-                                Text(item.time)
-                                    .font(.system(size: 13))
-                                    .foregroundColor(.secondary)
-                            }
-                            Spacer()
-                            Button {
-                                switch item.kind {
-                                case .water(let e):   onDeleteWater(e)
-                                case .alcohol(let e): onDeleteAlcohol(e)
+                        SwipeToDeleteView {
+                            HStack(spacing: 16) {
+                                ZStack {
+                                    Circle()
+                                        .fill(item.isWater ? Color(hex: "EEF4FF") : Color(hex: "F3E5F5"))
+                                        .frame(width: 40, height: 40)
+                                    Image(systemName: item.isWater ? "drop.fill" : "wineglass.fill")
+                                        .accessibilityHidden(true)
+                                        .font(.system(size: 16, weight: .medium))
+                                        .foregroundColor(item.isWater ? Color(hex: "4DA8F5") : Color(hex: "8B5CF6"))
                                 }
-                            } label: {
-                                Image(systemName: "trash")
-                                    .font(.system(size: 13))
-                                    .foregroundColor(.red.opacity(0.6))
-                                    .padding(8)
+                                VStack(alignment: .leading, spacing: 2) {
+                                    Text(item.label)
+                                        .font(.system(size: 15, weight: .semibold))
+                                    Text(item.time)
+                                        .font(.system(size: 13))
+                                        .foregroundColor(.secondary)
+                                }
+                                Spacer()
+                                Button {
+                                    switch item.kind {
+                                    case .water(let e): onDeleteWater(e)
+                                    case .alcohol(let e): onDeleteAlcohol(e)
+                                    }
+                                } label: {
+                                    Image(systemName: "trash")
+                                        .font(.system(size: 13))
+                                        .foregroundColor(.red.opacity(0.6))
+                                        .padding(8)
+                                }
+                                .accessibilityLabel(String(format: String(localized: "accessibility.delete_entry"), item.label))
+                                .accessibilityHint(String(localized: "accessibility.delete_hint"))
                             }
-                            .accessibilityLabel(String(format: String(localized: "accessibility.delete_entry"), item.label))
-                            .accessibilityHint(String(localized: "accessibility.delete_hint"))
+                            .padding(.horizontal, 16)
+                            .padding(.vertical, 12)
+                        } onDelete: {
+                            switch item.kind {
+                            case .water(let e): onDeleteWater(e)
+                            case .alcohol(let e): onDeleteAlcohol(e)
+                            }
+                            HapticManager.shared.entryDeleted()
                         }
-                        .padding(.horizontal, 16)
-                        .padding(.vertical, 12)
 
                         if index < items.count - 1 {
                             Divider().padding(.leading, 72)
@@ -488,13 +549,12 @@ struct RecentActivitySection: View {
 }
 
 // MARK: - ActivityItem
-
 private struct ActivityItem {
-    let id:    String
+    let id: String
     let label: String
-    let time:  String
-    let date:  Date
-    let kind:  ActivityKind
+    let time: String
+    let date: Date
+    let kind: ActivityKind
 
     var isWater: Bool {
         if case .water = kind { return true }
@@ -508,16 +568,15 @@ private enum ActivityKind {
 }
 
 // MARK: - Preview
-
 #Preview {
     let config = ModelConfiguration(isStoredInMemoryOnly: true)
     let container = try! ModelContainer(
         for: WaterEntry.self, WaterAlcoholEntry.self, DayRecord.self,
         configurations: config
     )
-    let store           = AppDataStore(modelContext: container.mainContext)
+    let store = AppDataStore(modelContext: container.mainContext)
     let confettiManager = ConfettiManager()
-    let weatherManager  = WeatherManager(store: store)
+    let weatherManager = WeatherManager(store: store)
     HomeView()
         .environmentObject(store)
         .environmentObject(confettiManager)
