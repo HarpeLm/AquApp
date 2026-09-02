@@ -23,12 +23,6 @@ enum ChallengeCategory: String {
     }
 }
 
-enum ChallengeStatus {
-    case locked
-    case available
-    case inProgress
-    case completed
-}
 
 // MARK: - Challenge Model
 
