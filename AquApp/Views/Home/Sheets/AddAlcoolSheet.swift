@@ -1,12 +1,11 @@
 import SwiftUI
 
 // MARK: - AlcoholDrink
-
 struct AlcoholDrink: Identifiable {
-    let id: String          // ID stable (pas UUID) pour éviter la perte d'état au rerendu
-    let name:           String
-    let sfSymbol:       String
-    let symbolColor:    Color
+    let id: String
+    let name: String
+    let sfSymbol: String
+    let symbolColor: Color
     let alcoholPercent: Double
 
     func compensation(for volumeMl: Double) -> Double {
@@ -19,29 +18,27 @@ struct AlcoholDrink: Identifiable {
 }
 
 // MARK: - AlcoholDisplayEntry
-
 struct AlcoholDisplayEntry: Identifiable {
-    let id             = UUID()
-    let drinkName:      String
-    let sfSymbol:       String
-    let volumeMl:       Double
+    let id = UUID()
+    let drinkName: String
+    let sfSymbol: String
+    let volumeMl: Double
     let compensationMl: Double
-    let date:           Date
-    let storeRef:       WaterAlcoholEntry
+    let date: Date
+    let storeRef: WaterAlcoholEntry
 }
 
 // MARK: - AddAlcoolSheet
-
 struct AddAlcoolSheet: View {
     @Binding var isPresented: Bool
     @EnvironmentObject var store: AppDataStore
 
-    @State private var expandedDrinkID: String? = nil   // String? au lieu de UUID?
-    @State private var showCustomForm:  Bool   = false
-    @State private var showHistory:     Bool   = false
-    @State private var customName:      String = ""
-    @State private var customAlcohol:   String = ""
-    @State private var customDrinks:    [AlcoholDrink] = []
+    @State private var expandedDrinkID: String? = nil
+    @State private var showCustomForm: Bool = false
+    @State private var showHistory: Bool = false
+    @State private var customName: String = ""
+    @State private var customAlcohol: String = ""
+    @State private var customDrinks: [AlcoholDrink] = []
     @State private var showAddedFeedback: String? = nil
 
     @FocusState private var focusedField: CustomField?
@@ -49,24 +46,23 @@ struct AddAlcoolSheet: View {
 
     var quantityPresets: [(label: String, sublabel: String, ml: Double)] {
         [
-            (UnitFormatter.volumeDecimal(25),  String(localized: "alcohol.preset.shot"),         25),
-            (UnitFormatter.volumeDecimal(50),  String(localized: "alcohol.preset.double_shot"),  50),
-            (UnitFormatter.volume(125),        String(localized: "alcohol.preset.flute"),        125),
-            (UnitFormatter.volume(150),        String(localized: "alcohol.preset.glass"),        150),
-            (UnitFormatter.volume(250),        String(localized: "alcohol.preset.large_glass"),  250),
-            (UnitFormatter.volume(330),        String(localized: "alcohol.preset.can"),          330),
-            (UnitFormatter.volume(500),        String(localized: "alcohol.preset.large_bottle"), 500),
+            (UnitFormatter.volumeDecimal(25), String(localized: "alcohol.preset.shot"), 25),
+            (UnitFormatter.volumeDecimal(50), String(localized: "alcohol.preset.double_shot"), 50),
+            (UnitFormatter.volume(125), String(localized: "alcohol.preset.flute"), 125),
+            (UnitFormatter.volume(150), String(localized: "alcohol.preset.glass"), 150),
+            (UnitFormatter.volume(250), String(localized: "alcohol.preset.large_glass"), 250),
+            (UnitFormatter.volume(330), String(localized: "alcohol.preset.can"), 330),
+            (UnitFormatter.volume(500), String(localized: "alcohol.preset.large_bottle"), 500),
         ]
     }
 
-    // IDs stables — ne dépendent PAS d'UUID() pour survivre aux rerenders
     var defaultDrinks: [AlcoholDrink] {
         [
-            AlcoholDrink(id: "beer",      name: String(localized: "alcohol.beer"),      sfSymbol: "mug.fill",       symbolColor: Color(hex: "D4A017"), alcoholPercent: 5),
-            AlcoholDrink(id: "wine",      name: String(localized: "alcohol.wine"),      sfSymbol: "wineglass.fill", symbolColor: Color(hex: "8B5CF6"), alcoholPercent: 12),
-            AlcoholDrink(id: "spirits",   name: String(localized: "alcohol.spirits"),   sfSymbol: "cylinder.fill",  symbolColor: Color(hex: "EF4444"), alcoholPercent: 40),
-            AlcoholDrink(id: "champagne", name: String(localized: "alcohol.champagne"), sfSymbol: "sparkles",       symbolColor: Color(hex: "F59E0B"), alcoholPercent: 12),
-            AlcoholDrink(id: "cocktail",  name: String(localized: "alcohol.cocktail"),  sfSymbol: "wineglass",      symbolColor: Color(hex: "10B981"), alcoholPercent: 10),
+            AlcoholDrink(id: "beer", name: String(localized: "alcohol.beer"), sfSymbol: "mug.fill", symbolColor: Color(hex: "D4A017"), alcoholPercent: 5),
+            AlcoholDrink(id: "wine", name: String(localized: "alcohol.wine"), sfSymbol: "wineglass.fill", symbolColor: Color(hex: "8B5CF6"), alcoholPercent: 12),
+            AlcoholDrink(id: "spirits", name: String(localized: "alcohol.spirits"), sfSymbol: "cylinder.fill", symbolColor: Color(hex: "EF4444"), alcoholPercent: 40),
+            AlcoholDrink(id: "champagne", name: String(localized: "alcohol.champagne"), sfSymbol: "sparkles", symbolColor: Color(hex: "F59E0B"), alcoholPercent: 12),
+            AlcoholDrink(id: "cocktail", name: String(localized: "alcohol.cocktail"), sfSymbol: "wineglass", symbolColor: Color(hex: "10B981"), alcoholPercent: 10),
         ]
     }
 
@@ -75,17 +71,17 @@ struct AddAlcoolSheet: View {
     var todayDisplayEntries: [AlcoholDisplayEntry] {
         store.todayAlcoholEntries().map { entry in
             AlcoholDisplayEntry(
-                drinkName:      entry.alcoholType.localizedName,
-                sfSymbol:       entry.alcoholType.sfSymbol,
-                volumeMl:       entry.amountMl,
+                drinkName: entry.alcoholType.localizedName,
+                sfSymbol: entry.alcoholType.sfSymbol,
+                volumeMl: entry.amountMl,
                 compensationMl: entry.compensationMl,
-                date:           entry.date,
-                storeRef:       entry
+                date: entry.date,
+                storeRef: entry
             )
         }
     }
 
-    var totalVolumeTodayMl:       Double { todayDisplayEntries.reduce(0) { $0 + $1.volumeMl } }
+    var totalVolumeTodayMl: Double { todayDisplayEntries.reduce(0) { $0 + $1.volumeMl } }
     var totalCompensationTodayMl: Double { todayDisplayEntries.reduce(0) { $0 + $1.compensationMl } }
 
     var body: some View {
@@ -166,7 +162,6 @@ struct AddAlcoolSheet: View {
     }
 
     // MARK: - Vue Historique
-
     var historyView: some View {
         ScrollView {
             VStack(spacing: 16) {
@@ -228,13 +223,9 @@ struct AddAlcoolSheet: View {
                                     Image(systemName: "trash")
                                         .font(.system(size: 14))
                                         .foregroundColor(.red.opacity(0.6)).padding(10)
-                                        .accessibilityHidden(true)
                                 }
-                                .accessibilityLabel(String(format: String(localized: "accessibility.delete_entry"), entry.drinkName))
-                                .accessibilityHint(String(localized: "accessibility.delete_hint"))
                             }
                             .padding(.horizontal, 16).padding(.vertical, 10)
-                            Divider().padding(.leading, 70)
                         }
                     }
                     .background(Color("AppCardBackground")).cornerRadius(16)
@@ -247,7 +238,6 @@ struct AddAlcoolSheet: View {
     }
 
     // MARK: - Vue Ajout
-
     var addView: some View {
         ScrollView {
             VStack(spacing: 20) {
@@ -264,7 +254,7 @@ struct AddAlcoolSheet: View {
                     .transition(.move(edge: .top).combined(with: .opacity))
                 }
 
-                // Avertissement santé — au-dessus de la liste
+                // Avertissement santé
                 VStack(alignment: .leading, spacing: 10) {
                     HStack(spacing: 8) {
                         Image(systemName: "exclamationmark.triangle.fill")
@@ -275,9 +265,9 @@ struct AddAlcoolSheet: View {
                             .foregroundColor(Color(hex: "92400E"))
                     }
                     VStack(alignment: .leading, spacing: 6) {
-                        WarningRow(symbol: "drop.fill",          color: Color(hex: "4DA8F5"), text: String(localized: "alcohol.warning.hydration"))
-                        WarningRow(symbol: "heart.fill",         color: Color(hex: "EF4444"), text: String(localized: "alcohol.warning.limit"))
-                        WarningRow(symbol: "moon.fill",          color: Color(hex: "6C3483"), text: String(localized: "alcohol.warning.sober_days"))
+                        WarningRow(symbol: "drop.fill", color: Color(hex: "4DA8F5"), text: String(localized: "alcohol.warning.hydration"))
+                        WarningRow(symbol: "heart.fill", color: Color(hex: "EF4444"), text: String(localized: "alcohol.warning.limit"))
+                        WarningRow(symbol: "moon.fill", color: Color(hex: "6C3483"), text: String(localized: "alcohol.warning.sober_days"))
                         WarningRow(symbol: "brain.head.profile", color: Color(hex: "D97706"), text: String(localized: "alcohol.warning.health"))
                     }
                 }
@@ -332,6 +322,7 @@ struct AddAlcoolSheet: View {
                                 TextField(String(localized: "alcohol.custom.name_placeholder"), text: $customName)
                                     .focused($focusedField, equals: .name)
                                     .padding(12).background(Color(UIColor.systemGray6)).cornerRadius(10)
+                                    .withDoneButton() // ← BOUTON "TERMINÉ" AJOUTÉ
                             }
                             VStack(alignment: .leading, spacing: 6) {
                                 Text(String(localized: "alcohol.custom.abv_label"))
@@ -340,6 +331,7 @@ struct AddAlcoolSheet: View {
                                     .keyboardType(.decimalPad)
                                     .focused($focusedField, equals: .alcohol)
                                     .padding(12).background(Color(UIColor.systemGray6)).cornerRadius(10)
+                                    .withDoneButton() // ← BOUTON "TERMINÉ" AJOUTÉ
                             }
                             Button { saveCustomDrink() } label: {
                                 Text(String(localized: "alcohol.custom.save"))
@@ -373,12 +365,12 @@ struct AddAlcoolSheet: View {
     private func logDrink(_ drink: AlcoholDrink, volumeMl: Double) {
         let kind: AlcoholKind
         switch drink.id {
-        case "beer":      kind = .beer
-        case "wine":      kind = .wine
-        case "spirits":   kind = .spirits
+        case "beer": kind = .beer
+        case "wine": kind = .wine
+        case "spirits": kind = .spirits
         case "champagne": kind = .wine
-        case "cocktail":  kind = .cocktail
-        default:          kind = .other
+        case "cocktail": kind = .cocktail
+        default: kind = .other
         }
         store.addAlcohol(amountMl: volumeMl, type: kind)
         HapticManager.shared.alcoholAdded()
@@ -395,29 +387,29 @@ struct AddAlcoolSheet: View {
         guard let alc = Double(customAlcohol) else { return }
         let trimmedName = customName.trimmingCharacters(in: .whitespaces)
         let newDrink = AlcoholDrink(
-            id: "custom_\(trimmedName)_\(Int(alc))",   // ID stable basé sur le nom
+            id: "custom_\(trimmedName)_\(Int(alc))",
             name: trimmedName,
             sfSymbol: "wineglass",
             symbolColor: Color(hex: "8B5CF6"),
             alcoholPercent: alc
         )
         withAnimation { customDrinks.append(newDrink) }
-        customName = ""; customAlcohol = ""; showCustomForm = false
+        customName = ""
+        customAlcohol = ""
+        showCustomForm = false
     }
 }
 
 // MARK: - DrinkRow
-
 struct DrinkRow: View {
-    let drink:      AlcoholDrink
+    let drink: AlcoholDrink
     let isExpanded: Bool
-    let presets:    [(label: String, sublabel: String, ml: Double)]
-    let onTap:      () -> Void
-    let onAdd:      (Double) -> Void
+    let presets: [(label: String, sublabel: String, ml: Double)]
+    let onTap: () -> Void
+    let onAdd: (Double) -> Void
 
     var body: some View {
         VStack(spacing: 0) {
-            // Header — toujours tappable pour toggle
             HStack(spacing: 14) {
                 ZStack {
                     RoundedRectangle(cornerRadius: 10)
@@ -435,7 +427,7 @@ struct DrinkRow: View {
                     .font(.system(size: 13)).foregroundColor(.secondary)
             }
             .padding(16)
-            .contentShape(Rectangle())          // zone de tap = tout le header
+            .contentShape(Rectangle())
             .onTapGesture { onTap() }
 
             if isExpanded {
@@ -470,7 +462,6 @@ struct DrinkRow: View {
 }
 
 // MARK: - CustomQuantityRow
-
 struct CustomQuantityRow: View {
     let drink: AlcoholDrink
     let onAdd: (Double) -> Void
@@ -483,6 +474,7 @@ struct CustomQuantityRow: View {
             TextField(UnitFormatter.volumePlaceholder, text: $customMl)
                 .keyboardType(.numberPad).focused($isFocused)
                 .padding(10).background(Color(UIColor.systemGray6)).cornerRadius(10).font(.system(size: 14))
+                .withDoneButton() // ← BOUTON "TERMINÉ" AJOUTÉ
 
             if let ml = Double(customMl), ml > 0 {
                 VStack(spacing: 1) {
@@ -495,7 +487,9 @@ struct CustomQuantityRow: View {
 
             Button {
                 if let ml = Double(customMl), ml > 0 {
-                    onAdd(ml); customMl = ""; isFocused = false
+                    onAdd(ml)
+                    customMl = ""
+                    isFocused = false
                 }
             } label: {
                 ZStack {
@@ -515,11 +509,10 @@ struct CustomQuantityRow: View {
 }
 
 // MARK: - WarningRow
-
 private struct WarningRow: View {
     let symbol: String
-    let color:  Color
-    let text:   String
+    let color: Color
+    let text: String
 
     var body: some View {
         HStack(alignment: .top, spacing: 8) {

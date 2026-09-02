@@ -7,9 +7,10 @@ import SwiftUI
 struct NameEntryView: View {
     var onComplete: () -> Void
 
-    @State private var firstName:       String = ""
-    @State private var goToBodyProfile: Bool   = false
-    @FocusState private var isFocused:  Bool
+    @State private var firstName: String = ""
+    @State private var goToBodyProfile: Bool = false
+    @FocusState private var isFocused: Bool
+    @State private var keyboardHeight: CGFloat = 0
 
     var body: some View {
         ZStack {
@@ -19,110 +20,119 @@ struct NameEntryView: View {
                 BodyProfileView(onComplete: onComplete)
                     .transition(.move(edge: .trailing).combined(with: .opacity))
             } else {
-                VStack(spacing: 0) {
+                ScrollView {
+                    VStack(spacing: 0) {
 
-                    Spacer()
+                        Spacer(minLength: 20)
 
-                    // Illustration
-                    ZStack {
-                        Circle()
-                            .fill(Color(hex: "4DA8F5").opacity(0.10))
-                            .frame(width: 160, height: 160)
-                        Circle()
-                            .fill(Color(hex: "4DA8F5").opacity(0.07))
-                            .frame(width: 200, height: 200)
+                        // Illustration (réduite)
                         ZStack {
                             Circle()
-                                .fill(
-                                    LinearGradient(
-                                        colors: [Color(hex: "4DA8F5"), Color(hex: "2B87E8")],
-                                        startPoint: .topLeading,
-                                        endPoint: .bottomTrailing
+                                .fill(Color(hex: "4DA8F5").opacity(0.10))
+                                .frame(width: 140, height: 140)
+                            Circle()
+                                .fill(Color(hex: "4DA8F5").opacity(0.07))
+                                .frame(width: 170, height: 170)
+                            ZStack {
+                                Circle()
+                                    .fill(
+                                        LinearGradient(
+                                            colors: [Color(hex: "4DA8F5"), Color(hex: "2B87E8")],
+                                            startPoint: .topLeading,
+                                            endPoint: .bottomTrailing
+                                        )
                                     )
-                                )
-                                .frame(width: 110, height: 110)
-                                .shadow(color: Color(hex: "4DA8F5").opacity(0.4), radius: 20, x: 0, y: 8)
-                            Image(systemName: "person.fill")
-                                .font(.system(size: 48, weight: .medium))
-                                .foregroundColor(.white)
+                                    .frame(width: 90, height: 90)
+                                    .shadow(color: Color(hex: "4DA8F5").opacity(0.4), radius: 15, x: 0, y: 6)
+                                Image(systemName: "person.fill")
+                                    .font(.system(size: 40, weight: .medium))
+                                    .foregroundColor(.white)
+                            }
                         }
-                    }
-                    .padding(.bottom, 36)
+                        .padding(.bottom, 28)
 
-                    // Titre
-                    VStack(spacing: 12) {
-                        Text(String(localized: "onboarding.name"))
-                            .font(.system(size: 28, weight: .bold))
-                            .multilineTextAlignment(.center)
-                        Text(String(localized: "onboarding.name_sub"))
-                            .font(.system(size: 16))
-                            .foregroundColor(.secondary)
-                            .multilineTextAlignment(.center)
-                    }
-                    .padding(.horizontal, 28)
-                    .padding(.bottom, 40)
-
-                    // Champ de saisie
-                    TextField(String(localized: "onboarding.name_placeholder"), text: $firstName)
-                        .textContentType(.givenName)
-                        .autocorrectionDisabled()
-                        .submitLabel(.done)
-                        .focused($isFocused)
-                        .font(.system(size: 17))
-                        .padding(16)
-                        .background(Color("AppCardBackground"))
-                        .cornerRadius(14)
-                        .shadow(color: .black.opacity(0.05), radius: 8, x: 0, y: 2)
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 14)
-                                .stroke(
-                                    isFocused ? Color(hex: "4DA8F5") : Color.clear,
-                                    lineWidth: 1.5
-                                )
-                        )
+                        // Titre
+                        VStack(spacing: 12) {
+                            Text(String(localized: "onboarding.name"))
+                                .font(.system(size: 28, weight: .bold))
+                                .multilineTextAlignment(.center)
+                            Text(String(localized: "onboarding.name_sub"))
+                                .font(.system(size: 16))
+                                .foregroundColor(.secondary)
+                                .multilineTextAlignment(.center)
+                        }
                         .padding(.horizontal, 28)
-                        .onSubmit {
-                            if !isButtonDisabled { saveName() }
-                        }
+                        .padding(.bottom, 32)
 
-                    Spacer()
+                        // Champ de saisie + Bouton (remontent ensemble)
+                        VStack(spacing: 16) {
+                            TextField(String(localized: "onboarding.name_placeholder"), text: $firstName)
+                                .textContentType(.givenName)
+                                .autocorrectionDisabled()
+                                .submitLabel(.done)
+                                .focused($isFocused)
+                                .font(.system(size: 17))
+                                .padding(16)
+                                .background(Color("AppCardBackground"))
+                                .cornerRadius(14)
+                                .shadow(color: .black.opacity(0.05), radius: 8, x: 0, y: 2)
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 14)
+                                        .stroke(
+                                            isFocused ? Color(hex: "4DA8F5") : Color.clear,
+                                            lineWidth: 1.5
+                                        )
+                                )
+                                .withDoneButton() // ← BOUTON "TERMINÉ" AJOUTÉ
+                                .onSubmit {
+                                    if !isButtonDisabled { saveName() }
+                                }
 
-                    // Bouton continuer
-                    Button { saveName() } label: {
-                        HStack(spacing: 8) {
-                            Text(String(localized: "onboarding.continue"))
-                                .font(.system(size: 18, weight: .bold))
-                            Image(systemName: "arrow.right")
-                                .font(.system(size: 16, weight: .bold))
-                                .accessibilityHidden(true)
+                            // Bouton continuer
+                            Button { saveName() } label: {
+                                Image(systemName: "arrow.right")
+                                    .font(.system(size: 18, weight: .bold))
+                                    .foregroundColor(.white)
+                                    .frame(maxWidth: .infinity)
+                                    .frame(height: 56)
+                                    .background(
+                                        LinearGradient(
+                                            colors: isButtonDisabled
+                                                ? [Color(UIColor.systemGray3), Color(UIColor.systemGray3)]
+                                                : [Color(hex: "4DA8F5"), Color(hex: "2B87E8")],
+                                            startPoint: .leading,
+                                            endPoint: .trailing
+                                        )
+                                    )
+                                    .cornerRadius(16)
+                                    .shadow(
+                                        color: isButtonDisabled ? .clear : Color(hex: "4DA8F5").opacity(0.4),
+                                        radius: 10, x: 0, y: 4
+                                    )
+                            }
+                            .disabled(isButtonDisabled)
                         }
-                        .foregroundColor(.white)
-                        .frame(maxWidth: .infinity)
-                        .frame(height: 56)
-                        .background(
-                            LinearGradient(
-                                colors: isButtonDisabled
-                                    ? [Color(UIColor.systemGray3), Color(UIColor.systemGray3)]
-                                    : [Color(hex: "4DA8F5"), Color(hex: "2B87E8")],
-                                startPoint: .leading,
-                                endPoint: .trailing
-                            )
-                        )
-                        .cornerRadius(16)
-                        .shadow(
-                            color: isButtonDisabled ? .clear : Color(hex: "4DA8F5").opacity(0.4),
-                            radius: 10, x: 0, y: 4
-                        )
+                        .padding(.horizontal, 28)
+                        .padding(.bottom, keyboardHeight)
+                        .padding(.bottom, 20)
                     }
-                    .disabled(isButtonDisabled)
-                    .padding(.horizontal, 28)
-                    .padding(.bottom, 48)
-                    .animation(.easeInOut(duration: 0.2), value: isButtonDisabled)
+                    .transition(.move(edge: .leading).combined(with: .opacity))
                 }
-                .transition(.move(edge: .leading).combined(with: .opacity))
+                .onAppear { isFocused = true }
+                .onReceive(NotificationCenter.default.publisher(for: UIResponder.keyboardWillShowNotification)) { notification in
+                    if let keyboardFrame = notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect {
+                        withAnimation(.easeOut(duration: 0.25)) {
+                            keyboardHeight = keyboardFrame.height - 34
+                        }
+                    }
+                }
+                .onReceive(NotificationCenter.default.publisher(for: UIResponder.keyboardWillHideNotification)) { _ in
+                    withAnimation(.easeOut(duration: 0.25)) {
+                        keyboardHeight = 0
+                    }
+                }
             }
         }
-        .onAppear { isFocused = true }
     }
 
     private var isButtonDisabled: Bool {
