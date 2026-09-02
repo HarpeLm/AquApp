@@ -88,30 +88,31 @@ struct OnboardingView: View {
                                 }
                             }
                         } label: {
-                            HStack(spacing: 8) {
-                                Text(currentPage < pages.count - 1
-                                     ? String(localized: "onboarding.next")
-                                     : String(localized: "onboarding.start"))
+                            if currentPage < pages.count - 1 {
+                                HStack(spacing: 8) {
+                                    Text(String(localized: "onboarding.next"))
+                                        .font(.system(size: 18, weight: .bold))
+                                    Image(systemName: "arrow.right")
+                                        .font(.system(size: 16, weight: .bold))
+                                        .accessibilityHidden(true)
+                                }
+                            } else {
+                                Image(systemName: "arrow.right")
                                     .font(.system(size: 18, weight: .bold))
-                                Image(systemName: currentPage < pages.count - 1
-                                      ? "arrow.right"
-                                      : "arrow.right.circle.fill")
-                                    .font(.system(size: 16, weight: .bold))
-                                    .accessibilityHidden(true)
                             }
-                            .foregroundColor(.white)
-                            .frame(maxWidth: .infinity)
-                            .frame(height: 56)
-                            .background(
-                                LinearGradient(
-                                    colors: pages[currentPage].gradient,
-                                    startPoint: .leading,
-                                    endPoint: .trailing
-                                )
-                            )
-                            .cornerRadius(16)
-                            .shadow(color: pages[currentPage].color.opacity(0.4), radius: 10, x: 0, y: 4)
                         }
+                        .foregroundColor(.white)
+                        .frame(maxWidth: .infinity)
+                        .frame(height: 56)
+                        .background(
+                            LinearGradient(
+                                colors: pages[currentPage].gradient,
+                                startPoint: .leading,
+                                endPoint: .trailing
+                            )
+                        )
+                        .cornerRadius(16)
+                        .shadow(color: pages[currentPage].color.opacity(0.4), radius: 10, x: 0, y: 4)
                         .animation(.easeInOut(duration: 0.2), value: currentPage)
 
                         // Passer
