@@ -263,7 +263,7 @@ struct AddWaterSheet: View {
                             .withDoneButton() // ← BOUTON "TERMINÉ" AJOUTÉ
 
                         Button {
-                            if let ml = Double(customAmount), ml > 0 {
+                            if let ml = Double(customAmount), ml > 0, ml <= 5000 {
                                 addWater(ml: ml)
                                 customAmount = ""
                                 isCustomFocused = false
