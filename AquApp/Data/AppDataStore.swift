@@ -137,6 +137,14 @@ final class AppDataStore: ObservableObject {
     // MARK: - Ajout eau
 
     func addWater(amountMl: Double, date: Date = Date()) {
+        // Garde-fou : un verre d'eau raisonnable est entre 0 et 5000 ml.
+        // Rejette silencieusement toute valeur aberrante (NaN, infini,
+        // négative, ou disproportionnée) avant qu'elle n'entre en base.
+        guard amountMl.isFinite, amountMl > 0, amountMl <= 5000 else {
+            print("⚠️ addWater — valeur rejetée: \(amountMl)")
+            return
+        }
+
         let wasGoalReached = todayGoalReached
 
         let entry = WaterEntry(amountMl: amountMl, date: date)
@@ -205,6 +213,13 @@ final class AppDataStore: ObservableObject {
     // MARK: - Ajout alcool
 
     func addAlcohol(amountMl: Double, type: AlcoholKind, date: Date = Date()) {
+        // Garde-fou : même logique que addWater — un verre d'alcool
+        // raisonnable reste sous 5000 ml.
+        guard amountMl.isFinite, amountMl > 0, amountMl <= 5000 else {
+            print("⚠️ addAlcohol — valeur rejetée: \(amountMl)")
+            return
+        }
+
         let entry = WaterAlcoholEntry(amountMl: amountMl, alcoholType: type, date: date)
         modelContext.insert(entry)
         save()
@@ -473,6 +488,17 @@ final class AppDataStore: ObservableObject {
                 let timestamp = entry["timestamp"] as? TimeInterval
             else { continue }
 
+            // Garde-fou : source externe (widget/Siri) non fiable — on rejette
+            // toute valeur aberrante avant qu'elle n'entre en base SwiftData.
+            guard amount.isFinite, amount > 0, amount <= 5000 else {
+                print("⚠️ flushWidgetPendingEntries — entrée rejetée, amountMl invalide: \(amount)")
+                continue
+            }
+            guard timestamp.isFinite, timestamp > 0 else {
+                print("⚠️ flushWidgetPendingEntries — entrée rejetée, timestamp invalide: \(timestamp)")
+                continue
+            }
+
             let date      = Date(timeIntervalSince1970: timestamp)
             let intentID  = entry["siriIntentID"] as? String
             let isAlcohol = entry["isAlcohol"] as? Bool ?? false
@@ -577,6 +603,46 @@ final class AppDataStore: ObservableObject {
             sortBy: [SortDescriptor(\.date, order: .reverse)]
         )
         return (try? modelContext.fetch(descriptor)) ?? []
+    }
+
+    // MARK: - Grille de contributions (365 jours)
+    // Fournit, pour chaque jour startOfDay des `days` derniers jours,
+    // le ratio net/objectif (0 si pas de donnée ou objectif non atteint,
+    // >0 sinon). Consommé par HydrationGridView — gratuit, aucune
+    // restriction Premium.
+    func contributionRatios(days: Int = 365) -> [Date: Double] {
+        let calendar = Calendar.current
+        let start    = calendar.date(byAdding: .day, value: -(days - 1), to: calendar.startOfDay(for: Date()))!
+
+        // NOTE : on évite volontairement un FetchDescriptor avec #Predicate
+        // ici. En environnement Xcode Previews (JIT), un #Predicate qui
+        // capture une variable externe (`start`) a provoqué des crashs bas
+        // niveau reproductibles dans SwiftData/AttributeGraph (SIGTRAP),
+        // y compris avec `try?` — l'erreur n'est pas catchable côté Swift
+        // car elle survient dans le moteur natif. Un fetch non filtré +
+        // filtrage en mémoire contourne la compilation du prédicat et
+        // reste largement assez rapide vu le faible volume de DayRecord.
+        let allRecords = (try? modelContext.fetch(FetchDescriptor<DayRecord>())) ?? []
+        let records = allRecords.filter { $0.date >= start }
+
+        var result: [Date: Double] = [:]
+        for record in records {
+            let day = calendar.startOfDay(for: record.date)
+            guard record.goalMl > 0 else { continue }
+            // On ne connaît que goalReached en historique (booléen), pas le
+            // volume exact du jour — sauf pour aujourd'hui où le cache donne
+            // la valeur en temps réel. On reconstruit un ratio représentatif :
+            // 1.0 si l'objectif est atteint, 0 sinon. Aujourd'hui est raffiné
+            // ci-dessous avec la vraie progression en cours.
+            result[day] = record.goalReached ? 1.0 : 0.0
+        }
+
+        // Aujourd'hui : ratio réel en cours (peut être entre 0 et 1, ou plus
+        // si dépassement), plus précis que le simple booléen goalReached.
+        let today = calendar.startOfDay(for: Date())
+        result[today] = todayProgress
+
+        return result
     }
 
     // MARK: - Pas (HealthKit) pour Marathonien
