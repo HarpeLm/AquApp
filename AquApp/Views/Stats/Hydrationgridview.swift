@@ -13,8 +13,9 @@ import SwiftData
 // "carte sombre" déjà utilisée dans WrappedView).
 //
 // Interactions :
-//   - Ouverture : la grille se scroll automatiquement sur la semaine
-//     courante (sinon l'utilisateur atterrit sur J-364, peu utile).
+//   - Ouverture : la grille se positionne directement sur la semaine
+//     courante (defaultScrollAnchor .trailing — sinon l'utilisateur
+//     atterrit sur J-364, peu utile).
 //   - La case du jour courant a un anneau distinctif.
 //   - Tap sur une case : popup avec la date + le volume du jour, et une
 //     onde animée façon "goutte d'eau" se propage depuis la case tapée.
@@ -85,18 +86,17 @@ struct HydrationGridView: View {
 
             header
 
-            ScrollViewReader { proxy in
-                ScrollView(.horizontal, showsIndicators: false) {
-                    gridBody
-                        .padding(.horizontal, 20)
-                }
-                .padding(.bottom, 12)
-                .onAppear {
-                    // Scroll auto vers la semaine courante — sans animation
-                    // pour que ça n'aie pas l'air d'un "saut" au chargement.
-                    scrollToToday(proxy: proxy, animated: false)
-                }
+            ScrollView(.horizontal, showsIndicators: false) {
+                gridBody
+                    .padding(.horizontal, 20)
             }
+            // La grille s'ouvre directement sur la fin (semaine courante) —
+            // comme GitHub. On utilise defaultScrollAnchor plutôt que
+            // ScrollViewReader.scrollTo : ce dernier dépend du timing
+            // d'onAppear et restait de façon fiable sur la position 0
+            // (grille affichée sur les mois anciens, aujourd'hui hors écran).
+            .defaultScrollAnchor(.trailing)
+            .padding(.bottom, 12)
 
             legend
         }
@@ -199,23 +199,6 @@ struct HydrationGridView: View {
         print("🔍 [HydrationGrid] refreshToday — today=\(today) ratio=\(ratiosByDay[today]!) todayWaterMl=\(store.todayWaterMl) goal=\(goal)")
     }
 
-    /// Fait défiler la grille jusqu'à la semaine courante.
-    private func scrollToToday(proxy: ScrollViewProxy, animated: Bool) {
-        let today = calendar.startOfDay(for: Date())
-        // L'identifiant utilisé par ForEach est l'offset de semaine — on le
-        // retrouve en comptant le nombre de jours entre gridStart et
-        // aujourd'hui, divisé par 7.
-        let daysSinceStart = calendar.dateComponents([.day], from: gridStart, to: today).day ?? 0
-        let weekOffset = max(0, daysSinceStart / 7)
-        if animated {
-            withAnimation(.easeInOut(duration: 0.4)) {
-                proxy.scrollTo(weekOffset, anchor: .trailing)
-            }
-        } else {
-            proxy.scrollTo(weekOffset, anchor: .trailing)
-        }
-    }
-
     // MARK: - Corps de la grille
 
     private var gridBody: some View {
@@ -300,10 +283,10 @@ struct HydrationGridView: View {
     private var legendSwatches: [Color] {
         [
             Color(hex: "161B22"),
-            Color(hex: "0C2D48"),
-            Color(hex: "0D4F8B"),
-            Color(hex: "1F6FEB"),
-            Color(hex: "58A6FF"),
+            GridPalette.level1,
+            GridPalette.level2,
+            GridPalette.level3,
+            GridPalette.level4,
         ]
     }
 
@@ -341,6 +324,18 @@ struct HydrationGridView: View {
     }
 }
 
+// MARK: - Palette de la grille
+// Partagée entre DayCell (remplissage) et la légende pour rester cohérents.
+// Niveau 1 volontairement assez lumineux pour être distingué du fond
+// "case vide" même sur l'écran sombre de la carte.
+
+private enum GridPalette {
+    static let level1 = Color(hex: "11497A") // < 50 % de l'objectif
+    static let level2 = Color(hex: "1F6FEB") // 50–85 %
+    static let level3 = Color(hex: "58A6FF") // 85–100 %
+    static let level4 = Color(hex: "A5D8FF") // objectif atteint/dépassé
+}
+
 // MARK: - DayCell
 
 private struct DayCell: View {
@@ -359,10 +354,10 @@ private struct DayCell: View {
         guard !isFuture else { return Color(hex: "0D1117") }
         guard let ratio, ratio > 0 else { return Color(hex: "161B22") }
         switch ratio {
-        case ..<0.5:  return Color(hex: "0C2D48")
-        case ..<0.85: return Color(hex: "0D4F8B")
-        case ..<1.0:  return Color(hex: "1F6FEB")
-        default:      return Color(hex: "58A6FF")
+        case ..<0.5:  return GridPalette.level1
+        case ..<0.85: return GridPalette.level2
+        case ..<1.0:  return GridPalette.level3
+        default:      return GridPalette.level4
         }
     }
 
