@@ -612,7 +612,8 @@ final class AppDataStore: ObservableObject {
     // restriction Premium.
     func contributionRatios(days: Int = 365) -> [Date: Double] {
         let calendar = Calendar.current
-        let start    = calendar.date(byAdding: .day, value: -(days - 1), to: calendar.startOfDay(for: Date()))!
+        let today    = calendar.startOfDay(for: Date())
+        let start    = calendar.date(byAdding: .day, value: -(days - 1), to: today)!
 
         // NOTE : on évite volontairement un FetchDescriptor avec #Predicate
         // ici. En environnement Xcode Previews (JIT), un #Predicate qui
@@ -621,25 +622,52 @@ final class AppDataStore: ObservableObject {
         // y compris avec `try?` — l'erreur n'est pas catchable côté Swift
         // car elle survient dans le moteur natif. Un fetch non filtré +
         // filtrage en mémoire contourne la compilation du prédicat et
-        // reste largement assez rapide vu le faible volume de DayRecord.
+        // reste largement assez rapide vu le faible volume de données.
+        let allWater   = (try? modelContext.fetch(FetchDescriptor<WaterEntry>())) ?? []
+        let allAlcohol = (try? modelContext.fetch(FetchDescriptor<WaterAlcoholEntry>())) ?? []
         let allRecords = (try? modelContext.fetch(FetchDescriptor<DayRecord>())) ?? []
-        let records = allRecords.filter { $0.date >= start }
 
-        var result: [Date: Double] = [:]
-        for record in records {
-            let day = calendar.startOfDay(for: record.date)
-            guard record.goalMl > 0 else { continue }
-            // On ne connaît que goalReached en historique (booléen), pas le
-            // volume exact du jour — sauf pour aujourd'hui où le cache donne
-            // la valeur en temps réel. On reconstruit un ratio représentatif :
-            // 1.0 si l'objectif est atteint, 0 sinon. Aujourd'hui est raffiné
-            // ci-dessous avec la vraie progression en cours.
-            result[day] = record.goalReached ? 1.0 : 0.0
+        // Volume net réel par jour : somme des entrées d'eau moins la
+        // compensation alcool. C'est ce qui permet d'afficher des teintes
+        // intermédiaires (jour partiel) et pas seulement binaire atteint/
+        // non atteint comme le booléen DayRecord.goalReached.
+        var waterByDay: [Date: Double] = [:]
+        for entry in allWater where entry.date >= start {
+            waterByDay[calendar.startOfDay(for: entry.date), default: 0] += entry.amountMl
+        }
+        var alcoholCompByDay: [Date: Double] = [:]
+        for entry in allAlcohol where entry.date >= start {
+            alcoholCompByDay[calendar.startOfDay(for: entry.date), default: 0] += entry.compensationMl
         }
 
-        // Aujourd'hui : ratio réel en cours (peut être entre 0 et 1, ou plus
-        // si dépassement), plus précis que le simple booléen goalReached.
-        let today = calendar.startOfDay(for: Date())
+        // Objectif du jour : celui persisté dans DayRecord s'il existe
+        // (l'objectif a pu changer dans l'année), sinon l'objectif courant.
+        var goalByDay: [Date: Double] = [:]
+        for record in allRecords where record.date >= start {
+            goalByDay[calendar.startOfDay(for: record.date)] = record.goalMl
+        }
+
+        var result: [Date: Double] = [:]
+        var allDays = Set(waterByDay.keys)
+        allDays.formUnion(goalByDay.keys)
+        for day in allDays where day <= today {
+            let net  = max(0, (waterByDay[day] ?? 0) - (alcoholCompByDay[day] ?? 0))
+            let goal = goalByDay[day] ?? dailyGoalMl
+            guard goal > 0 else { continue }
+            // Jour sans aucune entrée d'eau : on retombe sur le booléen
+            // historique (1.0 si objectif atteint ce jour-là, sinon rien —
+            // la case reste vide comme sur la grille GitHub).
+            if waterByDay[day] == nil {
+                if let reached = allRecords.first(where: { calendar.startOfDay(for: $0.date) == day })?.goalReached, reached {
+                    result[day] = 1.0
+                }
+                continue
+            }
+            result[day] = net / goal
+        }
+
+        // Aujourd'hui : ratio réel en cours depuis le cache (peut être
+        // entre 0 et 1, ou plus si dépassement) — plus à jour qu'un fetch.
         result[today] = todayProgress
 
         return result
