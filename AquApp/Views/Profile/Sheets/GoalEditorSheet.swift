@@ -13,8 +13,14 @@ struct GoalEditorSheet: View {
     @AppStorage("userGender")   private var genderRaw: String = "notSpecified"
 
     var calculatedGoalFromProfile: Double {
-        let base      = weightKg * 35
-        let heightAdj = (heightCm - 170) * 5
+        // Garde-fou : si une valeur corrompue a été persistée (ex. via une
+        // ancienne écriture non validée), on retombe sur des bornes saines
+        // plutôt que de laisser le calcul exploser.
+        let safeWeightKg = weightKg.isFinite ? min(max(weightKg, 30), 200) : 70
+        let safeHeightCm = heightCm.isFinite ? min(max(heightCm, 140), 220) : 170
+
+        let base      = safeWeightKg * 35
+        let heightAdj = (safeHeightCm - 170) * 5
         let genderAdj: Double
         switch genderRaw {
         case "male":   genderAdj = 200
@@ -152,7 +158,14 @@ struct GoalEditorSheet: View {
                                     Text(String(localized: "goal.editor.recalculate"))
                                         .font(.system(size: 14, weight: .semibold))
                                         .foregroundColor(Color(hex: "4DA8F5"))
-                                    Text(String(format: String(localized: "goal.editor.recalculate_sub"), UnitFormatter.weight(weightKg), UnitFormatter.height(Double(heightCm)), UnitFormatter.volume(calculatedGoalFromProfile)))
+                                    // ⚠️ Ne pas utiliser String(format:) ici : la chaîne localisée
+                                    // "goal.editor.recalculate_sub" attend des %@ (String), mais si
+                                    // une traduction contient par erreur des %d, String(format:) ne
+                                    // plante pas — il réinterprète les bits du pointeur de la String
+                                    // comme un entier, ce qui produit des nombres énormes à l'écran
+                                    // (ex. 1172255776). On construit donc la chaîne à la main,
+                                    // insensible au format de la traduction.
+                                    Text("\(UnitFormatter.weight(weightKg)) · \(UnitFormatter.height(Double(heightCm))) → \(UnitFormatter.volume(calculatedGoalFromProfile))")
                                         .font(.system(size: 12))
                                         .foregroundColor(.secondary)
                                 }
@@ -180,7 +193,10 @@ struct GoalEditorSheet: View {
                         } label: {
                             HStack(spacing: 6) {
                                 Image(systemName: "arrow.counterclockwise").font(.system(size: 13))
-                                Text(String(format: String(localized: "goal.editor.reset_to_profile"), UnitFormatter.volume(calculatedGoalFromProfile)))
+                                // ⚠️ Même précaution que plus haut : on évite String(format:)
+                                // avec une String en argument pour ne pas dépendre d'un éventuel
+                                // %d au lieu de %@ dans la traduction de "goal.editor.reset_to_profile".
+                                Text(resetToProfileLabel(UnitFormatter.volume(calculatedGoalFromProfile)))
                                     .font(.system(size: 13))
                             }
                             .foregroundColor(.secondary)
@@ -212,7 +228,9 @@ struct GoalEditorSheet: View {
 
                     // Bouton enregistrer
                     Button {
-                        dailyGoalMl = localGoal
+                        // Garde-fou : évite de persister une valeur aberrante
+                        // si localGoal a été affecté par une donnée corrompue.
+                        dailyGoalMl = localGoal.isFinite ? min(max(localGoal, 500), 5000) : 2170
                         isPresented = false
                     } label: {
                         HStack(spacing: 8) {
@@ -299,6 +317,33 @@ private struct SuggestionCard: View {
             .shadow(color: .black.opacity(0.04), radius: 4, x: 0, y: 2)
         }
     }
+}
+
+// MARK: - Helpers de formatage sûrs
+// String(format:) avec un %d dans la traduction alors qu'on passe une String
+// ne plante pas — il réinterprète les bits du pointeur comme un entier et
+// affiche un nombre énorme. Ces helpers évitent totalement ce risque.
+
+/// Insère `value` dans la chaîne localisée "goal.editor.reset_to_profile",
+/// que le specifier soit %@ (correct) ou %d (traduction fautive) — dans les
+/// deux cas, on affiche la valeur telle quelle plutôt que de risquer une
+/// réinterprétation binaire.
+private func resetToProfileLabel(_ value: String) -> String {
+    let template = String(localized: "goal.editor.reset_to_profile")
+    if template.contains("%@") {
+        return template.replacingOccurrences(of: "%@", with: value)
+    }
+    // Fallback si la traduction utilise %d/%f par erreur avec une String :
+    // on remplace le premier specifier numérique trouvé plutôt que de passer
+    // par String(format:), qui produirait un nombre aberrant.
+    for specifier in ["%d", "%1$d", "%.0f", "%.1f"] {
+        if template.contains(specifier) {
+            return template.replacingOccurrences(of: specifier, with: value)
+        }
+    }
+    // Aucun specifier reconnu — on affiche la valeur à la suite pour ne
+    // jamais perdre l'information, plutôt que de retourner un texte cassé.
+    return "\(template) \(value)"
 }
 
 #Preview {
