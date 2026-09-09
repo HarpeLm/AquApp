@@ -382,8 +382,9 @@ struct SwipeToDeleteView<Content: View>: View {
 
     var body: some View {
         ZStack(alignment: .leading) {
+            // Fond neutre révélé par le swipe (icône poubelle rouge conservée)
             Rectangle()
-                .fill(Color.red.opacity(0.2))
+                .fill(Color("AppCardBackground"))
                 .frame(height: 50)
                 .overlay(
                     Image(systemName: "trash.fill")
@@ -396,15 +397,23 @@ struct SwipeToDeleteView<Content: View>: View {
                 .padding(.horizontal, 16)
 
             content
+                .contentShape(Rectangle())
                 .offset(x: offset)
-                .gesture(
-                    DragGesture()
+                .highPriorityGesture(
+                    DragGesture(minimumDistance: 15, coordinateSpace: .local)
                         .onChanged { value in
+                            // Ne réagit qu'aux gestes majoritairement horizontaux,
+                            // pour laisser le ScrollView parent gérer le scroll vertical.
+                            guard abs(value.translation.width) > abs(value.translation.height) * 1.5 else { return }
                             if value.translation.width < 0 {
                                 offset = value.translation.width
                             }
                         }
                         .onEnded { value in
+                            guard abs(value.translation.width) > abs(value.translation.height) * 1.5 else {
+                                withAnimation(.spring()) { offset = 0 }
+                                return
+                            }
                             if value.translation.width < -80 {
                                 withAnimation(.easeInOut(duration: 0.2)) {
                                     offset = -UIScreen.main.bounds.width

@@ -109,8 +109,11 @@ struct BodyEditSheet: View {
     @State private var localGender: Gender = .notSpecified
 
     var calculatedGoal: Double {
-        let base      = localWeight * 35
-        let heightAdj = (localHeight - 170) * 5
+        let safeWeight = localWeight.isFinite ? min(max(localWeight, 30), 200)  : 70
+        let safeHeight = localHeight.isFinite ? min(max(localHeight, 140), 220) : 170
+
+        let base      = safeWeight * 35
+        let heightAdj = (safeHeight - 170) * 5
         let genderAdj: Double
         switch localGender {
         case .male:         genderAdj = 200
@@ -281,14 +284,20 @@ struct BodyEditSheet: View {
     }
 
     private func save() {
-        weightKg    = localWeight
-        heightCm    = localHeight
+        // Garde-fou : les sliders bornent déjà 30...200 kg et 140...220 cm,
+        // mais on sécurise quand même la valeur persistée.
+        let safeWeight = localWeight.isFinite  ? min(max(localWeight, 30), 200)   : 70
+        let safeHeight = localHeight.isFinite  ? min(max(localHeight, 140), 220)  : 170
+        let safeGoal   = calculatedGoal.isFinite ? min(max(calculatedGoal, 500), 5000) : 2170
+
+        weightKg    = safeWeight
+        heightCm    = safeHeight
         genderRaw   = localGender.rawValue
-        dailyGoalMl = calculatedGoal
-        UserDefaults.standard.set(localWeight,          forKey: "userWeightKg")
-        UserDefaults.standard.set(localHeight,          forKey: "userHeightCm")
+        dailyGoalMl = safeGoal
+        UserDefaults.standard.set(safeWeight,           forKey: "userWeightKg")
+        UserDefaults.standard.set(safeHeight,           forKey: "userHeightCm")
         UserDefaults.standard.set(localGender.rawValue, forKey: "userGender")
-        UserDefaults.standard.set(calculatedGoal,       forKey: "dailyGoalMl")
+        UserDefaults.standard.set(safeGoal,             forKey: "dailyGoalMl")
         isPresented = false
     }
 }

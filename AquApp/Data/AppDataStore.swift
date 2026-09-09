@@ -137,6 +137,14 @@ final class AppDataStore: ObservableObject {
     // MARK: - Ajout eau
 
     func addWater(amountMl: Double, date: Date = Date()) {
+        // Garde-fou : un verre d'eau raisonnable est entre 0 et 5000 ml.
+        // Rejette silencieusement toute valeur aberrante (NaN, infini,
+        // négative, ou disproportionnée) avant qu'elle n'entre en base.
+        guard amountMl.isFinite, amountMl > 0, amountMl <= 5000 else {
+            print("⚠️ addWater — valeur rejetée: \(amountMl)")
+            return
+        }
+
         let wasGoalReached = todayGoalReached
 
         let entry = WaterEntry(amountMl: amountMl, date: date)
@@ -178,14 +186,15 @@ final class AppDataStore: ObservableObject {
         )
         
         fetchAndCacheTodaySteps { [weak self] steps in
-            guard let self else { return }
-            self.achievementManager?.onMarathonienCheck(
-                drinkCount:  waterEntries.count,
-                goalReached: self.todayGoalReached,
-                steps:       steps
-            )
+            Task { @MainActor [weak self] in
+                guard let self else { return }
+                self.achievementManager?.onMarathonienCheck(
+                    drinkCount:  waterEntries.count,
+                    goalReached: self.todayGoalReached,
+                    steps:       steps
+                )
+            }
         }
-
 
 
         objectWillChange.send()
@@ -205,6 +214,13 @@ final class AppDataStore: ObservableObject {
     // MARK: - Ajout alcool
 
     func addAlcohol(amountMl: Double, type: AlcoholKind, date: Date = Date()) {
+        // Garde-fou : même logique que addWater — un verre d'alcool
+        // raisonnable reste sous 5000 ml.
+        guard amountMl.isFinite, amountMl > 0, amountMl <= 5000 else {
+            print("⚠️ addAlcohol — valeur rejetée: \(amountMl)")
+            return
+        }
+
         let entry = WaterAlcoholEntry(amountMl: amountMl, alcoholType: type, date: date)
         modelContext.insert(entry)
         save()
@@ -473,6 +489,17 @@ final class AppDataStore: ObservableObject {
                 let timestamp = entry["timestamp"] as? TimeInterval
             else { continue }
 
+            // Garde-fou : source externe (widget/Siri) non fiable — on rejette
+            // toute valeur aberrante avant qu'elle n'entre en base SwiftData.
+            guard amount.isFinite, amount > 0, amount <= 5000 else {
+                print("⚠️ flushWidgetPendingEntries — entrée rejetée, amountMl invalide: \(amount)")
+                continue
+            }
+            guard timestamp.isFinite, timestamp > 0 else {
+                print("⚠️ flushWidgetPendingEntries — entrée rejetée, timestamp invalide: \(timestamp)")
+                continue
+            }
+
             let date      = Date(timeIntervalSince1970: timestamp)
             let intentID  = entry["siriIntentID"] as? String
             let isAlcohol = entry["isAlcohol"] as? Bool ?? false
@@ -577,6 +604,70 @@ final class AppDataStore: ObservableObject {
             sortBy: [SortDescriptor(\.date, order: .reverse)]
         )
         return (try? modelContext.fetch(descriptor)) ?? []
+    }
+
+    // MARK: - Grille de contributions (365 jours)
+    // Fournit, pour chaque jour startOfDay des `days` derniers jours,
+    // le ratio net/objectif (0 si pas de donnée ou objectif non atteint,
+    // >0 sinon). Consommé par HydrationGridView — gratuit, aucune
+    // restriction Premium.
+    func contributionRatios(days: Int = 365) -> [Date: Double] {
+        let calendar = Calendar.current
+        let today    = calendar.startOfDay(for: Date())
+        let start    = calendar.date(byAdding: .day, value: -(days - 1), to: today)!
+
+        // NOTE : on évite volontairement un FetchDescriptor avec #Predicate
+        // ici (crashs SwiftData/AttributeGraph en Previews avec variable
+        // capturée). Un fetch non filtré + filtrage en mémoire suffit vu le
+        // faible volume de données.
+        let allWater   = (try? modelContext.fetch(FetchDescriptor<WaterEntry>())) ?? []
+        let allAlcohol = (try? modelContext.fetch(FetchDescriptor<WaterAlcoholEntry>())) ?? []
+        let allRecords = (try? modelContext.fetch(FetchDescriptor<DayRecord>())) ?? []
+
+        // Volume net réel par jour : somme des entrées d'eau moins la
+        // compensation alcool. C'est ce qui permet d'afficher des teintes
+        // intermédiaires (jour partiel) et pas seulement binaire atteint/
+        // non atteint comme le booléen DayRecord.goalReached.
+        var waterByDay: [Date: Double] = [:]
+        for entry in allWater where entry.date >= start {
+            waterByDay[calendar.startOfDay(for: entry.date), default: 0] += entry.amountMl
+        }
+        var alcoholCompByDay: [Date: Double] = [:]
+        for entry in allAlcohol where entry.date >= start {
+            alcoholCompByDay[calendar.startOfDay(for: entry.date), default: 0] += entry.compensationMl
+        }
+
+        // Objectif du jour : celui persisté dans DayRecord s'il existe
+        // (l'objectif a pu changer dans l'année), sinon l'objectif courant.
+        var goalByDay: [Date: Double] = [:]
+        for record in allRecords where record.date >= start {
+            goalByDay[calendar.startOfDay(for: record.date)] = record.goalMl
+        }
+
+        var result: [Date: Double] = [:]
+        var allDays = Set(waterByDay.keys)
+        allDays.formUnion(goalByDay.keys)
+        for day in allDays where day <= today {
+            let net  = max(0, (waterByDay[day] ?? 0) - (alcoholCompByDay[day] ?? 0))
+            let goal = goalByDay[day] ?? dailyGoalMl
+            guard goal > 0 else { continue }
+            // Jour sans aucune entrée d'eau : on retombe sur le booléen
+            // historique (1.0 si objectif atteint ce jour-là, sinon rien —
+            // la case reste vide comme sur la grille GitHub).
+            if waterByDay[day] == nil {
+                if let reached = allRecords.first(where: { calendar.startOfDay(for: $0.date) == day })?.goalReached, reached {
+                    result[day] = 1.0
+                }
+                continue
+            }
+            result[day] = net / goal
+        }
+
+        // Aujourd'hui : ratio réel en cours depuis le cache (peut être
+        // entre 0 et 1, ou plus si dépassement) — plus à jour qu'un fetch.
+        result[today] = todayProgress
+
+        return result
     }
 
     // MARK: - Pas (HealthKit) pour Marathonien

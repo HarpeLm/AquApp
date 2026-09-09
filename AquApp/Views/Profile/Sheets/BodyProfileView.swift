@@ -399,10 +399,17 @@ struct BodyProfileView: View {
     // MARK: - Sauvegarde
 
     func saveAndContinue() {
-        UserDefaults.standard.set(weightKg,                forKey: "userWeightKg")
-        UserDefaults.standard.set(heightCm,                forKey: "userHeightCm")
+        // Garde-fou : les sliders bornent déjà 30...200 kg et 140...220 cm,
+        // mais on sécurise quand même la valeur persistée pour éviter toute
+        // dérive silencieuse (ex. valeur restaurée depuis un ancien état).
+        let safeWeight = weightKg.isFinite ? min(max(weightKg, 30), 200) : 70
+        let safeHeight = heightCm.isFinite ? min(max(heightCm, 140), 220) : 170
+        let safeGoal   = calculatedGoalMl.isFinite ? min(max(calculatedGoalMl, 500), 5000) : 2170
+
+        UserDefaults.standard.set(safeWeight,               forKey: "userWeightKg")
+        UserDefaults.standard.set(safeHeight,               forKey: "userHeightCm")
         UserDefaults.standard.set(selectedGender.rawValue, forKey: "userGender")
-        UserDefaults.standard.set(calculatedGoalMl,        forKey: "dailyGoalMl")
+        UserDefaults.standard.set(safeGoal,                forKey: "dailyGoalMl")
         UserDefaults.standard.set(true,                    forKey: "onboardingCompleted")
         onComplete()
     }
