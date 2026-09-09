@@ -1,3 +1,11 @@
+//
+//  AppIconManagerTests.swift
+//  AquApp
+//
+//  Created by Fabian Dargaud on 07/09/2026.
+//
+
+
 import XCTest
 @testable import AquApp
 
@@ -22,7 +30,7 @@ final class AppIconManagerTests: XCTestCase {
         XCTAssertFalse(manager.isChanging)
     }
 
-    func testSetIcon_PremiumIcon_LockedForFreeUser() async {
+    func testSetIcon_PremiumIcon_LockedForFreeUser() async throws {
         guard let premium = AppIcon.allCases.first(where: { $0.isPremium }) else {
             throw XCTSkip("Aucune icône premium définie")
         }
@@ -31,7 +39,7 @@ final class AppIconManagerTests: XCTestCase {
         XCTAssertEqual(manager.currentIcon, .ocean, "Un utilisateur free ne doit pas pouvoir appliquer une icône premium")
     }
 
-    func testSetIcon_FreeIcon_AppliesAfterDelay() async {
+    func testSetIcon_FreeIcon_AppliesAfterDelay() async throws {
         guard let free = AppIcon.allCases.first(where: { !$0.isPremium && $0 != .ocean }) else {
             throw XCTSkip("Aucune icône gratuite secondaire")
         }
@@ -42,7 +50,7 @@ final class AppIconManagerTests: XCTestCase {
         XCTAssertFalse(manager.isChanging)
     }
 
-    func testSetIcon_PremiumUser_CanApplyPremiumIcon() async {
+    func testSetIcon_PremiumUser_CanApplyPremiumIcon() async throws {
         guard let premium = AppIcon.allCases.first(where: { $0.isPremium }) else {
             throw XCTSkip("Aucune icône premium définie")
         }
@@ -51,13 +59,13 @@ final class AppIconManagerTests: XCTestCase {
         XCTAssertEqual(manager.currentIcon, premium)
     }
 
-    func testReentrancyGuard_SecondCallIgnored() async {
+    func testReentrancyGuard_SecondCallIgnored() async throws {
         guard let free1 = AppIcon.allCases.first(where: { !$0.isPremium && $0 != .ocean }),
               let free2 = AppIcon.allCases.last(where: { !$0.isPremium && $0 != free1 }) else {
             throw XCTSkip("Pas assez d'icônes gratuites")
         }
         manager.setIcon(free1, isPremiumUser: false)
-        manager.setIcon(free2, isPremiumUser: false) // pendant isChanging → ignoré
+        manager.setIcon(free2, isPremiumUser: false)
         try? await Task.sleep(for: .seconds(0.6))
         XCTAssertEqual(manager.currentIcon, free1)
     }

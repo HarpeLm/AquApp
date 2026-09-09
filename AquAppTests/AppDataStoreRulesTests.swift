@@ -1,3 +1,11 @@
+//
+//  AppDataStoreRulesTests.swift
+//  AquApp
+//
+//  Created by Fabian Dargaud on 08/09/2026.
+//
+
+
 import XCTest
 import SwiftData
 @testable import AquApp
@@ -119,14 +127,16 @@ final class AppDataStoreRulesTests: XCTestCase {
 
     // MARK: - Clean 30 jours : borne exacte
 
-    func testCleanOldData_BoundaryExactly30Days() {
-        let cutoff = Calendar.current.date(byAdding: .day, value: -30, to: Date())!
-        store.addWater(amountMl: 111, date: cutoff)                      // == cutoff → gardée
-        store.addWater(amountMl: 222, date: cutoff.addingTimeInterval(-1)) // < cutoff → purgée
+    func testCleanOldData_Boundary30Days() {
+        let now       = Date()
+        let tooOld    = now.addingTimeInterval(-31 * 86400)  // > 30 jours → purgée
+        let stillKept = now.addingTimeInterval(-29 * 86400)  // < 30 jours → gardée
+        store.addWater(amountMl: 222, date: tooOld)
+        store.addWater(amountMl: 111, date: stillKept)
         store.isPremiumUser = false
         store.cleanOldDataIfNeeded()
         let remaining = store.allWaterEntries()
-        XCTAssertEqual(remaining.count, 1)
+        XCTAssertEqual(remaining.count, 1, "seule l'entrée de moins de 30 jours doit survivre")
         XCTAssertEqual(remaining.first?.amountMl, 111)
     }
 }

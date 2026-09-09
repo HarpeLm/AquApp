@@ -1,3 +1,11 @@
+//
+//  StoreKitManagerTests.swift
+//  AquApp
+//
+//  Created by Fabian Dargaud on 07/09/2026.
+//
+
+
 import XCTest
 import StoreKit
 @testable import AquApp

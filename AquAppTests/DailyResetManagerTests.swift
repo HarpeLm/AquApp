@@ -1,30 +1,31 @@
+//
+//  DailyResetManagerTests.swift
+//  AquApp
+//
+//  Created by Fabian Dargaud on 07/09/2026.
+//
+
 import XCTest
 @testable import AquApp
 
-final class DailyResetManagerTests: XCTestCase {
+final class WeekdayMathTests: XCTestCase {
 
-    // MARK: - Calcul du prochain Lundi
-
-    func testSecondsUntilNextMonday_Calculation() {
-        let calendar = Calendar.current
-        
-        // Helper pour simuler les jours
-        func simulateWeekday(_ weekday: Int) -> TimeInterval {
-            // weekday: 1=dim, 2=lun ... 7=sam
-            let daysUntilMonday = (weekday == 2) ? 7 : (9 - weekday) % 7
-            return Double(daysUntilMonday) * 86400.0
+    func testDaysUntilMonday_AllWeekdays() {
+        let table: [(Int, Int)] = [(1, 1), (2, 7), (3, 6), (4, 5), (5, 4), (6, 3), (7, 2)]
+        for (weekday, expected) in table {
+            let days = (weekday == 2) ? 7 : (9 - weekday) % 7
+            XCTAssertEqual(days, expected, "weekday=\(weekday)")
         }
-        
-        // Lundi (2) : doit attendre le lundi suivant (7 jours)
-        XCTAssertEqual(simulateWeekday(2), 7 * 86400.0, accuracy: 1.0)
-        
-        // Mardi (3) : doit attendre 6 jours
-        XCTAssertEqual(simulateWeekday(3), 6 * 86400.0, accuracy: 1.0)
-        
-        // Dimanche (1) : doit attendre 1 jour
-        XCTAssertEqual(simulateWeekday(1), 1 * 86400.0, accuracy: 1.0)
-        
-        // Samedi (7) : doit attendre 2 jours
-        XCTAssertEqual(simulateWeekday(7), 2 * 86400.0, accuracy: 1.0)
+    }
+
+    func testKnownDates_September2026() {
+        let cal = Calendar.current
+        let table: [(Int, Int)] = [(6, 1), (7, 7), (8, 6), (9, 5), (10, 4), (11, 3), (12, 2)]
+        for (day, expected) in table {
+            let date = cal.date(from: DateComponents(year: 2026, month: 9, day: day))!
+            let weekday = cal.component(.weekday, from: date)
+            let days = (weekday == 2) ? 7 : (9 - weekday) % 7
+            XCTAssertEqual(days, expected, "day=\(day)")
+        }
     }
 }

@@ -1,38 +1,29 @@
+//
+//  WeatherManagerTests.swift
+//  AquApp
+//
+//  Created by Fabian Dargaud on 07/09/2026.
+//
+
+
 import XCTest
 @testable import AquApp
 
-final class WeatherManagerTests: XCTestCase {
+final class WeatherManagerContractTests: XCTestCase {
 
-    var mockStore: AppDataStore!
-    var weatherManager: WeatherManager!
-
-    override func setUpWithError() throws {
-        super.setUp()
-        // Attention : AppDataStore nécessite SwiftData. 
-        // Pour un test unitaire pur, il faudrait créer un Mock de AppDataStore.
-        // Ici on teste la logique mathématique de 'applyTemperature' qui est privée.
-        // On va donc tester la logique métier via un Mock simple.
-    }
-
-    // MARK: - Logique Canicule (Test de la formule)
-
-    func testHeatwaveGoalAdaptation_Formula() {
-        // La règle : +200 ml par degré au-dessus de 32°C, plafonné à +1000 ml.
-        let baseGoal: Double = 2170.0
-        
-        // Test 1 : 35°C (3 degrés au-dessus de 32)
-        let extra35 = min((35.0 - 32.0) * 200, 1000)
-        XCTAssertEqual(extra35, 600.0)
-        
-        // Test 2 : 32°C (exactement le seuil, pas de bonus)
-        let extra32 = min((32.0 - 32.0) * 200, 1000)
-        XCTAssertEqual(extra32, 0.0)
-        
-        // Test 3 : 40°C (8 degrés au-dessus, doit être plafonné à 1000)
-        let extra40 = min((40.0 - 32.0) * 200, 1000)
-        XCTAssertEqual(extra40, 1000.0, "Le bonus doit être plafonné à 1000 ml")
-        
-        // Test 4 : 25°C (pas de canicule)
-        // La formule dans le code ne s'applique que si temp >= 32
+    /// Contrat : +200 ml/degré au-dessus de 32 °C, plafond +1000 ml, base 2170 ml.
+    func testHeatwaveFormula_ContractTable() {
+        let base = 2170.0
+        let table: [(Double, Bool, Double)] = [
+            (-10, false, 0), (0, false, 0), (31.99, false, 0),
+            (32.0, true, 0), (32.5, true, 100), (33, true, 200),
+            (35, true, 600), (36.9, true, 980),
+            (37, true, 1000), (37.5, true, 1000), (45, true, 1000),
+        ]
+        for (temp, isHeat, bonus) in table {
+            XCTAssertEqual(temp >= 32.0, isHeat, "temp=\(temp)")
+            let extra = isHeat ? min((temp - 32.0) * 200, 1000) : 0
+            XCTAssertEqual((extra + base).rounded(), bonus + base, accuracy: 0.5, "temp=\(temp)")
+        }
     }
 }
