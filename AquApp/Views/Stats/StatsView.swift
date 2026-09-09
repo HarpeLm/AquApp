@@ -19,6 +19,25 @@ enum ChartPeriod: String, CaseIterable {
     var isPro: Bool { self == .month || self == .all }
 }
 
+// MARK: - Helpers de formatage sûrs
+// String(format:) plante silencieusement (nombre aberrant, pas de crash net)
+// si le specifier de la traduction (%d/%f) ne correspond pas au type fourni
+// (String). Cette fonction insère la valeur sans dépendre du specifier —
+// utilisée par toutes les vues de ce fichier qui affichent l'objectif.
+
+private func insertValue(_ value: String, into key: String) -> String {
+    let template = String(localized: String.LocalizationValue(key))
+    if template.contains("%@") {
+        return template.replacingOccurrences(of: "%@", with: value)
+    }
+    for specifier in ["%d", "%1$d", "%.0f", "%.1f"] {
+        if template.contains(specifier) {
+            return template.replacingOccurrences(of: specifier, with: value)
+        }
+    }
+    return "\(template) \(value)"
+}
+
 // MARK: - StatsView
 
 struct StatsView: View {
@@ -76,15 +95,10 @@ struct StatsView: View {
                     )
                     .padding(.horizontal)
 
-                    // MARK: Analyse alcool PREMIUM
-                    AlcoolAnalysisCard(
-                        isPremium:   isPremiumUser,
-                        weekLiters:  store.weekAlcoholLiters,
-                        monthLiters: store.monthAlcoholLiters
-                    ) {
-                        showPremiumSheet = true
-                    }
-                    .padding(.horizontal)
+                    // MARK: Grille de contributions (gratuit)
+                    HydrationGridView()
+                        .environmentObject(store)
+                        .padding(.horizontal)
 
                     // MARK: Stats rapides
                     HStack(spacing: 12) {
@@ -216,14 +230,20 @@ private struct ChartCard: View {
     }
 
     // ── Légende objectif dynamique ────────────────────────────────────────────
+    // ⚠️ Ne pas utiliser String(format:) avec une String en argument : si la
+    // traduction contient %d au lieu de %@ (cas vu avec "Objectif %d ml"),
+    // String(format:) ne plante pas — il réinterprète les bits du pointeur
+    // de la String comme un entier, produisant un nombre aberrant à l'écran.
+    // On insère donc la valeur nous-mêmes, insensible au specifier utilisé
+    // dans la traduction.
     private var goalLegend: String {
         switch period {
         case .week:
-            return String(format: String(localized: "stats.goal_label"),       UnitFormatter.volume(store.dailyGoalMl))
+            return insertValue(UnitFormatter.volume(store.dailyGoalMl), into: "stats.goal_label")
         case .month:
-            return String(format: String(localized: "stats.goal_week_label"),  UnitFormatter.volume(store.dailyGoalMl * 7))
+            return insertValue(UnitFormatter.volume(store.dailyGoalMl * 7), into: "stats.goal_week_label")
         case .all:
-            return String(format: String(localized: "stats.goal_month_label"), UnitFormatter.volume(store.dailyGoalMl * 30))
+            return insertValue(UnitFormatter.volume(store.dailyGoalMl * 30), into: "stats.goal_month_label")
         }
     }
 
@@ -488,7 +508,7 @@ struct WeeklyChartCard: View {
                 RoundedRectangle(cornerRadius: 2)
                     .fill(Color(hex: "2B87E8"))
                     .frame(width: 16, height: 3)
-                Text(String(format: String(localized: "stats.goal_label"), Int(goal)))
+                Text(insertValue("\(Int(goal))", into: "stats.goal_label"))
                     .font(.system(size: 12))
                     .foregroundColor(.secondary)
             }

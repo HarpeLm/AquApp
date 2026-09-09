@@ -486,7 +486,7 @@ struct CustomQuantityRow: View {
             }
 
             Button {
-                if let ml = Double(customMl), ml > 0 {
+                if let ml = Double(customMl), ml > 0, ml <= 5000 {
                     onAdd(ml)
                     customMl = ""
                     isFocused = false
