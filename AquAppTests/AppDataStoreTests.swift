@@ -1,3 +1,11 @@
+//
+//  AppDataStoreTests.swift
+//  AquApp
+//
+//  Created by Fabian Dargaud on 07/09/2026.
+//
+
+
 import XCTest
 import SwiftData
 @testable import AquApp
@@ -20,10 +28,12 @@ final class AppDataStoreTests: XCTestCase {
     }
 
     override func tearDown() async throws {
+        try? await Task.sleep(for: .seconds(1.0)) // laisse mourir les tasks background
         for key in ["dailyGoalMl", "isPremiumUser", "last_reset_date", "heatwave_days"] {
             UserDefaults.standard.removeObject(forKey: key)
         }
-        store = nil; container = nil
+        store = nil
+        container = nil
         try await super.tearDown()
     }
 
@@ -51,7 +61,7 @@ final class AppDataStoreTests: XCTestCase {
 
     func testAlcohol_CompensationReducesNetWater() {
         store.addWater(amountMl: 500)
-        store.addAlcohol(amountMl: 500, type: .beer) // compense 197.25 ml
+        store.addAlcohol(amountMl: 500, type: .beer)
         XCTAssertEqual(store.todayWaterMl, 500 - 197.25, accuracy: 0.01)
     }
 

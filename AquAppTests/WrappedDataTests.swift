@@ -5,7 +5,6 @@
 //  Created by Fabian Dargaud on 07/09/2026.
 //
 
-
 import XCTest
 @testable import AquApp
 
@@ -28,8 +27,6 @@ final class WrappedDataTests: XCTestCase {
         )
     }
 
-    // MARK: - Percentile (bornes exactes : 347/329/292/256/183)
-
     func testPercentileTop_Boundaries() {
         let table: [(Int, Int)] = [
             (365, 1), (347, 1), (346, 5), (329, 5), (328, 10),
@@ -40,8 +37,6 @@ final class WrappedDataTests: XCTestCase {
         }
     }
 
-    // MARK: - Légendaire (4 déclencheurs + bornes)
-
     func testIsLegendary_Boundaries() {
         XCTAssertFalse(make().isLegendary)
         XCTAssertTrue(make(bestStreak: 100).isLegendary)
@@ -50,12 +45,11 @@ final class WrappedDataTests: XCTestCase {
         XCTAssertFalse(make(soberDays: 299).isLegendary)
         XCTAssertTrue(make(xpTotal: 8500).isLegendary)
         XCTAssertFalse(make(xpTotal: 8499).isLegendary)
-        XCTAssertTrue(make(goalDays: 347).isLegendary)   // percentile top 1
+        XCTAssertTrue(make(goalDays: 347).isLegendary)
         XCTAssertFalse(make(goalDays: 346).isLegendary)
     }
 
     func testLegendaryReason_PriorityOrder() {
-        // streak > sobriété > percentile > xp
         let both = make(bestStreak: 100, soberDays: 300)
         XCTAssertEqual(both.legendaryReason,
                        String(format: String(localized: "wrapped.legendary.reason_streak"), 100))
@@ -67,21 +61,16 @@ final class WrappedDataTests: XCTestCase {
                        String(format: String(localized: "wrapped.legendary.reason_xp"), 9000))
     }
 
-    // MARK: - Message de clôture (priorités + bornes)
-
     func testAdaptiveClosingMessage_Priority() {
-        // santé (sober ≥ 292) > discipline (streak ≥ 30) > équilibre (goal ≥ 219) > défaut
-        XCTAssertEqual(make(soberDays: 292, bestStreak: 50).adaptiveClosingMessage,
+        XCTAssertEqual(make(bestStreak: 50, soberDays: 292).adaptiveClosingMessage,
                        String(format: String(localized: "wrapped.closing.health"), "Fab"))
-        XCTAssertEqual(make(soberDays: 291, bestStreak: 30).adaptiveClosingMessage,
+        XCTAssertEqual(make(bestStreak: 30, soberDays: 291).adaptiveClosingMessage,
                        String(format: String(localized: "wrapped.closing.discipline"), "Fab"))
-        XCTAssertEqual(make(soberDays: 291, bestStreak: 29, goalDays: 219).adaptiveClosingMessage,
+        XCTAssertEqual(make(goalDays: 219, bestStreak: 29, soberDays: 291).adaptiveClosingMessage,
                        String(format: String(localized: "wrapped.closing.balance"), "Fab"))
-        XCTAssertEqual(make(soberDays: 291, bestStreak: 29, goalDays: 218).adaptiveClosingMessage,
+        XCTAssertEqual(make(goalDays: 218, bestStreak: 29, soberDays: 291).adaptiveClosingMessage,
                        String(format: String(localized: "wrapped.closing.default"), "Fab"))
     }
-
-    // MARK: - Codable round-trip
 
     func testCodable_RoundTrip() throws {
         let original = make(goalDays: 42, bestStreak: 7, soberDays: 100, xpTotal: 500)

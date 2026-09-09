@@ -24,18 +24,21 @@ final class ColorHexTests: XCTestCase {
 
     func testPrimaryColors() {
         let red = rgba(Color(hex: "FF0000"))
-        XCTAssertEqual(red.r, 1, accuracy: 0.01); XCTAssertEqual(red.g, 0, accuracy: 0.01)
-        let green = rgba(Color(hex: "00FF00"))
-        XCTAssertEqual(green.g, 1, accuracy: 0.01)
-        let blue = rgba(Color(hex: "0000FF"))
-        XCTAssertEqual(blue.b, 1, accuracy: 0.01)
+        XCTAssertEqual(red.r, 1, accuracy: 0.01)
+        XCTAssertEqual(red.g, 0, accuracy: 0.01)
+        XCTAssertEqual(rgba(Color(hex: "00FF00")).g, 1, accuracy: 0.01)
+        XCTAssertEqual(rgba(Color(hex: "0000FF")).b, 1, accuracy: 0.01)
     }
 
     func testBlackAndWhite() {
         let white = rgba(Color(hex: "FFFFFF"))
-        XCTAssertEqual(white.r, 1, accuracy: 0.01); XCTAssertEqual(white.g, 1, accuracy: 0.01); XCTAssertEqual(white.b, 1, accuracy: 0.01)
+        XCTAssertEqual(white.r, 1, accuracy: 0.01)
+        XCTAssertEqual(white.g, 1, accuracy: 0.01)
+        XCTAssertEqual(white.b, 1, accuracy: 0.01)
         let black = rgba(Color(hex: "000000"))
-        XCTAssertEqual(black.r, 0, accuracy: 0.01); XCTAssertEqual(black.g, 0, accuracy: 0.01); XCTAssertEqual(black.b, 0, accuracy: 0.01)
+        XCTAssertEqual(black.r, 0, accuracy: 0.01)
+        XCTAssertEqual(black.g, 0, accuracy: 0.01)
+        XCTAssertEqual(black.b, 0, accuracy: 0.01)
     }
 
     func testCaseInsensitive() {
