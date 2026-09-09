@@ -6,87 +6,66 @@
 //
 
 
-import XCTest
+//
+//  AppDataStoreCumulativeTests.swift
+//  AquAppTests
+//
+
+import Testing
 import SwiftData
 @testable import AquApp
 
 @MainActor
-final class AppDataStoreTests: XCTestCase {
+@Suite("Totaux cumulatifs")
+struct CumulativeTotalsTests {
 
-    var container: ModelContainer!
-    var store: AppDataStore!
+    // ⚠️ Stockés : le ModelContainer doit rester vivant pendant tout le test.
+    let container: ModelContainer
+    let store: AppDataStore
 
-    override func setUp() async throws {
-        try await super.setUp()
+    init() throws {
         let config = ModelConfiguration(isStoredInMemoryOnly: true)
-        container = try ModelContainer(
+        let c = try ModelContainer(
             for: WaterEntry.self, WaterAlcoholEntry.self, DayRecord.self,
             configurations: config
         )
-        // ⚠️ Adapte si ton init a une autre signature (ex: init(container:))
-        store = AppDataStore(modelContext: container.mainContext)
+        self.container = c
+        self.store = AppDataStore(modelContext: c.mainContext)
     }
 
-    override func tearDown() async throws {
-        try? await Task.sleep(for: .seconds(1.0)) // laisse mourir les tasks background
-        for key in ["dailyGoalMl", "isPremiumUser", "last_reset_date", "heatwave_days"] {
-            UserDefaults.standard.removeObject(forKey: key)
-        }
-        store = nil
-        container = nil
-        try await super.tearDown()
-    }
+    // NOTE IMPORTANTE : assertions en DELTA, jamais en valeurs absolues.
+    // HealthDataManager.shared est un singleton process-wide, également
+    // modifié par les suites XCTest qui tournent EN PARALLÈLE dans le
+    // même process. Entre deux lectures synchrones sur le main actor,
+    // aucun autre code ne peut s'intercaler → les deltas sont sûrs.
 
-    func testAddWater_SumsToday() {
-        store.addWater(amountMl: 250)
-        store.addWater(amountMl: 250)
-        XCTAssertEqual(store.todayWaterMl, 500, accuracy: 0.01)
-    }
-
-    func testGoalReached_Flag() {
-        store.dailyGoalMl = 500
-        store.addWater(amountMl: 499)
-        XCTAssertFalse(store.todayGoalReached)
-        store.addWater(amountMl: 1)
-        XCTAssertTrue(store.todayGoalReached)
-    }
-
-    func testDeleteWater_Removes() {
-        store.addWater(amountMl: 300)
-        let entry = store.allWaterEntries().last!
-        store.deleteWater(entry)
-        XCTAssertEqual(store.todayWaterMl, 0, accuracy: 0.01)
-        XCTAssertTrue(store.allWaterEntries().isEmpty)
-    }
-
-    func testAlcohol_CompensationReducesNetWater() {
+    @Test func addWaterIncrementsTotal() {
+        let before = HealthDataManager.shared.totalWaterMl
         store.addWater(amountMl: 500)
-        store.addAlcohol(amountMl: 500, type: .beer)
-        XCTAssertEqual(store.todayWaterMl, 500 - 197.25, accuracy: 0.01)
+        #expect(HealthDataManager.shared.totalWaterMl == before + 500)
     }
 
-    func testCleanOldData_NonPremium_DeletesBeyond30Days() {
-        let old = Calendar.current.date(byAdding: .day, value: -40, to: Date())!
-        store.addWater(amountMl: 100, date: old)
-        store.addWater(amountMl: 250)
-        store.isPremiumUser = false
-        store.cleanOldDataIfNeeded()
-        let remaining = store.allWaterEntries()
-        XCTAssertEqual(remaining.count, 1)
-        XCTAssertEqual(remaining.first?.amountMl, 250)
+    @Test func addAlcoholIncrementsTotal() {
+        let before = HealthDataManager.shared.totalAlcoholMl
+        store.addAlcohol(amountMl: 250, type: .beer)
+        #expect(HealthDataManager.shared.totalAlcoholMl == before + 250)
     }
 
-    func testCleanOldData_Premium_KeepsEverything() {
-        let old = Calendar.current.date(byAdding: .day, value: -40, to: Date())!
-        store.addWater(amountMl: 100, date: old)
-        store.isPremiumUser = true
-        store.cleanOldDataIfNeeded()
-        XCTAssertEqual(store.allWaterEntries().count, 1)
+    @Test func deleteWaterDecrementsTotal() {
+        let before = HealthDataManager.shared.totalWaterMl
+        store.addWater(amountMl: 500)
+        let entry = store.todayWaterEntries().first!   // la plus récente = 500 ml
+        store.deleteWater(entry)
+        #expect(HealthDataManager.shared.totalWaterMl == before)
     }
 
-    func testPerformMidnightReset_SetsLastResetDate() {
-        store.performMidnightReset()
-        let saved = UserDefaults.standard.object(forKey: "last_reset_date") as? Date
-        XCTAssertEqual(saved, Calendar.current.startOfDay(for: Date()))
+    @Test func totalLitersFollowsKeychainTotal() {
+        let beforeWater = HealthDataManager.shared.totalWaterMl
+        store.addWater(amountMl: 2500)
+        #expect(store.totalWaterLiters == (beforeWater + 2500) / 1000.0)
+
+        let beforeAlcohol = HealthDataManager.shared.totalAlcoholMl
+        store.addAlcohol(amountMl: 500, type: .wine)
+        #expect(store.totalAlcoholLiters == (beforeAlcohol + 500) / 1000.0)
     }
 }
