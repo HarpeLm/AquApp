@@ -35,7 +35,7 @@
             parallelizable = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "70F7AD472F8134B4003A197C"
+               BlueprintIdentifier = "701775C8304F2023007F31D1"
                BuildableName = "AquAppTests.xctest"
                BlueprintName = "AquAppTests"
                ReferencedContainer = "container:AquApp.xcodeproj">

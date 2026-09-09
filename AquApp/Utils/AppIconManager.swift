@@ -167,7 +167,14 @@ final class AppIconManager: ObservableObject {
 struct AppIconPickerView: View {
     @EnvironmentObject var iconManager: AppIconManager
     @EnvironmentObject var storeKit:    StoreKitManager
-    @AppStorage("isPremiumUser") private var isPremiumUser: Bool = false
+    @ObservedObject private var premiumStore = PremiumManager.shared
+    private var isPremiumUser: Bool {
+        get { premiumStore.isPremium }
+        nonmutating set { premiumStore.set(newValue) }
+    }
+    private var isPremiumUserBinding: Binding<Bool> {
+        Binding(get: { premiumStore.isPremium }, set: { premiumStore.set($0) })
+    }
     @State private var showPremiumSheet = false
 
     private let columns = Array(repeating: GridItem(.flexible(), spacing: 12), count: 4)
@@ -230,7 +237,7 @@ struct AppIconPickerView: View {
             .animation(.easeInOut(duration: 0.3), value: iconManager.toastMessage != nil)
         }
         .sheet(isPresented: $showPremiumSheet) {
-            PremiumSheet(isPremiumUser: $isPremiumUser, isPresented: $showPremiumSheet)
+            PremiumSheet(isPremiumUser: isPremiumUserBinding, isPresented: $showPremiumSheet)
                 .environmentObject(storeKit)
                 .presentationDetents([.large])
                 .presentationDragIndicator(.hidden)
