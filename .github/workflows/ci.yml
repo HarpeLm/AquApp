@@ -14,7 +14,7 @@ concurrency:
 jobs:
   test:
     name: Build & Test (iOS Simulator)
-    runs-on: macos-14
+    runs-on: macos-latest
 
     if: |
       !contains(github.event.head_commit.message, '[skip ci]') &&
@@ -22,15 +22,20 @@ jobs:
 
     env:
       SCHEME: "AquApp"
-      DESTINATION: "platform=iOS Simulator,name=iPhone 15 Pro,OS=17.5"
       PROJECT: "AquApp.xcodeproj"
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Select Xcode version
-        run: sudo xcode-select -s /Applications/Xcode_15.4.app/Contents/Developer
+      - name: Diagnose environment (Xcodes + simulateurs)
+        run: |
+          ls /Applications | grep -i xcode
+          xcodebuild -version
+          xcrun simctl list devices available | grep iPhone | head -8
+
+      - name: Select default Xcode
+        run: sudo xcode-select -s /Applications/Xcode.app/Contents/Developer
 
       - name: Cache DerivedData
         uses: actions/cache@v4
@@ -40,24 +45,20 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-derived-
 
-      - name: Cache Swift packages
-        uses: actions/cache@v4
-        with:
-          path: ~/Library/Developer/Xcode/DerivedData/**/SourcePackages
-          key: ${{ runner.os }}-spm-${{ hashFiles('**/Package.resolved') }}
-          restore-keys: |
-            ${{ runner.os }}-spm-
+      - name: Pick an available iPhone simulator
+        id: sim
+        run: |
+          NAME=$(xcrun simctl list devices available | grep -oE 'iPhone [^()]*' | head -1 | sed 's/[[:space:]]*$//')
+          echo "Using simulator: $NAME"
+          echo "name=$NAME" >> "$GITHUB_OUTPUT"
 
-      - name: List available destinations (debug)
-        run: xcodebuild -showdestinations -scheme "$SCHEME" -project "$PROJECT" | head -30
-
-      - name: Build
+      - name: Build for testing
         run: |
           set -o pipefail
           xcodebuild build-for-testing \
             -scheme "$SCHEME" \
             -project "$PROJECT" \
-            -destination "$DESTINATION" \
+            -destination "generic/platform=iOS Simulator" \
             -quiet
 
       - name: Run unit tests
@@ -66,7 +67,7 @@ jobs:
           xcodebuild test-without-building \
             -scheme "$SCHEME" \
             -project "$PROJECT" \
-            -destination "$DESTINATION" \
+            -destination "platform=iOS Simulator,name=${{ steps.sim.outputs.name }}" \
             -only-testing:AquAppTests \
             -resultBundlePath TestResults
 
