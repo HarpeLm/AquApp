@@ -230,38 +230,29 @@ final class AchievementManager: ObservableObject {
         if streak >= 7 { completeAchievement(id: "semaine_sobre") }
 
         if streak > 0 {
-            let soberTotal = defaults.double(forKey: "sober_days_total") + 1
-            defaults.set(soberTotal, forKey: "sober_days_total")
-            updateProgress(id: "centurion_sobre", value: min(soberTotal, 100))
-            if soberTotal >= 100 { completeAchievement(id: "centurion_sobre") }
+            let fmt = DateFormatter(); fmt.dateFormat = "yyyyMMdd"
+            let todayKey = fmt.string(from: Date())
+            if defaults.string(forKey: "sober_total_last_day") != todayKey {
+                let soberTotal = defaults.double(forKey: "sober_days_total") + 1
+                defaults.set(soberTotal, forKey: "sober_days_total")
+                defaults.set(todayKey, forKey: "sober_total_last_day")
+                updateProgress(id: "centurion_sobre", value: min(soberTotal, 100))
+                if soberTotal >= 100 { completeAchievement(id: "centurion_sobre") }
+            }
         }
 
         let month = Calendar.current.component(.month, from: Date())
-        if month == 1 {
-            updateProgress(id: "dry_january", value: min(Double(streak), 31))
-            if streak >= 31 { completeAchievement(id: "dry_january") }
-        }
-        if month == 10 {
-            updateProgress(id: "sober_october", value: min(Double(streak), 31))
-            if streak >= 31 { completeAchievement(id: "sober_october") }
-        }
-        if month == 11 {
-            updateProgress(id: "no_alcohol_november", value: min(Double(streak), 30))
-            if streak >= 30 { completeAchievement(id: "no_alcohol_november") }
-        }
+        if month == 1 { updateProgress(id: "dry_january", value: min(Double(streak), 31)); if streak >= 31 { completeAchievement(id: "dry_january") } }
+        if month == 10 { updateProgress(id: "sober_october", value: min(Double(streak), 31)); if streak >= 31 { completeAchievement(id: "sober_october") } }
+        if month == 11 { updateProgress(id: "no_alcohol_november", value: min(Double(streak), 30)); if streak >= 30 { completeAchievement(id: "no_alcohol_november") } }
     }
 
     func onHeatwaveDay(totalMl: Double) {
-        guard totalMl.isFinite else { return }
         if totalMl >= 3000 {
             let days = defaults.double(forKey: "heatwave_days") + 1
             defaults.set(days, forKey: "heatwave_days")
-            updateProgress(id: "heatwave", value: min(days, 3))
-            if days >= 3 {
-                DispatchQueue.main.async { [weak self] in
-                    self?.completeAchievement(id: "heatwave")
-                }
-            }
+            updateProgress(id: "heatwave", value: days)
+            if days >= 3 { completeAchievement(id: "heatwave") }   // ⚠️ >= et pas >
         }
     }
 
@@ -300,17 +291,8 @@ final class AchievementManager: ObservableObject {
     }
 
     func restoreHeatwaveProgress(days: Double) {
-        guard days.isFinite && days >= 0 else {
-            print("⚠️ Valeur invalide pour heatwave_days: \(days)")
-            return
-        }
-        let safeDays = min(days, 3)
-        updateProgress(id: "heatwave", value: safeDays)
-        if safeDays >= 3 {
-            DispatchQueue.main.async { [weak self] in
-                self?.completeAchievement(id: "heatwave")
-            }
-        }
+        updateProgress(id: "heatwave", value: min(days, 3))
+        if days >= 3 { completeAchievement(id: "heatwave") }       
     }
 
     // MARK: - Sleep Hydration (HealthKit)
