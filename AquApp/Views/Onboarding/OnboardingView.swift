@@ -113,6 +113,7 @@ struct OnboardingView: View {
                         )
                         .cornerRadius(16)
                         .shadow(color: pages[currentPage].color.opacity(0.4), radius: 10, x: 0, y: 4)
+                        .accessibilityIdentifier("onboarding.next")
                         .animation(.easeInOut(duration: 0.2), value: currentPage)
 
                         // Passer

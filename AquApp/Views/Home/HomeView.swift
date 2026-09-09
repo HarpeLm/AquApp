@@ -252,7 +252,7 @@ struct ProgressCard: View {
                                 startPoint: .leading,
                                 endPoint: .trailing
                             ))
-                            .frame(width: geo.size.width * progress, height: 8)
+                            .frame(width: max(0, geo.size.width * (progress.isFinite ? progress : 0)), height: 8)
                             .animation(.easeInOut(duration: 0.6), value: progress)
                     }
                 }

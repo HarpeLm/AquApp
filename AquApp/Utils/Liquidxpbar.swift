@@ -37,7 +37,8 @@ struct LiquidXPBar: View {
 
     var body: some View {
         GeometryReader { geo in
-            let fillWidth = geo.size.width * max(0, min(1, progress))
+            let clamped = progress.isFinite ? min(1, max(0, progress)) : 0
+            let fillWidth = max(0, geo.size.width * clamped)
 
             ZStack(alignment: .leading) {
 

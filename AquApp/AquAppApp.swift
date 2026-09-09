@@ -29,6 +29,24 @@ struct AquAppApp: App {
 
     @MainActor
     init() {
+        // 🧪 Hook tests UI — état déterministe sur demande (launch arguments)
+        // -uiTestingFresh  : app vierge, onboarding visible
+        // -uiTestingReady  : app vierge, onboarding sauté, arrive sur Home
+        let args = ProcessInfo.processInfo.arguments
+        if args.contains("-uiTestingFresh") || args.contains("-uiTestingReady") {
+            if let bid = Bundle.main.bundleIdentifier {
+                UserDefaults.standard.removePersistentDomain(forName: bid)
+            }
+            UserDefaults(suiteName: "group.com.fabian.dargaud.AquApp")?
+                .removePersistentDomain(forName: "group.com.fabian.dargaud.AquApp")
+            PremiumManager.shared.set(false)
+            HealthDataManager.shared.resetForTests()
+            if args.contains("-uiTestingReady") {
+                UserDefaults.standard.set(true, forKey: "onboardingCompleted")
+                HealthDataManager.shared.setFirstName("Test")
+            }
+        }
+
         let schema = Schema([WaterEntry.self, WaterAlcoholEntry.self, DayRecord.self])
         let config = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
 
@@ -83,7 +101,7 @@ struct AquAppApp: App {
         chm.confettiManager  = cm
         am.xpManager         = xpm
         chm.xpManager        = xpm
-        am.isPremiumUser     = UserDefaults.standard.bool(forKey: "isPremiumUser")
+        am.isPremiumUser     = PremiumManager.shared.isPremium   // ✅ corrigé (Phase 2)
 
         s.recalculateAllAchievementsFromHistory()
 
@@ -167,18 +185,9 @@ struct AquAppApp: App {
 
     // MARK: - Programmation du BGAppRefreshTask
 
-    /// Programme un BGAppRefreshTask pour que iOS réveille l'app en background
-    /// et recalcule les streaks + synchronise les widgets.
-    ///
-    /// earliestBeginDate = maintenant + 15 min : iOS ne déclenchera pas
-    /// la tâche avant ce délai, mais peut attendre plus longtemps selon
-    /// la batterie, le réseau et l'usage. On vise un refresh dans la nuit.
     private func scheduleBackgroundRefresh() {
         let request = BGAppRefreshTaskRequest(identifier: bgRefreshID)
 
-        // On cible minuit du jour suivant comme earliest date.
-        // Si l'app est mise en background à 22h, iOS pourra réveiller
-        // l'app à minuit ou juste après pour faire le reset.
         let calendar = Calendar.current
         let tomorrow = calendar.date(byAdding: .day, value: 1, to: Date())!
         let midnight = calendar.startOfDay(for: tomorrow)
@@ -187,31 +196,18 @@ struct AquAppApp: App {
         do {
             try BGTaskScheduler.shared.submit(request)
         } catch {
-            // Echec silencieux — handleForeground() reste le filet de sécurité
             print("⚠️ BGTaskScheduler.submit failed: \(error)")
         }
     }
 
     // MARK: - Exécution du BGAppRefreshTask
 
-    /// Appelé par iOS quand l'app est réveillée en background.
-    /// Durée max : 30 secondes. On signale setTaskCompleted en fin de tâche.
-    ///
-    /// Opérations effectuées :
-    ///   1. Reset quotidien si minuit est passé (streaks, DayRecord)
-    ///   2. Synchronisation des données widget dans l'App Group
-    ///   3. Reload des timelines WidgetKit
-    ///   4. Reprogrammation du prochain BGAppRefreshTask
     private static func handleBackgroundRefresh(_ task: BGAppRefreshTask) {
-        // Timeout safety : si iOS annule la tâche avant qu'on ait fini,
-        // on signale quand même la complétion pour éviter une pénalité.
         task.expirationHandler = {
             task.setTaskCompleted(success: false)
         }
 
         Task { @MainActor in
-            // Crée un contexte SwiftData indépendant pour le background.
-            // On ne peut pas utiliser le contexte principal (lié à l'UI).
             let schema = Schema([WaterEntry.self, WaterAlcoholEntry.self, DayRecord.self])
             let config = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
 
@@ -222,22 +218,18 @@ struct AquAppApp: App {
 
             let bgStore = AppDataStore(modelContext: container.mainContext)
 
-            // 1. Vérifie si un reset quotidien est nécessaire
             let calendar  = Calendar.current
             let today     = calendar.startOfDay(for: Date())
             let lastReset = UserDefaults.standard.object(forKey: "last_reset_date") as? Date
 
             if lastReset == nil || !calendar.isDate(lastReset!, inSameDayAs: today) {
-                // Reset manqué — recalcule streaks et met à jour DayRecord
                 bgStore.performMidnightReset()
             } else {
-                // Pas de reset nécessaire — juste sync des widgets
                 bgStore.recalculateGoalStreak()
                 bgStore.recalculateSoberStreak()
                 bgStore.syncWidgetData()
             }
 
-            // 2. Reprogramme le prochain refresh pour la nuit suivante
             let nextMidnight = calendar.startOfDay(
                 for: calendar.date(byAdding: .day, value: 1, to: Date())!
             )
