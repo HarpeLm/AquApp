@@ -5,7 +5,6 @@
 //  Created by Fabian Dargaud on 09/09/2026.
 //
 
-
 import Foundation
 import Combine
 import SwiftUI
@@ -32,6 +31,8 @@ final class HealthDataManager: ObservableObject {
     @Published private(set) var xpTotal:         Int
     @Published private(set) var heatwaveDays:    Double
     @Published private(set) var soberDaysTotal:  Double
+    @Published private(set) var totalWaterMl:    Double
+    @Published private(set) var totalAlcoholMl:  Double
 
     // MARK: - Date d'installation
 
@@ -65,6 +66,10 @@ final class HealthDataManager: ObservableObject {
                               ?? d.double(forKey: "heatwave_days")
         self.soberDaysTotal = km.getDouble(forKey: "sober_days_total")
                               ?? d.double(forKey: "sober_days_total")
+        self.totalWaterMl   = km.getDouble(forKey: "total_water_ml")
+                              ?? d.double(forKey: "total_water_ml")
+        self.totalAlcoholMl = km.getDouble(forKey: "total_alcohol_ml")
+                              ?? d.double(forKey: "total_alcohol_ml")
 
         if let keychainDate = km.getString(forKey: "aquapp_first_launch_date"),
            let ti = Double(keychainDate) {
@@ -102,6 +107,13 @@ final class HealthDataManager: ObservableObject {
         firstLaunchDate = v
     }
 
+    // MARK: - Setters totaux cumulatifs (O(1))
+
+    func setTotalWaterMl(_ v: Double)   { km.set(v, forKey: "total_water_ml");   totalWaterMl = v }
+    func setTotalAlcoholMl(_ v: Double) { km.set(v, forKey: "total_alcohol_ml"); totalAlcoholMl = v }
+    func addWaterMl(_ delta: Double)    { setTotalWaterMl(totalWaterMl + delta) }
+    func addAlcoholMl(_ delta: Double)  { setTotalAlcoholMl(totalAlcoholMl + delta) }
+
     // MARK: - Progrès succès/défis
 
     func setAchievementProgress(_ id: String, value: Double) {
@@ -135,7 +147,8 @@ final class HealthDataManager: ObservableObject {
     private func migrateIfNeeded() {
         for key in ["userWeightKg", "userHeightCm", "userGender", "userFirstName",
                     "current_streak", "total_goal_days", "sober_streak", "xp_total",
-                    "heatwave_days", "sober_days_total", "aquapp_first_launch_date"]
+                    "heatwave_days", "sober_days_total", "aquapp_first_launch_date",
+                    "total_water_ml", "total_alcohol_ml"]
             where d.object(forKey: key) != nil { d.removeObject(forKey: key) }
 
         var achProg = achievementProgress
@@ -180,6 +193,7 @@ final class HealthDataManager: ObservableObject {
         setWeight(70); setHeight(170); setGender("notSpecified"); setFirstName("")
         setCurrentStreak(0); setTotalGoalDays(0); setSoberStreak(0); setXPTotal(0)
         setHeatwaveDays(0); setSoberDaysTotal(0)
+        setTotalWaterMl(0); setTotalAlcoholMl(0)
         achievementProgress = [:]; achievementCompleted = [:]; challengeCompleted = [:]
     }
 }

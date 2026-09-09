@@ -58,8 +58,45 @@ final class AppDataStore: ObservableObject {
 
     init(modelContext: ModelContext) {
         self.modelContext = modelContext
-        recalculateSoberStreak()
+        bootstrapCumulativeTotals()
+        fullScanSoberStreakAtLaunch()
         recalculateGoalStreak()
+    }
+
+    // MARK: - Bootstrap au lancement
+
+    /// Initialise totalWaterMl / totalAlcoholMl depuis la DB si le Keychain
+    /// est vide (1er lancement ou wipe). 1 full fetch au lancement uniquement.
+    private func bootstrapCumulativeTotals() {
+        if HealthDataManager.shared.totalWaterMl == 0,
+           let sum = sumWaterMl(), sum > 0 {
+            HealthDataManager.shared.setTotalWaterMl(sum)
+        }
+        if HealthDataManager.shared.totalAlcoholMl == 0,
+           let sum = sumAlcoholMl(), sum > 0 {
+            HealthDataManager.shared.setTotalAlcoholMl(sum)
+        }
+    }
+
+    /// Force un recalcul complet de sober_streak depuis SwiftData au lancement.
+    /// Ferme le risque de désynchronisation après restore iCloud / migration.
+    /// Le cas différentiel (O(1)) reste pour les mutations en cours de session.
+    private func fullScanSoberStreakAtLaunch() {
+        guard cachedAlcoholEntries().isEmpty else {
+            HealthDataManager.shared.setSoberStreak(0)
+            achievementManager?.onSoberStreakUpdated(streak: 0)
+            return
+        }
+        let streak = fullScanSoberStreak()
+        HealthDataManager.shared.setSoberStreak(streak)
+        achievementManager?.onSoberStreakUpdated(streak: streak)
+    }
+
+    /// Recalcule les totaux cumulés depuis SwiftData.
+    /// À appeler après un restore iCloud / migration de données.
+    public func recalculateCumulativeTotals() {
+        if let w = sumWaterMl() { HealthDataManager.shared.setTotalWaterMl(w) }
+        if let a = sumAlcoholMl() { HealthDataManager.shared.setTotalAlcoholMl(a) }
     }
 
     // MARK: - Recalcul des succès au démarrage
@@ -67,7 +104,7 @@ final class AppDataStore: ObservableObject {
     func recalculateAllAchievementsFromHistory() {
         guard let am = achievementManager else { return }
 
-        let totalMl = sumWaterMl() ?? 0
+        let totalMl = HealthDataManager.shared.totalWaterMl
         am.onWaterAdded(totalCumulatedMl: totalMl)
 
         am.onGoalReached(streak: currentStreak, totalDays: totalGoalDays)
@@ -126,6 +163,7 @@ final class AppDataStore: ObservableObject {
         let entry = WaterEntry(amountMl: amountMl, date: date)
         modelContext.insert(entry)
         save()
+        HealthDataManager.shared.addWaterMl(amountMl)
 
         HealthKitWriter.shared.write(amountMl: amountMl, date: date, entryID: entry.id)
         Task { @MainActor in xpManager?.add(.water(ml: amountMl)) }
@@ -143,8 +181,7 @@ final class AppDataStore: ObservableObject {
             Task { @MainActor in xpManager?.add(.dailyGoal) }
         }
 
-        let totalCumulatedMl = sumWaterMl() ?? 0
-        achievementManager?.onWaterAdded(totalCumulatedMl: totalCumulatedMl)
+        achievementManager?.onWaterAdded(totalCumulatedMl: HealthDataManager.shared.totalWaterMl)
 
         let nineAM       = Calendar.current.date(bySettingHour: 9, minute: 0, second: 0, of: Date())!
         let waterEntries = cachedWaterEntries()
@@ -178,6 +215,7 @@ final class AppDataStore: ObservableObject {
         HealthKitWriter.shared.delete(entryID: entry.id, date: entry.date)
         modelContext.delete(entry)
         save()
+        HealthDataManager.shared.addWaterMl(-entry.amountMl)
         invalidateCache()
         updateDayRecord(for: entry.date)
         recalculateGoalStreak()
@@ -196,6 +234,7 @@ final class AppDataStore: ObservableObject {
         let entry = WaterAlcoholEntry(amountMl: amountMl, alcoholType: type, date: date)
         modelContext.insert(entry)
         save()
+        HealthDataManager.shared.addAlcoholMl(amountMl)
         invalidateCache()
         updateDayRecord(for: date)
         recalculateSoberStreak()
@@ -209,6 +248,7 @@ final class AppDataStore: ObservableObject {
     func deleteAlcohol(_ entry: WaterAlcoholEntry) {
         modelContext.delete(entry)
         save()
+        HealthDataManager.shared.addAlcoholMl(-entry.amountMl)
         invalidateCache()
         updateDayRecord(for: entry.date)
         recalculateSoberStreak()
@@ -257,7 +297,7 @@ final class AppDataStore: ObservableObject {
     }
 
     var totalAlcoholLiters: Double {
-        (sumAlcoholMl() ?? 0) / 1000.0
+        HealthDataManager.shared.totalAlcoholMl / 1000.0
     }
 
     // MARK: - Semaine en cours
@@ -293,7 +333,7 @@ final class AppDataStore: ObservableObject {
     }
 
     var totalWaterLiters: Double {
-        (sumWaterMl() ?? 0) / 1000.0
+        HealthDataManager.shared.totalWaterMl / 1000.0
     }
 
     func weekTotalMl(from start: Date, to end: Date) -> Double {
@@ -349,6 +389,8 @@ final class AppDataStore: ObservableObject {
         HealthDataManager.shared.soberStreak
     }
 
+    /// Recalcul différentiel (O(1)) appelé à chaque mutation.
+    /// Le full scan est fait au lancement par fullScanSoberStreakAtLaunch().
     func recalculateSoberStreak() {
         let calendar = Calendar.current
 
@@ -360,14 +402,6 @@ final class AppDataStore: ObservableObject {
         }
 
         let storedStreak = HealthDataManager.shared.soberStreak
-
-        if storedStreak == 0 {
-            let streak = fullScanSoberStreak()
-            HealthDataManager.shared.setSoberStreak(streak)
-            achievementManager?.onSoberStreakUpdated(streak: streak)
-            objectWillChange.send()
-            return
-        }
 
         let yesterday    = calendar.date(byAdding: .day, value: -1, to: Date())!
         let yesterdayEnd = calendar.date(byAdding: .day, value: 1, to: calendar.startOfDay(for: yesterday))!
@@ -454,11 +488,13 @@ final class AppDataStore: ObservableObject {
                 let kind    = AlcoholKind.migratedAlcoholKind(from: kindRaw)
                 let alcoholEntry = WaterAlcoholEntry(amountMl: amount, alcoholType: kind, date: date, siriIntentID: intentID)
                 modelContext.insert(alcoholEntry)
+                HealthDataManager.shared.addAlcoholMl(amount)
                 needsSoberRecalc = true
             } else {
                 if let id = intentID, existingWaterIDs.contains(id) { continue }
                 let waterEntry = WaterEntry(amountMl: amount, date: date, siriIntentID: intentID)
                 modelContext.insert(waterEntry)
+                HealthDataManager.shared.addWaterMl(amount)
                 HealthKitWriter.shared.write(amountMl: amount, date: date, entryID: waterEntry.id)
             }
 
@@ -501,6 +537,9 @@ final class AppDataStore: ObservableObject {
         oldRecords.forEach { modelContext.delete($0) }
         save()
         invalidateCache()
+        // Recalcule les totaux après purge : la différence est perdue mais la
+        // cohérence Keychain/DB est restaurée.
+        recalculateCumulativeTotals()
     }
 
     // MARK: - DayRecord
@@ -619,7 +658,21 @@ final class AppDataStore: ObservableObject {
         store.execute(query)
     }
 
-    // MARK: - Requêtes agrégées SQLite
+    // MARK: - Requêtes agrégées (fetch complet, utilisé uniquement au bootstrap / restore)
+    //
+    // Les valeurs totales courantes (totalWaterMl, totalAlcoholMl) sont gérées
+    // par HealthDataManager avec un total cumulé incrémental O(1) — aucun
+    // full fetch à chaque mutation.
+    // sumWaterMl() / sumAlcoholMl() / countDistinctWaterDays() ne sont appelées
+    // qu'au bootstrap (init), après un restore iCloud, ou après la purge
+    // 30 jours non-premium.
+    //
+    // NOTE : SwiftData n'expose pas encore d'API publique d'agrégation SUM
+    // (#Expression n'est pas stable pour ce cas sur iOS 17/18). Un fallback
+    // via NSFetchRequest avec expressionForAggregateKey serait possible
+    // via la stack CoreData sous-jacente, mais introduirait une complexité
+    // injustifiée pour le volume actuel.
+    // TODO (iOS 18+) : réévaluer #AggregateQuery dès qu'il devient stable.
 
     private func sumWaterMl() -> Double? {
         let descriptor = FetchDescriptor<WaterEntry>()
