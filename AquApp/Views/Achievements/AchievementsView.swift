@@ -69,10 +69,10 @@ final class AchievementManager: ObservableObject {
     weak var confettiManager: ConfettiManager?
     weak var xpManager: XPManager?
 
-    var isPremiumUser: Bool = UserDefaults.standard.bool(forKey: "isPremiumUser") {
+    var isPremiumUser: Bool = PremiumManager.shared.isPremium {
         didSet {
             guard oldValue != isPremiumUser else { return }
-            UserDefaults.standard.set(isPremiumUser, forKey: "isPremiumUser")
+            PremiumManager.shared.set(isPremiumUser)
             updateProStatus()
         }
     }
@@ -520,7 +520,14 @@ struct AchievementsView: View {
     @EnvironmentObject var manager: AchievementManager
     @EnvironmentObject var confettiManager: ConfettiManager
     @EnvironmentObject var storeKit: StoreKitManager
-    @AppStorage("isPremiumUser") private var isPremiumUser: Bool = false
+    @ObservedObject private var premiumStore = PremiumManager.shared
+    private var isPremiumUser: Bool {
+        get { premiumStore.isPremium }
+        nonmutating set { premiumStore.set(newValue) }
+    }
+    private var isPremiumUserBinding: Binding<Bool> {
+        Binding(get: { premiumStore.isPremium }, set: { premiumStore.set($0) })
+    }
     @Environment(\.colorScheme) private var colorScheme
 
     @State private var showPremiumSheet = false
@@ -653,7 +660,7 @@ struct AchievementsView: View {
                 }
             }
             .sheet(isPresented: $showPremiumSheet) {
-                PremiumSheet(isPremiumUser: $isPremiumUser, isPresented: $showPremiumSheet)
+                PremiumSheet(isPremiumUser: isPremiumUserBinding, isPresented: $showPremiumSheet)
                     .environmentObject(storeKit)
                     .presentationDetents([.large])
                     .presentationDragIndicator(.hidden)
