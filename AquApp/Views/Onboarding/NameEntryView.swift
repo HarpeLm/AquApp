@@ -76,6 +76,7 @@ struct NameEntryView: View {
                                         )
                                 )
                                 .withDoneButton()
+                                .accessibilityIdentifier("onboarding.name")
                                 .onSubmit {
                                     if !isButtonDisabled { saveName() }
                                 }
@@ -102,6 +103,7 @@ struct NameEntryView: View {
                                     )
                             }
                             .disabled(isButtonDisabled)
+                            .accessibilityIdentifier("onboarding.name.continue")
                         }
                         .padding(.horizontal, 28)
                         .padding(.bottom, keyboardHeight)

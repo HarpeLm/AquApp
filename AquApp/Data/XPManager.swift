@@ -154,7 +154,9 @@ final class XPManager: ObservableObject {
 
     var progressRatio: Double {
         guard let _ = currentLevel.next else { return 1.0 }
-        return min(1.0, Double(xpInCurrentLevel) / Double(currentLevelRange))
+        let ratio = Double(xpInCurrentLevel) / Double(currentLevelRange)
+        guard ratio.isFinite else { return 0 }
+        return min(max(ratio, 0), 1.0)
     }
 
     var xpUntilNextLevel: Int? {

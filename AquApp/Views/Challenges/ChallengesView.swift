@@ -42,7 +42,9 @@ struct Challenge: Identifiable {
 
     var progressRatio: Double {
         guard targetProgress > 0 else { return 0 }
-        return min(currentProgress / targetProgress, 1.0)
+        let ratio = currentProgress / targetProgress
+        guard ratio.isFinite else { return 0 }
+        return min(max(ratio, 0), 1.0)
     }
 
     var badgeSFSymbol: String {

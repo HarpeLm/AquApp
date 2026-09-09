@@ -14,6 +14,13 @@
 			remoteGlobalIDString = 70AB0CAA2F66CB0F00DF04B8;
 			remoteInfo = AquApp;
 		};
+		701777823051A0DA007F31D1 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 70AB0CA32F66CB0F00DF04B8 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 70AB0CAA2F66CB0F00DF04B8;
+			remoteInfo = AquApp;
+		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -31,6 +38,7 @@
 
 /* Begin PBXFileReference section */
 		701775C9304F2023007F31D1 /* AquAppTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = AquAppTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		7017777C3051A0DA007F31D1 /* AquAppTestsUi.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = AquAppTestsUi.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		704EBA282F6BE58000F66142 /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
 		704EBA2A2F6BE58000F66142 /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
 		70AB0CAB2F66CB0F00DF04B8 /* AquApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AquApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -52,6 +60,11 @@
 			path = AquAppTests;
 			sourceTree = "<group>";
 		};
+		7017777D3051A0DA007F31D1 /* AquAppUiTests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = AquAppUiTests;
+			sourceTree = "<group>";
+		};
 		70AB0CAD2F66CB0F00DF04B8 /* AquApp */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
@@ -64,6 +77,13 @@
 
 /* Begin PBXFrameworksBuildPhase section */
 		701775C6304F2023007F31D1 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		701777793051A0DA007F31D1 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -94,6 +114,7 @@
 			children = (
 				70AB0CAD2F66CB0F00DF04B8 /* AquApp */,
 				701775CA304F2023007F31D1 /* AquAppTests */,
+				7017777D3051A0DA007F31D1 /* AquAppUiTests */,
 				7023E5672F69EA150035F7A0 /* Frameworks */,
 				70AB0CAC2F66CB0F00DF04B8 /* Products */,
 			);
@@ -104,6 +125,7 @@
 			children = (
 				70AB0CAB2F66CB0F00DF04B8 /* AquApp.app */,
 				701775C9304F2023007F31D1 /* AquAppTests.xctest */,
+				7017777C3051A0DA007F31D1 /* AquAppTestsUi.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -133,6 +155,29 @@
 			productName = AquAppTests;
 			productReference = 701775C9304F2023007F31D1 /* AquAppTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		7017777B3051A0DA007F31D1 /* AquAppTestsUi */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 701777843051A0DA007F31D1 /* Build configuration list for PBXNativeTarget "AquAppTestsUi" */;
+			buildPhases = (
+				701777783051A0DA007F31D1 /* Sources */,
+				701777793051A0DA007F31D1 /* Frameworks */,
+				7017777A3051A0DA007F31D1 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				701777833051A0DA007F31D1 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				7017777D3051A0DA007F31D1 /* AquAppUiTests */,
+			);
+			name = AquAppTestsUi;
+			packageProductDependencies = (
+			);
+			productName = AquAppTestsUi;
+			productReference = 7017777C3051A0DA007F31D1 /* AquAppTestsUi.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
 		};
 		70AB0CAA2F66CB0F00DF04B8 /* AquApp */ = {
 			isa = PBXNativeTarget;
@@ -171,6 +216,10 @@
 						CreatedOnToolsVersion = 26.6;
 						TestTargetID = 70AB0CAA2F66CB0F00DF04B8;
 					};
+					7017777B3051A0DA007F31D1 = {
+						CreatedOnToolsVersion = 26.6;
+						TestTargetID = 70AB0CAA2F66CB0F00DF04B8;
+					};
 					70AB0CAA2F66CB0F00DF04B8 = {
 						CreatedOnToolsVersion = 26.3;
 					};
@@ -193,12 +242,20 @@
 			targets = (
 				70AB0CAA2F66CB0F00DF04B8 /* AquApp */,
 				701775C8304F2023007F31D1 /* AquAppTests */,
+				7017777B3051A0DA007F31D1 /* AquAppTestsUi */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
 		701775C7304F2023007F31D1 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		7017777A3051A0DA007F31D1 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -222,6 +279,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		701777783051A0DA007F31D1 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		70AB0CA72F66CB0F00DF04B8 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -236,6 +300,11 @@
 			isa = PBXTargetDependency;
 			target = 70AB0CAA2F66CB0F00DF04B8 /* AquApp */;
 			targetProxy = 701775CD304F2023007F31D1 /* PBXContainerItemProxy */;
+		};
+		701777833051A0DA007F31D1 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 70AB0CAA2F66CB0F00DF04B8 /* AquApp */;
+			targetProxy = 701777823051A0DA007F31D1 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -281,6 +350,48 @@
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/AquApp.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/AquApp";
+			};
+			name = Release;
+		};
+		701777853051A0DA007F31D1 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = B2WR9NJN4S;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.3.1;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.fabian.dargaud.AquAppTestsUi;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = AquApp;
+			};
+			name = Debug;
+		};
+		701777863051A0DA007F31D1 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = B2WR9NJN4S;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.3.1;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.fabian.dargaud.AquAppTestsUi;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = AquApp;
 			};
 			name = Release;
 		};
@@ -496,6 +607,15 @@
 			buildConfigurations = (
 				701775CF304F2023007F31D1 /* Debug */,
 				701775D0304F2023007F31D1 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		701777843051A0DA007F31D1 /* Build configuration list for PBXNativeTarget "AquAppTestsUi" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				701777853051A0DA007F31D1 /* Debug */,
+				701777863051A0DA007F31D1 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

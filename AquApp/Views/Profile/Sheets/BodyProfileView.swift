@@ -177,6 +177,7 @@ struct BodyProfileView: View {
                             ))
                             .cornerRadius(16)
                             .shadow(color: Color(hex: "9B59B6").opacity(0.4), radius: 10, x: 0, y: 4)
+                            .accessibilityIdentifier("onboarding.body.save")
                         }
                     }
                     .padding(.horizontal, 28)

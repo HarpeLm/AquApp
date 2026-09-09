@@ -52,6 +52,17 @@
                ReferencedContainer = "container:AquApp.xcodeproj">
             </BuildableReference>
          </TestableReference>
+         <TestableReference
+            skipped = "NO"
+            parallelizable = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "7017777B3051A0DA007F31D1"
+               BuildableName = "AquAppTestsUi.xctest"
+               BlueprintName = "AquAppTestsUi"
+               ReferencedContainer = "container:AquApp.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
       </Testables>
    </TestAction>
    <LaunchAction
