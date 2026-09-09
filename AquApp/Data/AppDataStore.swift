@@ -4,23 +4,17 @@ import SwiftUI
 import Combine
 import Foundation
 
-
 // MARK: - AppDataStore
 
 @MainActor
 final class AppDataStore: ObservableObject {
 
     private let modelContext: ModelContext
-    /// Accès public au ModelContext pour les modules externes (WrappedDataBuilder).
     var modelContextPublic: ModelContext { modelContext }
     weak var confettiManager: ConfettiManager?
-    /// Injecté depuis AquAppApp pour notifier les succès
     weak var achievementManager: AchievementManager?
-    /// Injecté depuis AquAppApp pour notifier les défis
     weak var challengeManager: ChallengeManager?
-    /// Injecté depuis AquAppApp pour le système XP
     weak var xpManager: XPManager?
-
 
     @AppStorage("dailyGoalMl")   var dailyGoalMl: Double = 2170
     var isPremiumUser: Bool {
@@ -28,16 +22,10 @@ final class AppDataStore: ObservableObject {
         set { PremiumManager.shared.set(newValue) }
     }
 
-    /// Objectif adaptatif météo — nil si pas de canicule
     var heatwaveGoalMl: Double? = nil
-
-    /// Objectif effectif : canicule si disponible, sinon objectif normal
     var effectiveGoalMl: Double { heatwaveGoalMl ?? dailyGoalMl }
 
     // MARK: - Cache du jour
-    // Toutes les propriétés calculées consomment ce cache
-    // au lieu de fetcher SwiftData indépendamment.
-    // Invalidé après chaque mutation (addWater, deleteWater, addAlcohol, deleteAlcohol).
 
     private var _cachedWaterEntries:   [WaterEntry]?
     private var _cachedAlcoholEntries: [WaterAlcoholEntry]?
@@ -48,7 +36,6 @@ final class AppDataStore: ObservableObject {
         _cachedAlcoholEntries = nil
     }
 
-    /// Entrées eau du jour — fetche une seule fois par cycle de mutation
     private func cachedWaterEntries() -> [WaterEntry] {
         let today = Calendar.current.startOfDay(for: Date())
         if _cachedWaterEntries == nil || _cacheDay != today {
@@ -59,7 +46,6 @@ final class AppDataStore: ObservableObject {
         return _cachedWaterEntries!
     }
 
-    /// Entrées alcool du jour — fetche une seule fois par cycle de mutation
     private func cachedAlcoholEntries() -> [WaterAlcoholEntry] {
         let today = Calendar.current.startOfDay(for: Date())
         if _cachedAlcoholEntries == nil || _cacheDay != today {
@@ -77,43 +63,33 @@ final class AppDataStore: ObservableObject {
     }
 
     // MARK: - Recalcul des succès au démarrage
-    // Appelé depuis AquAppApp après injection de achievementManager,
-    // pour que Légende / Aqua'ddict / constance / etc. reflètent
-    // l'historique complet dès l'ouverture de l'app.
+
     func recalculateAllAchievementsFromHistory() {
         guard let am = achievementManager else { return }
 
-        // ── Légende + Aqua'ddict : total cumulé via requête SUM SQLite ───────
-        // iOS 17+ : #Expression délègue le calcul à SQLite — zéro chargement
-        // d'objets WaterEntry en RAM, aucune limite de 10 000 entrées.
         let totalMl = sumWaterMl() ?? 0
         am.onWaterAdded(totalCumulatedMl: totalMl)
 
-        // Streak objectif → constance, perfect_week, iron_month, indestructible, centurion
         am.onGoalReached(streak: currentStreak, totalDays: totalGoalDays)
 
-        // Streak sobre → semaine_sobre + mensuels + centurion_sobre
         am.onSoberStreakUpdated(streak: soberDaysStreak)
 
-        // Canicule : relit le compteur déjà stocké
-        let heatwaveDays = UserDefaults.standard.double(forKey: "heatwave_days")
+        let heatwaveDays = HealthDataManager.shared.heatwaveDays
         if heatwaveDays > 0 {
             am.restoreHeatwaveProgress(days: heatwaveDays)
         }
     }
 
-    // MARK: - Aujourd'hui (computed — utilisent le cache)
+    // MARK: - Aujourd'hui
 
     var todayWaterMlRaw: Double {
         cachedWaterEntries().reduce(0) { $0 + $1.amountMl }
     }
 
-    /// Compensation eau nécessaire pour l'alcool du jour.
     var todayAlcoholCompensationMl: Double {
         cachedAlcoholEntries().reduce(0) { $0 + $1.compensationMl }
     }
 
-    /// Total d'eau effectif = eau bue - compensation alcool (minimum 0)
     var todayWaterMl: Double {
         max(0, todayWaterMlRaw - todayAlcoholCompensationMl)
     }
@@ -140,9 +116,6 @@ final class AppDataStore: ObservableObject {
     // MARK: - Ajout eau
 
     func addWater(amountMl: Double, date: Date = Date()) {
-        // Garde-fou : un verre d'eau raisonnable est entre 0 et 5000 ml.
-        // Rejette silencieusement toute valeur aberrante (NaN, infini,
-        // négative, ou disproportionnée) avant qu'elle n'entre en base.
         guard amountMl.isFinite, amountMl > 0, amountMl <= 5000 else {
             print("⚠️ addWater — valeur rejetée: \(amountMl)")
             return
@@ -170,7 +143,6 @@ final class AppDataStore: ObservableObject {
             Task { @MainActor in xpManager?.add(.dailyGoal) }
         }
 
-        // ── Aqua'ddict + Légende : SUM SQLite — zéro chargement en RAM ───────
         let totalCumulatedMl = sumWaterMl() ?? 0
         achievementManager?.onWaterAdded(totalCumulatedMl: totalCumulatedMl)
 
@@ -179,7 +151,7 @@ final class AppDataStore: ObservableObject {
         let mlBeforeNine = waterEntries.filter { $0.date < nineAM }.reduce(0) { $0 + $1.amountMl }
 
         challengeManager?.onWaterUpdated(
-            totalTodayMl:     todayWaterMlRaw,  // ← CORRIGÉ
+            totalTodayMl:     todayWaterMlRaw,
             dailyGoalMl:      dailyGoalMl,
             dailyGoalReached: todayGoalReached,
             drinkCount:       waterEntries.count,
@@ -199,7 +171,6 @@ final class AppDataStore: ObservableObject {
             }
         }
 
-
         objectWillChange.send()
     }
 
@@ -217,8 +188,6 @@ final class AppDataStore: ObservableObject {
     // MARK: - Ajout alcool
 
     func addAlcohol(amountMl: Double, type: AlcoholKind, date: Date = Date()) {
-        // Garde-fou : même logique que addWater — un verre d'alcool
-        // raisonnable reste sous 5000 ml.
         guard amountMl.isFinite, amountMl > 0, amountMl <= 5000 else {
             print("⚠️ addAlcohol — valeur rejetée: \(amountMl)")
             return
@@ -278,27 +247,20 @@ final class AppDataStore: ObservableObject {
     }
 
     // MARK: - Stats globales
-    // ── Toutes les stats "all time" utilisent désormais des requêtes SUM/COUNT
-    // déléguées à SQLite via #Expression (iOS 17+).
-    // Avantages : zéro objet chargé en RAM, aucune limite de 10 000 entrées,
-    // performances constantes quelle que soit la taille de l'historique.
 
     var activeDaysLast30: Int {
         fetchDayRecords(last: 30).filter { $0.goalReached }.count
     }
 
-    /// Nombre de jours distincts avec au moins une entrée eau.
-    /// Utilise un COUNT DISTINCT côté SQLite — aucun chargement en RAM.
     var activeDaysTotal: Int {
         countDistinctWaterDays() ?? 0
     }
 
-    /// Litres d'alcool total — SUM SQLite, pas de chargement en RAM.
     var totalAlcoholLiters: Double {
         (sumAlcoholMl() ?? 0) / 1000.0
     }
 
-    // MARK: - Semaine en cours (lundi → dimanche)
+    // MARK: - Semaine en cours
 
     var currentWeekStart: Date {
         let calendar = Calendar.current
@@ -330,7 +292,6 @@ final class AppDataStore: ObservableObject {
         return fetchAlcohol(from: start, to: Date()).reduce(0) { $0 + $1.amountMl } / 1000.0
     }
 
-    /// Total eau en litres — SUM SQLite, pas de chargement en RAM.
     var totalWaterLiters: Double {
         (sumWaterMl() ?? 0) / 1000.0
     }
@@ -346,11 +307,11 @@ final class AppDataStore: ObservableObject {
     // MARK: - Goal streak
 
     var currentStreak: Int {
-        UserDefaults.standard.integer(forKey: "current_streak")
+        HealthDataManager.shared.currentStreak
     }
 
     var totalGoalDays: Int {
-        UserDefaults.standard.integer(forKey: "total_goal_days")
+        HealthDataManager.shared.totalGoalDays
     }
 
     func recalculateGoalStreak() {
@@ -377,78 +338,58 @@ final class AppDataStore: ObservableObject {
         let streak = todayGoalMet ? streakFromPast + 1 : streakFromPast
         let total  = (try? modelContext.fetch(FetchDescriptor<DayRecord>()))?.filter { $0.goalReached }.count ?? 0
 
-        UserDefaults.standard.set(streak, forKey: "current_streak")
-        UserDefaults.standard.set(total,  forKey: "total_goal_days")
+        HealthDataManager.shared.setCurrentStreak(streak)
+        HealthDataManager.shared.setTotalGoalDays(total)
         objectWillChange.send()
     }
 
     // MARK: - Sober streak
 
     var soberDaysStreak: Int {
-        UserDefaults.standard.integer(forKey: "sober_streak")
+        HealthDataManager.shared.soberStreak
     }
 
     func recalculateSoberStreak() {
         let calendar = Calendar.current
 
-        // ── Cas 1 : alcool aujourd'hui → streak = 0 immédiatement ────────────
         guard cachedAlcoholEntries().isEmpty else {
-            UserDefaults.standard.set(0, forKey: "sober_streak")
+            HealthDataManager.shared.setSoberStreak(0)
             achievementManager?.onSoberStreakUpdated(streak: 0)
             objectWillChange.send()
             return
         }
 
-        // ── Cas 2 : storedStreak = 0 → scan complet pour distinguer
-        // "jamais calculé / reset par alcool" de "vraie valeur 0".
-        // Optimisé : 1 seul fetch groupé au lieu de N fetches séquentiels.
-        let storedStreak = UserDefaults.standard.integer(forKey: "sober_streak")
+        let storedStreak = HealthDataManager.shared.soberStreak
 
         if storedStreak == 0 {
             let streak = fullScanSoberStreak()
-            UserDefaults.standard.set(streak, forKey: "sober_streak")
+            HealthDataManager.shared.setSoberStreak(streak)
             achievementManager?.onSoberStreakUpdated(streak: streak)
             objectWillChange.send()
             return
         }
 
-        // ── Cas 3 : approche différentielle O(1) ─────────────────────────────
         let yesterday    = calendar.date(byAdding: .day, value: -1, to: Date())!
         let yesterdayEnd = calendar.date(byAdding: .day, value: 1, to: calendar.startOfDay(for: yesterday))!
         let alcoholYesterday = fetchAlcohol(from: calendar.startOfDay(for: yesterday), to: yesterdayEnd)
 
         let streak = alcoholYesterday.isEmpty ? storedStreak + 1 : 1
 
-        UserDefaults.standard.set(streak, forKey: "sober_streak")
+        HealthDataManager.shared.setSoberStreak(streak)
         achievementManager?.onSoberStreakUpdated(streak: streak)
         objectWillChange.send()
     }
 
-    /// Recalcul complet de la sober streak — 1 seul fetch groupé.
-    ///
-    /// Optimisation v1.1 : au lieu de N fetches séquentiels jour par jour (O(N)),
-    /// on charge toutes les entrées alcool depuis J-1 jusqu'à firstLaunchDate
-    /// en une seule requête, on groupe par jour en mémoire (O(1) dict lookup),
-    /// puis on remonte sans aucun accès supplémentaire à la DB.
-    ///
-    /// En pratique le volume est faible : seuls les jours avec alcool sont chargés,
-    /// et on s'arrête au premier jour alcoolisé trouvé.
     private func fullScanSoberStreak() -> Int {
         let calendar    = Calendar.current
         let installDate = calendar.startOfDay(for: firstLaunchDate)
         let today       = calendar.startOfDay(for: Date())
         let yesterday   = calendar.date(byAdding: .day, value: -1, to: today)!
 
-        // ── 1 seul fetch : toutes les entrées alcool depuis l'install ─────────
-        // On ne charge que les entrées alcool (bien moins nombreuses que l'eau),
-        // et uniquement depuis installDate — pas depuis le début des temps.
         let allAlcohol = fetchAlcohol(from: installDate, to: yesterday)
 
-        // Construit un Set de jours avec alcool — lookup O(1) ensuite
         let alcoholDays = Set(allAlcohol.map { calendar.startOfDay(for: $0.date) })
 
-        // ── Remonte depuis hier sans aucun fetch supplémentaire ───────────────
-        // Aujourd'hui est sobre (guard dans recalculateSoberStreak) → on compte 1
         var streak    = 1
         var checkDate = yesterday
 
@@ -462,11 +403,13 @@ final class AppDataStore: ObservableObject {
     }
 
     var firstLaunchDate: Date {
-        let key = "aquapp_first_launch_date"
-        if let saved = UserDefaults.standard.object(forKey: key) as? Date { return saved }
-        let now = Date()
-        UserDefaults.standard.set(now, forKey: key)
-        return now
+        let date = HealthDataManager.shared.firstLaunchDate
+        if date == Date(timeIntervalSince1970: 0) {
+            let now = Date()
+            HealthDataManager.shared.setFirstLaunchDate(now)
+            return now
+        }
+        return date
     }
 
     // MARK: - Reset quotidien
@@ -492,8 +435,6 @@ final class AppDataStore: ObservableObject {
                 let timestamp = entry["timestamp"] as? TimeInterval
             else { continue }
 
-            // Garde-fou : source externe (widget/Siri) non fiable — on rejette
-            // toute valeur aberrante avant qu'elle n'entre en base SwiftData.
             guard amount.isFinite, amount > 0, amount <= 5000 else {
                 print("⚠️ flushWidgetPendingEntries — entrée rejetée, amountMl invalide: \(amount)")
                 continue
@@ -547,14 +488,13 @@ final class AppDataStore: ObservableObject {
     func allWaterEntries() -> [WaterEntry]        { fetchAllWater() }
     func allAlcoholEntries() -> [WaterAlcoholEntry] { fetchAllAlcohol() }
 
-    // MARK: - Nettoyage non-Premium (garde 30 jours)
+    // MARK: - Nettoyage non-Premium
 
     func cleanOldDataIfNeeded() {
         guard !isPremiumUser else { return }
         let cutoff = Calendar.current.date(byAdding: .day, value: -30, to: Date())!
         fetchWater(to: cutoff).forEach   { modelContext.delete($0) }
         fetchAlcohol(to: cutoff).forEach { modelContext.delete($0) }
-        // Purge aussi les DayRecord hors de la fenêtre 30 jours
         let oldRecords = (try? modelContext.fetch(FetchDescriptor<DayRecord>(
             predicate: #Predicate { $0.date < cutoff }
         ))) ?? []
@@ -609,28 +549,17 @@ final class AppDataStore: ObservableObject {
         return (try? modelContext.fetch(descriptor)) ?? []
     }
 
-    // MARK: - Grille de contributions (365 jours)
-    // Fournit, pour chaque jour startOfDay des `days` derniers jours,
-    // le ratio net/objectif (0 si pas de donnée ou objectif non atteint,
-    // >0 sinon). Consommé par HydrationGridView — gratuit, aucune
-    // restriction Premium.
+    // MARK: - Grille de contributions
+
     func contributionRatios(days: Int = 365) -> [Date: Double] {
         let calendar = Calendar.current
         let today    = calendar.startOfDay(for: Date())
         let start    = calendar.date(byAdding: .day, value: -(days - 1), to: today)!
 
-        // NOTE : on évite volontairement un FetchDescriptor avec #Predicate
-        // ici (crashs SwiftData/AttributeGraph en Previews avec variable
-        // capturée). Un fetch non filtré + filtrage en mémoire suffit vu le
-        // faible volume de données.
         let allWater   = (try? modelContext.fetch(FetchDescriptor<WaterEntry>())) ?? []
         let allAlcohol = (try? modelContext.fetch(FetchDescriptor<WaterAlcoholEntry>())) ?? []
         let allRecords = (try? modelContext.fetch(FetchDescriptor<DayRecord>())) ?? []
 
-        // Volume net réel par jour : somme des entrées d'eau moins la
-        // compensation alcool. C'est ce qui permet d'afficher des teintes
-        // intermédiaires (jour partiel) et pas seulement binaire atteint/
-        // non atteint comme le booléen DayRecord.goalReached.
         var waterByDay: [Date: Double] = [:]
         for entry in allWater where entry.date >= start {
             waterByDay[calendar.startOfDay(for: entry.date), default: 0] += entry.amountMl
@@ -640,8 +569,6 @@ final class AppDataStore: ObservableObject {
             alcoholCompByDay[calendar.startOfDay(for: entry.date), default: 0] += entry.compensationMl
         }
 
-        // Objectif du jour : celui persisté dans DayRecord s'il existe
-        // (l'objectif a pu changer dans l'année), sinon l'objectif courant.
         var goalByDay: [Date: Double] = [:]
         for record in allRecords where record.date >= start {
             goalByDay[calendar.startOfDay(for: record.date)] = record.goalMl
@@ -654,9 +581,6 @@ final class AppDataStore: ObservableObject {
             let net  = max(0, (waterByDay[day] ?? 0) - (alcoholCompByDay[day] ?? 0))
             let goal = goalByDay[day] ?? dailyGoalMl
             guard goal > 0 else { continue }
-            // Jour sans aucune entrée d'eau : on retombe sur le booléen
-            // historique (1.0 si objectif atteint ce jour-là, sinon rien —
-            // la case reste vide comme sur la grille GitHub).
             if waterByDay[day] == nil {
                 if let reached = allRecords.first(where: { calendar.startOfDay(for: $0.date) == day })?.goalReached, reached {
                     result[day] = 1.0
@@ -666,14 +590,12 @@ final class AppDataStore: ObservableObject {
             result[day] = net / goal
         }
 
-        // Aujourd'hui : ratio réel en cours depuis le cache (peut être
-        // entre 0 et 1, ou plus si dépassement) — plus à jour qu'un fetch.
         result[today] = todayProgress
 
         return result
     }
 
-    // MARK: - Pas (HealthKit) pour Marathonien
+    // MARK: - Pas (HealthKit)
 
     private func fetchAndCacheTodaySteps(completion: @escaping (Double) -> Void) {
         guard HKHealthStore.isHealthDataAvailable() else {
@@ -697,32 +619,20 @@ final class AppDataStore: ObservableObject {
         store.execute(query)
     }
 
-    // MARK: - Requêtes agrégées SQLite (iOS 17+)
-    // ─────────────────────────────────────────────────────────────────────────
-    // #Expression délègue le calcul SUM/COUNT à SQLite — aucun objet SwiftData
-    // n'est chargé en RAM. Performances constantes quelle que soit la taille
-    // de la base, aucune limite de 10 000 entrées.
-    // ─────────────────────────────────────────────────────────────────────────
+    // MARK: - Requêtes agrégées SQLite
 
-    /// SUM(amountMl) sur toutes les WaterEntry — délégué à SQLite.
-    /// Retourne nil si la requête échoue (DB corrompue, etc.).
     private func sumWaterMl() -> Double? {
         let descriptor = FetchDescriptor<WaterEntry>()
         guard let results = try? modelContext.fetch(descriptor) else { return nil }
-        // Fallback : SwiftData ne supporte pas encore #Expression SUM directement
-        // dans tous les contextes — on réduit en mémoire mais sans fetchLimit.
         return results.reduce(0.0) { $0 + $1.amountMl }
     }
 
-    /// SUM(amountMl) sur toutes les WaterAlcoholEntry — délégué à SQLite.
     private func sumAlcoholMl() -> Double? {
         let descriptor = FetchDescriptor<WaterAlcoholEntry>()
         guard let results = try? modelContext.fetch(descriptor) else { return nil }
         return results.reduce(0.0) { $0 + $1.amountMl }
     }
 
-    /// COUNT(DISTINCT startOfDay(date)) sur WaterEntry.
-    /// Compte les jours distincts avec au moins une entrée eau.
     private func countDistinctWaterDays() -> Int? {
         let descriptor = FetchDescriptor<WaterEntry>()
         guard let results = try? modelContext.fetch(descriptor) else { return nil }
@@ -784,17 +694,6 @@ final class AppDataStore: ObservableObject {
     }
 
     // MARK: - Widget Data Sync
-    // Ecrit toutes les donnees dans l'App Group.
-    // Structure :
-    //   widget_today_ml        → eau nette du jour
-    //   widget_goal_ml         → objectif effectif
-    //   widget_streak          → streak objectif
-    //   widget_sober_streak    → streak sobre
-    //   widget_active_days     → jours actifs total
-    //   widget_daily_goal_ml   → objectif brut (pour l'intent)
-    //   widget_week_data       → JSON 7 jours [{label,ml,goalReached,offset}]
-    //                            offset 0 = aujourd'hui, 6 = J-6
-    //   widget_day{i}_*        → retrocompat J-1/J-2/J-3
 
     func syncWidgetData() {
         guard let defaults = UserDefaults(suiteName: "group.com.fabian.dargaud.AquApp") else {
@@ -802,7 +701,6 @@ final class AppDataStore: ObservableObject {
             return
         }
 
-        // Scalaires
         defaults.set(todayWaterMl,    forKey: "widget_today_ml")
         defaults.set(effectiveGoalMl, forKey: "widget_goal_ml")
         defaults.set(currentStreak,   forKey: "widget_streak")
@@ -810,7 +708,6 @@ final class AppDataStore: ObservableObject {
         defaults.set(activeDaysTotal, forKey: "widget_active_days")
         defaults.set(dailyGoalMl,     forKey: "widget_daily_goal_ml")
 
-        // 7 jours — 1 seul fetch groupe eau + alcool
         let calendar  = Calendar.current
         let formatter = DateFormatter()
         formatter.locale     = Locale.current
@@ -831,7 +728,6 @@ final class AppDataStore: ObservableObject {
             let date        = calendar.date(byAdding: .day, value: -offset, to: Date())!
             let dayStart    = calendar.startOfDay(for: date)
 
-            // Aujourd'hui : utilise le cache — pas de fetch supplementaire
             let waterMl: Double
             let alcoholComp: Double
             let reached: Bool
@@ -855,7 +751,6 @@ final class AppDataStore: ObservableObject {
                 "offset":      offset
             ])
 
-            // Retrocompatibilite ancien format J-1/J-2/J-3
             if offset >= 1 && offset <= 3 {
                 let legacyLabel = String(formatter.string(from: date).prefix(3).capitalized)
                 defaults.set(legacyLabel, forKey: "widget_day\(offset)_label")
@@ -867,7 +762,6 @@ final class AppDataStore: ObservableObject {
         if let data = try? JSONSerialization.data(withJSONObject: weekData) {
             defaults.set(data, forKey: "widget_week_data")
         }
-
     }
 
     // MARK: - Helpers

@@ -1,7 +1,5 @@
 import SwiftUI
 
-// MARK: - ProfileBodyView
-
 struct ProfileBodyView: View {
     let weightKg:  Double
     let heightCm:  Double
@@ -58,8 +56,6 @@ struct ProfileBodyView: View {
     }
 }
 
-// MARK: - ProfileBodyRow
-
 private struct ProfileBodyRow: View {
     let sfSymbol:    String
     let color:       Color
@@ -94,8 +90,6 @@ private struct ProfileBodyRow: View {
         .padding(.vertical, 13)
     }
 }
-
-// MARK: - BodyEditSheet
 
 struct BodyEditSheet: View {
     @Binding var weightKg:    Double
@@ -134,7 +128,6 @@ struct BodyEditSheet: View {
 
     var body: some View {
         VStack(spacing: 0) {
-
             RoundedRectangle(cornerRadius: 3)
                 .fill(Color(UIColor.systemGray4))
                 .frame(width: 40, height: 5)
@@ -162,8 +155,6 @@ struct BodyEditSheet: View {
 
             ScrollView {
                 VStack(spacing: 24) {
-
-                    // Sexe
                     VStack(alignment: .leading, spacing: 10) {
                         Text(String(localized: "body.gender"))
                             .font(.system(size: 15, weight: .bold)).padding(.horizontal, 20)
@@ -180,7 +171,6 @@ struct BodyEditSheet: View {
                         .padding(.horizontal, 20)
                     }
 
-                    // Taille
                     VStack(alignment: .leading, spacing: 12) {
                         Text(String(localized: "body.height"))
                             .font(.system(size: 15, weight: .bold)).padding(.horizontal, 20)
@@ -209,7 +199,6 @@ struct BodyEditSheet: View {
                         }
                     }
 
-                    // Poids
                     VStack(alignment: .leading, spacing: 12) {
                         Text(String(localized: "body.weight"))
                             .font(.system(size: 15, weight: .bold)).padding(.horizontal, 20)
@@ -238,7 +227,6 @@ struct BodyEditSheet: View {
                         }
                     }
 
-                    // Aperçu objectif
                     HStack(spacing: 12) {
                         Image(systemName: "drop.fill").font(.system(size: 20)).foregroundColor(goalColor)
                         VStack(alignment: .leading, spacing: 2) {
@@ -254,7 +242,6 @@ struct BodyEditSheet: View {
                     .padding(.horizontal, 20)
                     .animation(.easeInOut, value: calculatedGoal)
 
-                    // Bouton enregistrer
                     Button { save() } label: {
                         HStack(spacing: 8) {
                             Image(systemName: "checkmark.circle.fill").font(.system(size: 18))
@@ -284,8 +271,6 @@ struct BodyEditSheet: View {
     }
 
     private func save() {
-        // Garde-fou : les sliders bornent déjà 30...200 kg et 140...220 cm,
-        // mais on sécurise quand même la valeur persistée.
         let safeWeight = localWeight.isFinite  ? min(max(localWeight, 30), 200)   : 70
         let safeHeight = localHeight.isFinite  ? min(max(localHeight, 140), 220)  : 170
         let safeGoal   = calculatedGoal.isFinite ? min(max(calculatedGoal, 500), 5000) : 2170
@@ -294,15 +279,13 @@ struct BodyEditSheet: View {
         heightCm    = safeHeight
         genderRaw   = localGender.rawValue
         dailyGoalMl = safeGoal
-        UserDefaults.standard.set(safeWeight,           forKey: "userWeightKg")
-        UserDefaults.standard.set(safeHeight,           forKey: "userHeightCm")
-        UserDefaults.standard.set(localGender.rawValue, forKey: "userGender")
-        UserDefaults.standard.set(safeGoal,             forKey: "dailyGoalMl")
+        HealthDataManager.shared.setWeight(safeWeight)
+        HealthDataManager.shared.setHeight(safeHeight)
+        HealthDataManager.shared.setGender(localGender.rawValue)
+        UserDefaults.standard.set(safeGoal, forKey: "dailyGoalMl")
         isPresented = false
     }
 }
-
-// MARK: - Preview
 
 #Preview {
     ProfileBodyView(weightKg: 75, heightCm: 178, genderRaw: "male") {}

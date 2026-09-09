@@ -1,8 +1,6 @@
 import SwiftUI
 import Combine
 
-// MARK: - XPLevel
-
 enum XPLevel: Int, CaseIterable {
     case goutte      = 1
     case ruisseau    = 2
@@ -13,9 +11,6 @@ enum XPLevel: Int, CaseIterable {
     case ocean       = 7
     case aquaLegend  = 8
 
-    // ── Courbe B — progressive medium ────────────────────────────────────────
-    // Paliers validés : utilisateur régulier (4 verres/j + objectif + 3 défis/sem)
-    // atteint le niveau 8 en ~18 mois.
     var threshold: Int {
         switch self {
         case .goutte:     return 0
@@ -42,10 +37,9 @@ enum XPLevel: Int, CaseIterable {
         }
     }
 
-    /// Couleur accent de la barre liquide — utilisée pour le remplissage
     var color: Color {
         switch self {
-        case .goutte:     return Color(hex: "4DA8F5")  // bleu principal app
+        case .goutte:     return Color(hex: "4DA8F5")
         case .ruisseau:   return Color(hex: "4DA8F5")
         case .source:     return Color(hex: "2B87E8")
         case .riviere:    return Color(hex: "2B87E8")
@@ -56,11 +50,8 @@ enum XPLevel: Int, CaseIterable {
         }
     }
 
-    /// Couleur du texte et des icônes — toujours lisible en mode clair/sombre
-    /// Identique à color mais garantit un contraste suffisant pour les niveaux bas
     var displayColor: Color { color }
 
-    /// Prochain niveau, nil si max
     var next: XPLevel? {
         XPLevel(rawValue: rawValue + 1)
     }
@@ -70,16 +61,14 @@ enum XPLevel: Int, CaseIterable {
     }
 }
 
-// MARK: - XPSource
-
 enum XPSource {
-    case water(ml: Double)          // 1–4 XP selon volume
-    case dailyGoal                  // +10 XP
-    case challenge                  // +15 XP
-    case achievement                // +30 XP
-    case streak7                    // +20 XP hebdo
-    case sober7                     // +25 XP
-    case heatwaveGoal               // +5 XP
+    case water(ml: Double)
+    case dailyGoal
+    case challenge
+    case achievement
+    case streak7
+    case sober7
+    case heatwaveGoal
 
     var amount: Int {
         switch self {
@@ -100,22 +89,14 @@ enum XPSource {
     }
 }
 
-// MARK: - XPManager
-
 final class XPManager: ObservableObject {
 
-    // ── État publié ───────────────────────────────────────────────────────────
     @Published private(set) var totalXP:      Int      = 0
     @Published private(set) var currentLevel: XPLevel  = .goutte
-    @Published private(set) var lastGain:     Int?     = nil   // affichage toast "+N XP"
+    @Published private(set) var lastGain:     Int?     = nil
     @Published private(set) var didLevelUp:   Bool     = false
 
-    // ── Persistence ───────────────────────────────────────────────────────────
     private let defaults   = UserDefaults.standard
-    private let keyTotal   = "xp_total"
-
-    // ── Plafond XP eau par jour ───────────────────────────────────────────────
-    // Evite le "grind" : max 20 XP/jour issus des verres d'eau
     private let dailyWaterXPCap = 20
     private var waterXPToday: Int {
         get { defaults.integer(forKey: "xp_water_today_\(todayKey)") }
@@ -126,21 +107,15 @@ final class XPManager: ObservableObject {
         return f.string(from: Date())
     }
 
-    // ── Init ─────────────────────────────────────────────────────────────────
     init() {
-        totalXP      = defaults.integer(forKey: keyTotal)
+        totalXP      = HealthDataManager.shared.xpTotal
         currentLevel = XPLevel.level(for: totalXP)
     }
 
-    // MARK: - API publique
-
-    /// Ajoute des XP depuis une source donnée.
-    /// Appelé depuis AppDataStore ou AchievementManager.
     @MainActor
     func add(_ source: XPSource) {
         var gain = source.amount
 
-        // Plafonne les XP eau du jour
         if case .water = source {
             let remaining = max(0, dailyWaterXPCap - waterXPToday)
             guard remaining > 0 else { return }
@@ -152,16 +127,14 @@ final class XPManager: ObservableObject {
 
         let previousLevel = currentLevel
         totalXP += gain
-        defaults.set(totalXP, forKey: keyTotal)
+        HealthDataManager.shared.setXPTotal(totalXP)
         currentLevel = XPLevel.level(for: totalXP)
 
-        // Toast "+N XP"
         lastGain = gain
         DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) { [weak self] in
             self?.lastGain = nil
         }
 
-        // Level up
         if currentLevel != previousLevel {
             didLevelUp = true
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) { [weak self] in
@@ -170,26 +143,20 @@ final class XPManager: ObservableObject {
         }
     }
 
-    // MARK: - Computed helpers
-
-    /// XP dans le niveau courant (depuis le seuil bas)
     var xpInCurrentLevel: Int {
         totalXP - currentLevel.threshold
     }
 
-    /// Taille totale du niveau courant
     var currentLevelRange: Int {
         guard let next = currentLevel.next else { return 1 }
         return next.threshold - currentLevel.threshold
     }
 
-    /// Ratio 0…1 de progression dans le niveau
     var progressRatio: Double {
         guard let _ = currentLevel.next else { return 1.0 }
         return min(1.0, Double(xpInCurrentLevel) / Double(currentLevelRange))
     }
 
-    /// XP restants avant le prochain niveau
     var xpUntilNextLevel: Int? {
         guard let next = currentLevel.next else { return nil }
         return next.threshold - totalXP

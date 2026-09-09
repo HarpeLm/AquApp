@@ -1,9 +1,5 @@
 import SwiftUI
 
-// MARK: - NameEntryView
-// Étape 2 du flux onboarding (après OnboardingView).
-// Navigation vers BodyProfileView via ZStack + state (sans NavigationStack).
-
 struct NameEntryView: View {
     var onComplete: () -> Void
 
@@ -22,10 +18,8 @@ struct NameEntryView: View {
             } else {
                 ScrollView {
                     VStack(spacing: 0) {
-
                         Spacer(minLength: 20)
 
-                        // Illustration (réduite)
                         ZStack {
                             Circle()
                                 .fill(Color(hex: "4DA8F5").opacity(0.10))
@@ -51,7 +45,6 @@ struct NameEntryView: View {
                         }
                         .padding(.bottom, 28)
 
-                        // Titre
                         VStack(spacing: 12) {
                             Text(String(localized: "onboarding.name"))
                                 .font(.system(size: 28, weight: .bold))
@@ -64,7 +57,6 @@ struct NameEntryView: View {
                         .padding(.horizontal, 28)
                         .padding(.bottom, 32)
 
-                        // Champ de saisie + Bouton (remontent ensemble)
                         VStack(spacing: 16) {
                             TextField(String(localized: "onboarding.name_placeholder"), text: $firstName)
                                 .textContentType(.givenName)
@@ -83,12 +75,11 @@ struct NameEntryView: View {
                                             lineWidth: 1.5
                                         )
                                 )
-                                .withDoneButton() // ← BOUTON "TERMINÉ" AJOUTÉ
+                                .withDoneButton()
                                 .onSubmit {
                                     if !isButtonDisabled { saveName() }
                                 }
 
-                            // Bouton continuer
                             Button { saveName() } label: {
                                 Image(systemName: "arrow.right")
                                     .font(.system(size: 18, weight: .bold))
@@ -141,7 +132,7 @@ struct NameEntryView: View {
 
     private func saveName() {
         let trimmed = firstName.trimmingCharacters(in: .whitespacesAndNewlines)
-        UserDefaults.standard.set(trimmed, forKey: "userFirstName")
+        HealthDataManager.shared.setFirstName(trimmed)
         isFocused = false
         withAnimation(.easeInOut(duration: 0.35)) {
             goToBodyProfile = true
