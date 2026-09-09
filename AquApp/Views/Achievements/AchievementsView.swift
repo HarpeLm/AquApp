@@ -198,8 +198,8 @@ final class AchievementManager: ObservableObject {
         ]
         monthlyAchievements = list.map { ach in
             var a = ach
-            let progress = defaults.double(forKey: "ach_progress_\(a.id)")
-            let done = defaults.bool(forKey: "ach_completed_\(a.id)")
+            let progress = HealthDataManager.shared.achievementProgressValue(a.id)
+            let done = HealthDataManager.shared.isAchievementCompleted(a.id)
             a.currentProgress = progress
             if done { a.status = .completed }
             else if progress > 0 { a.status = .inProgress }
@@ -233,8 +233,8 @@ final class AchievementManager: ObservableObject {
             let fmt = DateFormatter(); fmt.dateFormat = "yyyyMMdd"
             let todayKey = fmt.string(from: Date())
             if defaults.string(forKey: "sober_total_last_day") != todayKey {
-                let soberTotal = defaults.double(forKey: "sober_days_total") + 1
-                defaults.set(soberTotal, forKey: "sober_days_total")
+                let soberTotal = HealthDataManager.shared.soberDaysTotal + 1
+                HealthDataManager.shared.setSoberDaysTotal(soberTotal)
                 defaults.set(todayKey, forKey: "sober_total_last_day")
                 updateProgress(id: "centurion_sobre", value: min(soberTotal, 100))
                 if soberTotal >= 100 { completeAchievement(id: "centurion_sobre") }
@@ -249,15 +249,14 @@ final class AchievementManager: ObservableObject {
 
     func onHeatwaveDay(totalMl: Double) {
         if totalMl >= 3000 {
-            let days = defaults.double(forKey: "heatwave_days") + 1
-            defaults.set(days, forKey: "heatwave_days")
+            let days = HealthDataManager.shared.heatwaveDays + 1
+            HealthDataManager.shared.setHeatwaveDays(days)
             updateProgress(id: "heatwave", value: days)
-            if days >= 3 { completeAchievement(id: "heatwave") }   // ⚠️ >= et pas >
+            if days >= 3 { completeAchievement(id: "heatwave") }
         }
     }
 
     func onWaterAdded(totalCumulatedMl: Double) {
-        // Protection contre les valeurs NaN/Infinity ou négatives
         guard totalCumulatedMl.isFinite, totalCumulatedMl >= 0 else {
             print("⚠️ Valeur invalide pour totalCumulatedMl: \(totalCumulatedMl)")
             return
@@ -292,22 +291,16 @@ final class AchievementManager: ObservableObject {
 
     func restoreHeatwaveProgress(days: Double) {
         updateProgress(id: "heatwave", value: min(days, 3))
-        if days >= 3 { completeAchievement(id: "heatwave") }       
+        if days >= 3 { completeAchievement(id: "heatwave") }
     }
 
     // MARK: - Sleep Hydration (HealthKit)
 
     func checkSleepHydration() {
-        guard HKHealthStore.isHealthDataAvailable() else {
-            print("⚠️ HealthKit non disponible")
-            return
-        }
+        guard HKHealthStore.isHealthDataAvailable() else { return }
 
         guard let sleepType = HKObjectType.categoryType(forIdentifier: .sleepAnalysis),
-              let waterType = HKQuantityType.quantityType(forIdentifier: .dietaryWater) else {
-            print("⚠️ Types HealthKit non disponibles")
-            return
-        }
+              let waterType = HKQuantityType.quantityType(forIdentifier: .dietaryWater) else { return }
 
         let sleepAuth = healthStore.authorizationStatus(for: sleepType)
         let waterAuth = healthStore.authorizationStatus(for: waterType)
@@ -326,15 +319,8 @@ final class AchievementManager: ObservableObject {
               let stepType = HKQuantityType.quantityType(forIdentifier: .stepCount) else { return }
 
         healthStore.requestAuthorization(toShare: [], read: [sleepType, waterType, stepType]) { [weak self] granted, error in
-            guard let self = self, granted, error == nil else {
-                if let error = error {
-                    print("⚠️ Erreur HealthKit: \(error.localizedDescription)")
-                }
-                return
-            }
-            DispatchQueue.main.async {
-                self.performSleepHydrationCheck()
-            }
+            guard let self = self, granted, error == nil else { return }
+            DispatchQueue.main.async { self.performSleepHydrationCheck() }
         }
     }
 
@@ -353,14 +339,8 @@ final class AchievementManager: ObservableObject {
             limit: HKObjectQueryNoLimit,
             sortDescriptors: [NSSortDescriptor(key: HKSampleSortIdentifierStartDate, ascending: false)]
         ) { [weak self] _, samples, error in
-            guard let self = self else { return }
-
-            if let error = error {
-                print("⚠️ Erreur SleepHydration: \(error.localizedDescription)")
-                return
-            }
-
-            guard let sleepSamples = samples as? [HKCategorySample] else { return }
+            guard let self = self, error == nil,
+                  let sleepSamples = samples as? [HKCategorySample] else { return }
 
             let sleepStarts = sleepSamples
                 .filter {
@@ -385,14 +365,9 @@ final class AchievementManager: ObservableObject {
                     quantityType: waterType,
                     quantitySamplePredicate: windowPred,
                     options: .cumulativeSum
-                ) { _, result, error in
-                    if let error = error {
-                        print("⚠️ Erreur WaterQuery: \(error.localizedDescription)")
-                    }
+                ) { _, result, _ in
                     let ml = result?.sumQuantity()?.doubleValue(for: .literUnit(with: .milli)) ?? 0
-                    if ml >= 150 {
-                        countQueue.sync { hydratedNights += 1 }
-                    }
+                    if ml >= 150 { countQueue.sync { hydratedNights += 1 } }
                     group.leave()
                 }
                 self.healthStore.execute(waterQuery)
@@ -402,9 +377,7 @@ final class AchievementManager: ObservableObject {
                 guard let self = self else { return }
                 let nights = min(hydratedNights, 5)
                 self.updateProgress(id: "sleep_hydrated", value: Double(nights))
-                if nights >= 5 {
-                    self.completeAchievement(id: "sleep_hydrated")
-                }
+                if nights >= 5 { self.completeAchievement(id: "sleep_hydrated") }
             }
         }
         healthStore.execute(sleepQuery)
@@ -417,8 +390,8 @@ final class AchievementManager: ObservableObject {
             guard achievements[i].isPro else { continue }
             if isPremiumUser {
                 if achievements[i].status == .locked {
-                    let p = defaults.double(forKey: "ach_progress_\(achievements[i].id)")
-                    let c = defaults.bool(forKey: "ach_completed_\(achievements[i].id)")
+                    let p = HealthDataManager.shared.achievementProgressValue(achievements[i].id)
+                    let c = HealthDataManager.shared.isAchievementCompleted(achievements[i].id)
                     if c {
                         achievements[i].status = .completed
                         achievements[i].currentProgress = achievements[i].targetProgress
@@ -439,16 +412,16 @@ final class AchievementManager: ObservableObject {
 
     private func saveProgress() {
         for a in achievements + monthlyAchievements {
-            defaults.set(a.currentProgress, forKey: "ach_progress_\(a.id)")
-            defaults.set(a.status == .completed, forKey: "ach_completed_\(a.id)")
+            HealthDataManager.shared.setAchievementProgress(a.id, value: a.currentProgress)
+            HealthDataManager.shared.setAchievementCompleted(a.id, value: a.status == .completed)
         }
     }
 
     private func restoreProgress() {
         for i in achievements.indices {
             let id = achievements[i].id
-            let progress = defaults.double(forKey: "ach_progress_\(id)")
-            let done = defaults.bool(forKey: "ach_completed_\(id)")
+            let progress = HealthDataManager.shared.achievementProgressValue(id)
+            let done = HealthDataManager.shared.isAchievementCompleted(id)
             achievements[i].currentProgress = progress
             if done {
                 achievements[i].status = .completed
@@ -480,7 +453,6 @@ final class AchievementManager: ObservableObject {
 
     private func completeAchievement(id: String) {
         var title: String?
-        var isMonthly = false
 
         if let idx = achievements.firstIndex(where: { $0.id == id }) {
             guard achievements[idx].status != .locked && achievements[idx].status != .completed else { return }
@@ -492,7 +464,6 @@ final class AchievementManager: ObservableObject {
             monthlyAchievements[idx].status = .completed
             monthlyAchievements[idx].currentProgress = monthlyAchievements[idx].targetProgress
             title = monthlyAchievements[idx].title
-            isMonthly = true
         }
 
         guard let t = title else { return }
@@ -501,14 +472,8 @@ final class AchievementManager: ObservableObject {
         DispatchQueue.main.async { [weak self] in
             guard let self = self else { return }
             HapticManager.shared.achievementUnlocked()
-
-            if let confettiManager = self.confettiManager {
-                confettiManager.trigger(.achievementUnlocked(title: t))
-            }
-
-            Task { @MainActor in
-                self.xpManager?.add(.achievement)
-            }
+            self.confettiManager?.trigger(.achievementUnlocked(title: t))
+            Task { @MainActor in self.xpManager?.add(.achievement) }
         }
     }
 }
@@ -558,7 +523,6 @@ struct AchievementsView: View {
                     VStack(alignment: .leading, spacing: 24) {
                         Color.clear.frame(height: 0).id("top")
 
-                        // Header
                         VStack(alignment: .leading, spacing: 4) {
                             Text(L10n.achievementsTitle)
                                 .font(.system(size: 32, weight: .bold))
@@ -569,11 +533,9 @@ struct AchievementsView: View {
                         .padding(.horizontal)
                         .padding(.top, 8)
 
-                        // Résumé progression
                         SummaryCard(completed: completedCount, total: totalCount)
                             .padding(.horizontal)
 
-                        // Défis du mois
                         VStack(alignment: .leading, spacing: 12) {
                             AchievementSectionTitle(
                                 sfSymbol: "calendar.badge.clock",
@@ -590,7 +552,6 @@ struct AchievementsView: View {
                             .padding(.horizontal)
                         }
 
-                        // Succès
                         VStack(alignment: .leading, spacing: 12) {
                             AchievementSectionTitle(
                                 sfSymbol: "rosette",
@@ -607,13 +568,11 @@ struct AchievementsView: View {
                             .padding(.horizontal)
                         }
 
-                        // Aqua'ddict — bannière légendaire
                         if let legendary = legendaryAchievement {
                             AquaAddictBanner(achievement: legendary)
                                 .padding(.horizontal)
                         }
 
-                        // Bannière Premium
                         if !isPremiumUser {
                             Button { showPremiumSheet = true } label: {
                                 HStack(spacing: 12) {
