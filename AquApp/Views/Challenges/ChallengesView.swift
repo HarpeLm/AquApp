@@ -89,8 +89,11 @@ class ChallengeManager: ObservableObject {
 
     @Published var challenges: [Challenge] = []
 
-    var isPremiumUser: Bool = UserDefaults.standard.bool(forKey: "isPremiumUser") {
-        didSet { updateProStatus() }
+    var isPremiumUser: Bool = PremiumManager.shared.isPremium {
+        didSet {
+            PremiumManager.shared.set(isPremiumUser)
+            updateProStatus()
+        }
     }
 
     weak var confettiManager: ConfettiManager?
@@ -558,7 +561,14 @@ struct ChallengesView: View {
     @EnvironmentObject var manager:         ChallengeManager
     @EnvironmentObject var store:           AppDataStore
     @EnvironmentObject var confettiManager: ConfettiManager
-    @AppStorage("isPremiumUser") private var isPremiumUser: Bool = false
+    @ObservedObject private var premiumStore = PremiumManager.shared
+    private var isPremiumUser: Bool {
+        get { premiumStore.isPremium }
+        nonmutating set { premiumStore.set(newValue) }
+    }
+    private var isPremiumUserBinding: Binding<Bool> {
+        Binding(get: { premiumStore.isPremium }, set: { premiumStore.set($0) })
+    }
 
     var scrollToTopID: UUID = UUID()
 

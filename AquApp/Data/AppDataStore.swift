@@ -23,7 +23,10 @@ final class AppDataStore: ObservableObject {
 
 
     @AppStorage("dailyGoalMl")   var dailyGoalMl: Double = 2170
-    @AppStorage("isPremiumUser") var isPremiumUser: Bool = false
+    var isPremiumUser: Bool {
+        get { PremiumManager.shared.isPremium }
+        set { PremiumManager.shared.set(newValue) }
+    }
 
     /// Objectif adaptatif météo — nil si pas de canicule
     var heatwaveGoalMl: Double? = nil
