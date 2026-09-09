@@ -186,14 +186,15 @@ final class AppDataStore: ObservableObject {
         )
         
         fetchAndCacheTodaySteps { [weak self] steps in
-            guard let self else { return }
-            self.achievementManager?.onMarathonienCheck(
-                drinkCount:  waterEntries.count,
-                goalReached: self.todayGoalReached,
-                steps:       steps
-            )
+            Task { @MainActor [weak self] in
+                guard let self else { return }
+                self.achievementManager?.onMarathonienCheck(
+                    drinkCount:  waterEntries.count,
+                    goalReached: self.todayGoalReached,
+                    steps:       steps
+                )
+            }
         }
-
 
 
         objectWillChange.send()
@@ -616,13 +617,9 @@ final class AppDataStore: ObservableObject {
         let start    = calendar.date(byAdding: .day, value: -(days - 1), to: today)!
 
         // NOTE : on évite volontairement un FetchDescriptor avec #Predicate
-        // ici. En environnement Xcode Previews (JIT), un #Predicate qui
-        // capture une variable externe (`start`) a provoqué des crashs bas
-        // niveau reproductibles dans SwiftData/AttributeGraph (SIGTRAP),
-        // y compris avec `try?` — l'erreur n'est pas catchable côté Swift
-        // car elle survient dans le moteur natif. Un fetch non filtré +
-        // filtrage en mémoire contourne la compilation du prédicat et
-        // reste largement assez rapide vu le faible volume de données.
+        // ici (crashs SwiftData/AttributeGraph en Previews avec variable
+        // capturée). Un fetch non filtré + filtrage en mémoire suffit vu le
+        // faible volume de données.
         let allWater   = (try? modelContext.fetch(FetchDescriptor<WaterEntry>())) ?? []
         let allAlcohol = (try? modelContext.fetch(FetchDescriptor<WaterAlcoholEntry>())) ?? []
         let allRecords = (try? modelContext.fetch(FetchDescriptor<DayRecord>())) ?? []
