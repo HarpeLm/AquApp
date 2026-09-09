@@ -22,7 +22,9 @@ final class StoreKitManager: ObservableObject {
     // MARK: - État publié
 
     @Published var products:             [Product] = []
-    @Published var isPremiumUser:        Bool      = false
+    @Published var isPremiumUser:        Bool      = PremiumManager.shared.isPremium {
+        didSet { PremiumManager.shared.set(isPremiumUser) }
+    }
     @Published var isLoading:            Bool      = false
     @Published var errorMessage:         String?   = nil
 
@@ -132,7 +134,7 @@ final class StoreKitManager: ObservableObject {
             }
         }
         isPremiumUser = active
-        UserDefaults.standard.set(active, forKey: "isPremiumUser")
+        // PremiumManager.shared.set déjà fait par le didSet
     }
 
     // MARK: - Écoute des transactions en temps réel
@@ -172,7 +174,6 @@ final class StoreKitManager: ObservableObject {
             }
         }
         isPremiumUser = active
-        UserDefaults.standard.set(active, forKey: "isPremiumUser")
     }
 
     /// Formate la période d'essai en texte lisible (ex. "7 jours offerts")

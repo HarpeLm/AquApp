@@ -7,7 +7,14 @@ struct ProfileView: View {
     @AppStorage("userFirstName")   private var userName: String = ""
     @AppStorage("dailyGoalMl")     private var dailyGoalMl: Double = 2170
     @AppStorage("selectedBadgeID") private var selectedBadgeID: String = ""
-    @AppStorage("isPremiumUser")   private var isPremiumUser: Bool = false
+    @ObservedObject private var premiumStore = PremiumManager.shared
+    private var isPremiumUser: Bool {
+        get { premiumStore.isPremium }
+        nonmutating set { premiumStore.set(newValue) }
+    }
+    private var isPremiumUserBinding: Binding<Bool> {
+        Binding(get: { premiumStore.isPremium }, set: { premiumStore.set($0) })
+    }
     @AppStorage("colorSchemeRaw")  private var colorSchemeRaw: String = "system"
     @AppStorage("notificationsOn") private var notificationsOn: Bool = false
     @AppStorage("userWeightKg")    private var weightKg: Double = 70
@@ -246,7 +253,7 @@ struct ProfileView: View {
                 .presentationDetents([.large]).presentationDragIndicator(.hidden).presentationCornerRadius(24)
         }
         .sheet(isPresented: $showPremiumSheet) {
-            PremiumSheet(isPremiumUser: $isPremiumUser, isPresented: $showPremiumSheet)
+            PremiumSheet(isPremiumUser: isPremiumUserBinding, isPresented: $showPremiumSheet)
                 .environmentObject(storeKit)
                 .presentationDetents([.large]).presentationDragIndicator(.hidden).presentationCornerRadius(24)
         }
