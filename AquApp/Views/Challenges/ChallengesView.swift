@@ -68,15 +68,15 @@ struct Challenge: Identifiable {
         case "regulier":
             return String(format: String(localized: "challenge.progress_times"), Int(currentProgress))
         case "grand_buveur":
-            return String(format: String(localized: "challenge.progress_ml"), Int(currentProgress))
+            return String(format: String(localized: "challenge.progress_ml"), UnitFormatter.volume(currentProgress))
         case "cadence_parfaite":
             return String(format: String(localized: "challenge.cadence.progress"), Int(currentProgress), Int(targetProgress))
         case "flash_hydrate":
-            return String(format: String(localized: "challenge.flash.progress"), Int(currentProgress))
+            return String(format: String(localized: "challenge.flash.progress"), UnitFormatter.volume(currentProgress))
         case "matin_champion":
-            return String(format: String(localized: "challenge.matin.progress"), Int(currentProgress))
+            return String(format: String(localized: "challenge.matin.progress"), UnitFormatter.volume(currentProgress))
         case "recuperation":
-            return String(format: String(localized: "challenge.recuperation.progress"), Int(currentProgress))
+            return String(format: String(localized: "challenge.recuperation.progress"), UnitFormatter.volume(currentProgress))
         default:
             return ""
         }
@@ -91,6 +91,7 @@ class ChallengeManager: ObservableObject {
 
     var isPremiumUser: Bool = PremiumManager.shared.isPremium {
         didSet {
+            guard oldValue != isPremiumUser else { return }
             PremiumManager.shared.set(isPremiumUser)
             updateProStatus()
         }
@@ -102,8 +103,6 @@ class ChallengeManager: ObservableObject {
     private let healthStore = HKHealthStore()
     private let defaults    = UserDefaults.standard
 
-    // Cache du dernier workout du jour pour éviter de refetch HealthKit à chaque
-    // ajout d'eau. Invalidé au reset quotidien.
     private var cachedWorkoutEndDate: Date? = nil
     private var workoutFetchedToday: Bool   = false
 
@@ -117,15 +116,10 @@ class ChallengeManager: ObservableObject {
 
     private func loadChallenges() {
         challenges = [
-
-            // ── Hydratation ───────────────────────────────────────────────────
-
             Challenge(
                 id: "matinal",
                 sfSymbol: "sunrise.fill", symbolColor: .orange,
                 title: String(localized: "challenge.matinal.title"), titleEmoji: "🌅",
-                // BUG FIX : "boire avant 9h" = toute entrée avant 9h, pas forcément 500 ml.
-                // La description a été simplifiée en conséquence.
                 description: String(localized: "challenge.matinal.desc"),
                 category: .hydration, isPro: false, targetProgress: 1
             ),
@@ -161,7 +155,6 @@ class ChallengeManager: ObservableObject {
                 id: "flash_hydrate",
                 sfSymbol: "bolt.fill", symbolColor: Color(hex: "EF4444"),
                 title: String(localized: "challenge.flash_hydrate.title"), titleEmoji: "⚡",
-                // BUG FIX : 500 ml cumulés en 30 min, même en une seule prise.
                 description: String(localized: "challenge.flash_hydrate.desc"),
                 category: .hydration, isPro: false, targetProgress: 500
             ),
@@ -238,10 +231,7 @@ class ChallengeManager: ObservableObject {
         healthStore.execute(query)
     }
 
-    /// Fetche le dernier workout du jour UNE SEULE FOIS par jour (mis en cache).
-    /// BUG FIX : évite un fetch HealthKit asynchrone à chaque ajout d'eau.
     private func fetchLastWorkoutEndDateCached(completion: @escaping (Date?) -> Void) {
-        // Si déjà fetché aujourd'hui, on retourne le cache immédiatement
         if workoutFetchedToday {
             completion(cachedWorkoutEndDate)
             return
@@ -295,11 +285,9 @@ class ChallengeManager: ObservableObject {
             defaults.removeObject(forKey: "today_completed_\(challenges[i].id)")
         }
 
-        // Réinitialise les flags persistants
         defaults.set(false, forKey: "grand_ecart_before9")
         defaults.set(false, forKey: "grand_ecart_after21")
 
-        // Réinitialise le cache workout
         cachedWorkoutEndDate = nil
         workoutFetchedToday  = false
 
@@ -322,39 +310,26 @@ class ChallengeManager: ObservableObject {
         waterEntries:     [WaterEntry],
         alcoholCount:     Int
     ) {
-        // ── Matinal ───────────────────────────────────────────────────────────
-        // BUG FIX : n'importe quelle entrée avant 9h suffit (pas besoin de 500 ml).
-        // mlBeforeNine > 0 signifie qu'au moins une entrée a été faite avant 9h.
         if mlBeforeNine > 0 { completeChallenge(id: "matinal") }
 
-        // ── Grand Buveur ──────────────────────────────────────────────────────
         updateProgress(id: "grand_buveur", value: totalTodayMl)
         if totalTodayMl >= 3000 { completeChallenge(id: "grand_buveur") }
 
-        // ── Régulier ──────────────────────────────────────────────────────────
         updateProgress(id: "regulier", value: Double(drinkCount))
         if drinkCount >= 4 { completeChallenge(id: "regulier") }
 
-        // ── Matin de Champion ─────────────────────────────────────────────────
         checkMatinChampion(waterEntries: waterEntries, dailyGoalMl: dailyGoalMl)
 
-        // ── Cadence Parfaite ──────────────────────────────────────────────────
         checkCadenceParfaite(waterEntries: waterEntries)
 
-        // ── Grand Écart ───────────────────────────────────────────────────────
         checkGrandEcart(waterEntries: waterEntries)
 
-        // ── Flash Hydraté ─────────────────────────────────────────────────────
         checkFlashHydrate(waterEntries: waterEntries)
 
-        // ── Soirée Tranquille ─────────────────────────────────────────────────
         if dailyGoalReached && alcoholCount == 0 {
             completeChallenge(id: "soiree_tranquille")
         }
 
-        // ── Journée Active ────────────────────────────────────────────────────
-        // BUG FIX : on met à jour la progression des pas même sans objectif atteint,
-        // pour que la barre de progression soit visible en temps réel.
         fetchTodaySteps { [weak self] steps in
             guard let self else { return }
             self.updateProgress(id: "active_day", value: steps)
@@ -363,14 +338,11 @@ class ChallengeManager: ObservableObject {
             }
         }
 
-        // ── Récupération ──────────────────────────────────────────────────────
         checkRecuperation(waterEntries: waterEntries)
     }
 
-    /// Appelé depuis AppDataStore.addAlcohol / deleteAlcohol.
     func onAlcoholUpdated(alcoholCount: Int, dailyGoalReached: Bool) {
         if alcoholCount > 0 {
-            // L'utilisateur a bu de l'alcool → défi perdu pour aujourd'hui
             if let idx = challenges.firstIndex(where: { $0.id == "soiree_tranquille" }),
                challenges[idx].status == .completed {
                 challenges[idx].status          = .inProgress
@@ -378,14 +350,12 @@ class ChallengeManager: ObservableObject {
                 saveTodayProgress()
             }
         } else if dailyGoalReached {
-            // Plus d'alcool ET objectif atteint → peut être complété
             completeChallenge(id: "soiree_tranquille")
         }
     }
 
     // MARK: - Logique de chaque défi
 
-    /// Matin de Champion — 50% de l'objectif avant midi.
     private func checkMatinChampion(waterEntries: [WaterEntry], dailyGoalMl: Double) {
         let calendar = Calendar.current
         let noon     = calendar.date(bySettingHour: 12, minute: 0, second: 0, of: Date())!
@@ -397,7 +367,6 @@ class ChallengeManager: ObservableObject {
         if mlBeforeNoon >= target { completeChallenge(id: "matin_champion") }
     }
 
-    /// Cadence Parfaite — au moins 200 ml dans chacune des 6 fenêtres de 2h (8h–20h).
     private func checkCadenceParfaite(waterEntries: [WaterEntry]) {
         let calendar = Calendar.current
         let windows: [(Int, Int)] = [(8,10),(10,12),(12,14),(14,16),(16,18),(18,20)]
@@ -414,7 +383,6 @@ class ChallengeManager: ObservableObject {
         if coveredWindows >= 6 { completeChallenge(id: "cadence_parfaite") }
     }
 
-    /// Grand Écart — au moins une entrée avant 9h ET au moins une après 21h.
     private func checkGrandEcart(waterEntries: [WaterEntry]) {
         let calendar = Calendar.current
         let nineAM   = calendar.date(bySettingHour: 9,  minute: 0, second: 0, of: Date())!
@@ -430,21 +398,11 @@ class ChallengeManager: ObservableObject {
         if b9 && a21 { completeChallenge(id: "grand_ecart") }
     }
 
-    /// Flash Hydraté — 500 ml cumulés en moins de 30 minutes.
-    ///
-    /// BUG FIX (corrigé) :
-    /// L'ancienne version exigeait `count >= 2` (au moins 2 entrées distinctes),
-    /// ce qui empêchait de valider le défi avec une seule grosse entrée (ex: 750 ml d'un coup).
-    ///
-    /// Nouvelle logique : fenêtre glissante de 30 min sur toutes les entrées du jour.
-    /// Pour chaque point de départ possible, on cumule les ml des entrées suivantes
-    /// dans la fenêtre. Si le total atteint 500 ml, le défi est validé —
-    /// qu'il s'agisse d'1 entrée, 2, ou plus.
     private func checkFlashHydrate(waterEntries: [WaterEntry]) {
         guard !waterEntries.isEmpty else { return }
 
         let sorted = waterEntries.sorted { $0.date < $1.date }
-        let windowDuration: TimeInterval = 30 * 60  // 30 minutes
+        let windowDuration: TimeInterval = 30 * 60
 
         var bestCumulative: Double = 0
 
@@ -468,14 +426,9 @@ class ChallengeManager: ObservableObject {
             }
         }
 
-        // Met à jour la meilleure progression même si pas encore 500 ml
         updateProgress(id: "flash_hydrate", value: min(bestCumulative, 500))
     }
 
-    /// Récupération — 300 ml dans l'heure qui suit la fin d'une séance HealthKit.
-    ///
-    /// BUG FIX : le workout est maintenant mis en cache pour éviter un fetch
-    /// HealthKit asynchrone à chaque ajout d'eau.
     private func checkRecuperation(waterEntries: [WaterEntry]) {
         fetchLastWorkoutEndDateCached { [weak self] workoutEnd in
             guard let self, let workoutEnd else { return }
@@ -507,6 +460,7 @@ class ChallengeManager: ObservableObject {
         challenges[idx].currentProgress = challenges[idx].targetProgress
         saveTodayProgress()
         defaults.set(true, forKey: "completed_\(id)")
+        HealthDataManager.shared.setChallengeCompleted(id, value: true)
         let title = challenges[idx].title
         DispatchQueue.main.async {
             HapticManager.shared.achievementUnlocked()
@@ -565,9 +519,6 @@ struct ChallengesView: View {
     private var isPremiumUser: Bool {
         get { premiumStore.isPremium }
         nonmutating set { premiumStore.set(newValue) }
-    }
-    private var isPremiumUserBinding: Binding<Bool> {
-        Binding(get: { premiumStore.isPremium }, set: { premiumStore.set($0) })
     }
 
     var scrollToTopID: UUID = UUID()
