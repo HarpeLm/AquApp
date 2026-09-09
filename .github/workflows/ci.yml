@@ -1,0 +1,79 @@
+name: iOS CI
+
+on:
+  push:
+    branches: [ main, fixbug/appdatastore, security/keychain ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: Build & Test (iOS Simulator)
+    runs-on: macos-14
+
+    if: |
+      !contains(github.event.head_commit.message, '[skip ci]') &&
+      !contains(github.event.head_commit.message, 'docs:')
+
+    env:
+      SCHEME: "AquApp"
+      DESTINATION: "platform=iOS Simulator,name=iPhone 15 Pro,OS=17.5"
+      PROJECT: "AquApp.xcodeproj"
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Select Xcode version
+        run: sudo xcode-select -s /Applications/Xcode_15.4.app/Contents/Developer
+
+      - name: Cache DerivedData
+        uses: actions/cache@v4
+        with:
+          path: ~/Library/Developer/Xcode/DerivedData
+          key: ${{ runner.os }}-derived-${{ hashFiles('**/*.swift', '**/*.xcodeproj') }}
+          restore-keys: |
+            ${{ runner.os }}-derived-
+
+      - name: Cache Swift packages
+        uses: actions/cache@v4
+        with:
+          path: ~/Library/Developer/Xcode/DerivedData/**/SourcePackages
+          key: ${{ runner.os }}-spm-${{ hashFiles('**/Package.resolved') }}
+          restore-keys: |
+            ${{ runner.os }}-spm-
+
+      - name: List available destinations (debug)
+        run: xcodebuild -showdestinations -scheme "$SCHEME" -project "$PROJECT" | head -30
+
+      - name: Build
+        run: |
+          set -o pipefail
+          xcodebuild build-for-testing \
+            -scheme "$SCHEME" \
+            -project "$PROJECT" \
+            -destination "$DESTINATION" \
+            -quiet
+
+      - name: Run unit tests
+        run: |
+          set -o pipefail
+          xcodebuild test-without-building \
+            -scheme "$SCHEME" \
+            -project "$PROJECT" \
+            -destination "$DESTINATION" \
+            -only-testing:AquAppTests \
+            -resultBundlePath TestResults
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: TestResults.xcresult
+          retention-days: 14
