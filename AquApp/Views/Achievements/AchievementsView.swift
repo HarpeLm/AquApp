@@ -546,7 +546,7 @@ struct AchievementsView: View {
 
                             LazyVGrid(columns: columns, spacing: 16) {
                                 ForEach(manager.monthlyAchievements) { ach in
-                                    AchievementBadge(achievement: ach) { showPremiumSheet = true }
+                                    AchievementBadge(achievement: ach, isPremiumUser: isPremiumUser) { showPremiumSheet = true }
                                 }
                             }
                             .padding(.horizontal)
@@ -562,7 +562,7 @@ struct AchievementsView: View {
 
                             LazyVGrid(columns: columns, spacing: 16) {
                                 ForEach(regularAchievements) { ach in
-                                    AchievementBadge(achievement: ach) { showPremiumSheet = true }
+                                    AchievementBadge(achievement: ach, isPremiumUser: isPremiumUser) { showPremiumSheet = true }
                                 }
                             }
                             .padding(.horizontal)
@@ -822,9 +822,18 @@ struct SummaryCard: View {
 
 struct AchievementBadge: View {
     let achievement: Achievement
+    let isPremiumUser: Bool  // ← AJOUTÉ : pour vérifier le statut Premium en temps réel
     let onUnlock: () -> Void
 
-    var isLocked: Bool { achievement.status == .locked }
+    var isLocked: Bool {
+        // Si c'est un achievement Pro, il n'est verrouillé que si l'utilisateur N'EST PAS premium
+        if achievement.isPro && !isPremiumUser {
+            return true
+        }
+        // Sinon, on se fie au statut normal
+        return achievement.status == .locked
+    }
+    
     var isCompleted: Bool { achievement.status == .completed }
 
     var badgeBackground: Color {
