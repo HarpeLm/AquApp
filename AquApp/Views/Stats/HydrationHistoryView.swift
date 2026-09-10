@@ -64,6 +64,51 @@ struct HydrationHistoryView: View {
         ratios.values.filter { $0 >= 1.0 }.count
     }
 
+    // MARK: - Stats de comparaison
+
+    /// Stats de l'année précédente (si disponible dans l'historique)
+    private var previousYearStats: (reachedDays: Int, percentage: Double)? {
+        let previousYear = selectedYear - 1
+        guard yearsRange.contains(previousYear) else { return nil }
+
+        let start = calendar.date(from: DateComponents(year: previousYear, month: 1, day: 1))!
+        let end   = calendar.date(from: DateComponents(year: previousYear, month: 12, day: 31))!
+        
+        // On récupère les ratios (4000 jours couvrent ~11 ans, suffisant pour l'année précédente)
+        let allRatios = store.contributionRatios(days: 4000)
+        let prevRatios = allRatios.filter { $0.key >= start && $0.key <= end }
+
+        let reachedDays = prevRatios.values.filter { $0 >= 1.0 }.count
+        let totalDays = calendar.range(of: .day, in: .year, for: start)?.count ?? 365
+        let percentage = Double(reachedDays) / Double(totalDays)
+
+        return (reachedDays, percentage)
+    }
+
+    /// Texte dynamique : comparaison OU jours atteints
+    private var comparisonText: String {
+        if let prevStats = previousYearStats {
+            let currentTotalDays = calendar.range(of: .day, in: .year, for: yearRange.start)?.count ?? 365
+            let currentPercentage = Double(reachedTotal) / Double(currentTotalDays)
+            
+            let diff = (currentPercentage - prevStats.percentage) * 100
+            let sign = diff > 0 ? "+" : ""
+            
+            return String(format: String(localized: "stats.history.vs"),
+                          "\(selectedYear - 1)", "\(sign)\(Int(abs(diff)))%")
+        } else {
+            return String(format: String(localized: "stats.history.days_reached"),
+                          "\(reachedTotal)")
+        }
+    }
+
+    private var comparisonIconColor: Color {
+        if previousYearStats != nil {
+            return comparisonText.contains("+") ? .green : .red
+        }
+        return .blue
+    }
+
     // MARK: - Body
 
     var body: some View {
@@ -86,15 +131,27 @@ struct HydrationHistoryView: View {
                 }
                 .padding(.horizontal)
 
-                // Compteur
-                HStack {
-                    Text(String(localized: "stats.grid.title"))
-                        .font(.system(size: 13, weight: .semibold))
-                        .foregroundColor(.secondary)
-                    Spacer()
-                    Text("\(reachedTotal)")
-                        .font(.system(size: 13, weight: .bold))
-                        .foregroundColor(.primary)
+                // Compteur + Comparaison dynamique
+                VStack(alignment: .leading, spacing: 8) {
+                    HStack {
+                        Text(String(localized: "stats.grid.title"))
+                            .font(.system(size: 13, weight: .semibold))
+                            .foregroundColor(.secondary)
+                        Spacer()
+                        Text("\(reachedTotal)")
+                            .font(.system(size: 13, weight: .bold))
+                            .foregroundColor(.primary)
+                    }
+
+                    HStack {
+                        Image(systemName: previousYearStats != nil ? "arrow.up.arrow.down" : "checkmark.circle.fill")
+                            .font(.system(size: 10))
+                            .foregroundColor(comparisonIconColor)
+                        Text(comparisonText)
+                            .font(.system(size: 11))
+                            .foregroundColor(.secondary)
+                        Spacer()
+                    }
                 }
                 .padding(.horizontal)
 
