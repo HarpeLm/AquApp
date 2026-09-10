@@ -1,41 +1,42 @@
+//
+//  HydrationHistoryView.swift
+//  AquApp
+//
+//  Created by Fabian Dargaud on 10/09/2026.
+//
+
 import SwiftUI
 import SwiftData
 
-// MARK: - HydrationGridView
-// Grille contribution horizontale, petits carreaux, groupée PAR MOIS (12 derniers mois).
-// Bouton "Voir tout" : ouvre un sheet plein écran avec sélecteur d'année.
+// MARK: - HydrationHistoryView
+// Sheet plein écran : historique complet d'une année sélectionnée,
+// 12 mois affichés en grille 4 colonnes x 3 lignes (tout sur un écran).
 
-struct HydrationGridView: View {
+struct HydrationHistoryView: View {
     @EnvironmentObject var store: AppDataStore
+    @Environment(\.dismiss) private var dismiss
+
+    @State private var selectedYear: Int = Calendar.current.component(.year, from: Date())
     @State private var ratios: [Date: Double] = [:]
-    @State private var showHistorySheet = false  // ← NOUVEAU
 
     private let calendar  = Calendar.current
     private let cellSize: CGFloat = 11
     private let spacing:  CGFloat = 3
     private let monthGap: CGFloat = 14
 
-    // MARK: - Plage & groupes par mois (12 derniers mois)
+    // MARK: - Plage de l'année sélectionnée
 
-    private var dayRange: (start: Date, end: Date) {
-        let today = calendar.startOfDay(for: Date())
-        let firstOfCurrent = calendar.date(
-            from: calendar.dateComponents([.year, .month], from: today)
-        )!
-        let start = calendar.date(byAdding: .month, value: -11, to: firstOfCurrent)!
-        let end = calendar.date(
-            byAdding: .day, value: -1,
-            to: calendar.date(byAdding: .month, value: 1, to: firstOfCurrent)!
-        )!
+    private var yearRange: (start: Date, end: Date) {
+        let start = calendar.date(from: DateComponents(year: selectedYear, month: 1, day: 1))!
+        let end   = calendar.date(from: DateComponents(year: selectedYear, month: 12, day: 31))!
         return (start, end)
     }
 
+    /// Groupes de mois pour l'année sélectionnée
     private var monthGroups: [(month: Date, columns: [[Date?]])] {
-        let (start, end) = dayRange
+        let (start, end) = yearRange
         var result: [(Date, [[Date?]])] = []
-        var month = calendar.date(
-            from: calendar.dateComponents([.year, .month], from: start)
-        )!
+        var month = start
 
         while month <= end {
             let nextMonth = calendar.date(byAdding: .month, value: 1, to: month)!
@@ -46,9 +47,8 @@ struct HydrationGridView: View {
                 var col: [Date?] = []
                 for offset in 0..<7 {
                     let day = calendar.date(byAdding: .day, value: offset, to: weekStart)!
-                    let inRange = day >= start && day <= end
                     let inMonth = calendar.isDate(day, equalTo: month, toGranularity: .month)
-                    col.append(inRange && inMonth ? day : nil)
+                    col.append(inMonth ? day : nil)
                 }
                 columns.append(col)
                 weekStart = calendar.date(byAdding: .day, value: 7, to: weekStart)!
@@ -67,76 +67,81 @@ struct HydrationGridView: View {
     // MARK: - Body
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            HStack(spacing: 8) {
-                Text(String(localized: "stats.grid.title"))
-                    .font(.system(size: 15, weight: .bold))
-                    .foregroundColor(.white)
-                    .lineLimit(1)
+        NavigationStack {
+            VStack(alignment: .leading, spacing: 16) {
 
-                Text("\(reachedTotal)")
-                    .font(.system(size: 12, weight: .semibold))
-                    .foregroundColor(.white.opacity(0.6))
-
-                Spacer()
-
-                // ── Bouton "Voir tout" → ouvre le sheet plein écran ───────
-                Button {
-                    showHistorySheet = true
-                } label: {
-                    Text(String(localized: "stats.grid.see_all"))
-                        .font(.system(size: 10, weight: .bold))
-                        .foregroundColor(.white)
-                        .padding(.horizontal, 10)
-                        .padding(.vertical, 5)
-                        .background(Color.white.opacity(0.14))
-                        .cornerRadius(8)
-                }
-                .buttonStyle(.plain)
-                .accessibilityLabel(String(localized: "stats.grid.see_all"))
-            }
-
-            ScrollViewReader { proxy in
-                ScrollView(.horizontal, showsIndicators: false) {
-                    HStack(alignment: .top, spacing: monthGap) {
-                        ForEach(monthGroups, id: \.month) { group in
-                            monthBlock(group.month, columns: group.columns)
-                                .id(group.month)
+                // Sélecteur d'année
+                HStack {
+                    Text(String(localized: "stats.history.year"))
+                        .font(.system(size: 15, weight: .bold))
+                        .foregroundColor(.primary)
+                    Spacer()
+                    Picker(String(localized: "stats.history.year"), selection: $selectedYear) {
+                        ForEach(yearsRange, id: \.self) { year in
+                            Text(verbatim: "\(year)").tag(year)
                         }
                     }
-                    .padding(.vertical, 2)
+                    .pickerStyle(.menu)
+                    .tint(.accentColor)
                 }
-                .onAppear {
-                    if let last = monthGroups.last?.month {
-                        proxy.scrollTo(last, anchor: .trailing)
+                .padding(.horizontal)
+
+                // Compteur
+                HStack {
+                    Text(String(localized: "stats.grid.title"))
+                        .font(.system(size: 13, weight: .semibold))
+                        .foregroundColor(.secondary)
+                    Spacer()
+                    Text("\(reachedTotal)")
+                        .font(.system(size: 13, weight: .bold))
+                        .foregroundColor(.primary)
+                }
+                .padding(.horizontal)
+
+                // Grille 4 colonnes x 3 lignes (tout sur un écran)
+                LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: monthGap), count: 4), spacing: monthGap) {
+                    ForEach(monthGroups, id: \.month) { group in
+                        monthBlock(group.month, columns: group.columns)
+                    }
+                }
+                .padding(.horizontal)
+                .padding(.vertical, 8)
+
+                // Légende
+                legend
+                    .padding(.horizontal)
+
+                Spacer()
+            }
+            .padding(.top)
+            .background(Color("AppBackground"))
+            .navigationTitle(String(localized: "stats.history.title"))
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button {
+                        dismiss()
+                    } label: {
+                        Image(systemName: "xmark.circle.fill")
+                            .font(.system(size: 20))
+                            .foregroundColor(.secondary)
                     }
                 }
             }
-
-            legend
-        }
-        .padding(20)
-        .background(Color.black)
-        .cornerRadius(20)
-        .shadow(color: .black.opacity(0.25), radius: 10, x: 0, y: 4)
-        .onAppear { ratios = store.contributionRatios(days: 400) }
-        .onChange(of: store.todayWaterMl) { _, _ in
-            ratios = store.contributionRatios(days: 400)
-        }
-        // ── Sheet plein écran pour l'historique par année ────────────────
-        .fullScreenCover(isPresented: $showHistorySheet) {
-            HydrationHistoryView()
-                .environmentObject(store)
+            .onAppear { ratios = store.contributionRatios(days: 4000) }
+            .onChange(of: selectedYear) { _, _ in
+                ratios = store.contributionRatios(days: 4000)
+            }
         }
     }
 
-    // MARK: - Bloc mois (en-tête + semaines)
+    // MARK: - Bloc mois
 
     private func monthBlock(_ month: Date, columns: [[Date?]]) -> some View {
         VStack(alignment: .leading, spacing: 6) {
-            Text(month.formatted(.dateTime.month(.abbreviated).year(.twoDigits)))
+            Text(month.formatted(.dateTime.month(.abbreviated)))
                 .font(.system(size: 9, weight: .bold))
-                .foregroundColor(.white.opacity(0.75))
+                .foregroundColor(.secondary)
                 .padding(.bottom, 1)
 
             HStack(alignment: .top, spacing: spacing) {
@@ -164,8 +169,6 @@ struct HydrationGridView: View {
             .fill(color(for: ratio))
             .frame(width: cellSize, height: cellSize)
             .opacity(isFuture ? 0.12 : 1.0)
-            .accessibilityLabel(date.formatted(.dateTime.day().month()))
-            .accessibilityValue("\(Int(ratio * 100)) %")
     }
 
     private func color(for ratio: Double) -> Color {
@@ -191,7 +194,7 @@ struct HydrationGridView: View {
             Text(String(localized: "stats.grid.more"))
         }
         .font(.system(size: 10, weight: .medium))
-        .foregroundColor(.white.opacity(0.6))
+        .foregroundColor(.secondary)
     }
 
     private func legendColor(_ i: Int) -> Color {
@@ -202,6 +205,14 @@ struct HydrationGridView: View {
         case 3:  return Color(hex: "4DA8F5").opacity(0.90)
         default: return Color(hex: "4DA8F5")
         }
+    }
+
+    // MARK: - Années disponibles (depuis firstLaunchDate jusqu'à aujourd'hui)
+
+    private var yearsRange: [Int] {
+        let currentYear = Calendar.current.component(.year, from: Date())
+        let launchYear  = Calendar.current.component(.year, from: store.firstLaunchDate)
+        return Array(launchYear...currentYear).reversed()
     }
 }
 
@@ -214,7 +225,6 @@ struct HydrationGridView: View {
         configurations: config
     )
     let store = AppDataStore(modelContext: container.mainContext)
-    return HydrationGridView()
+    return HydrationHistoryView()
         .environmentObject(store)
-        .padding()
 }
