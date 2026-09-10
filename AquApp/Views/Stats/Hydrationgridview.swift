@@ -2,13 +2,14 @@ import SwiftUI
 import SwiftData
 
 // MARK: - HydrationGridView
-// Grille contribution horizontale, petits carreaux, groupée PAR MOIS :
-// chaque mois = un bloc (en-tête + ses semaines), séparé par un espace.
-// Tous les jours de chaque mois sont présents (jours futurs estompés).
+// Grille contribution horizontale, petits carreaux, groupée PAR MOIS.
+// Bouton "Voir tout" : bascule entre 12 mois et TOUT l'historique
+// (depuis firstLaunchDate). Jours futurs estompés.
 
 struct HydrationGridView: View {
     @EnvironmentObject var store: AppDataStore
     @State private var ratios: [Date: Double] = [:]
+    @State private var showAllHistory = false
 
     private let calendar  = Calendar.current
     private let cellSize: CGFloat = 11
@@ -17,17 +18,36 @@ struct HydrationGridView: View {
 
     // MARK: - Plage & groupes par mois
 
+    /// Début de la plage : 12 mois glissants OU premier lancement
+    private var historyStart: Date {
+        if showAllHistory {
+            return calendar.startOfDay(for: store.firstLaunchDate)
+        }
+        let today = calendar.startOfDay(for: Date())
+        let firstOfCurrent = calendar.date(
+            from: calendar.dateComponents([.year, .month], from: today)
+        )!
+        return calendar.date(byAdding: .month, value: -11, to: firstOfCurrent)!
+    }
+
     private var dayRange: (start: Date, end: Date) {
         let today = calendar.startOfDay(for: Date())
         let firstOfCurrent = calendar.date(
             from: calendar.dateComponents([.year, .month], from: today)
         )!
-        let start = calendar.date(byAdding: .month, value: -11, to: firstOfCurrent)!
-        let end   = calendar.date(
+        let end = calendar.date(
             byAdding: .day, value: -1,
             to: calendar.date(byAdding: .month, value: 1, to: firstOfCurrent)!
         )!
-        return (start, end)
+        return (historyStart, end)
+    }
+
+    /// Nombre de jours à demander à contributionRatios selon le mode
+    private var ratioDays: Int {
+        let days = calendar.dateComponents(
+            [.day], from: historyStart, to: calendar.startOfDay(for: Date())
+        ).day ?? 365
+        return min(max(days + 2, 30), 4000)
     }
 
     /// Un élément par mois : ses colonnes de semaines (7 cases, nil = hors mois)
@@ -69,19 +89,43 @@ struct HydrationGridView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
-            HStack {
+            HStack(spacing: 8) {
                 Text(String(localized: "stats.grid.title"))
                     .font(.system(size: 15, weight: .bold))
                     .foregroundColor(.white)
-                Spacer()
+                    .lineLimit(1)
+
                 Text("\(reachedTotal)")
                     .font(.system(size: 12, weight: .semibold))
                     .foregroundColor(.white.opacity(0.6))
+
+                Spacer()
+
+                // ── Bouton "Voir tout" / "12 mois" ──────────────────────────
+                Button {
+                    withAnimation(.easeInOut(duration: 0.25)) {
+                        showAllHistory.toggle()
+                    }
+                } label: {
+                    Text(showAllHistory
+                         ? String(localized: "stats.grid.last12")
+                         : String(localized: "stats.grid.see_all"))
+                        .font(.system(size: 10, weight: .bold))
+                        .foregroundColor(.white)
+                        .padding(.horizontal, 10)
+                        .padding(.vertical, 5)
+                        .background(Color.white.opacity(0.14))
+                        .cornerRadius(8)
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel(showAllHistory
+                    ? String(localized: "stats.grid.last12")
+                    : String(localized: "stats.grid.see_all"))
             }
 
             ScrollViewReader { proxy in
                 ScrollView(.horizontal, showsIndicators: false) {
-                    HStack(alignment: .top, spacing: monthGap) {   // ← démarcation
+                    HStack(alignment: .top, spacing: monthGap) {
                         ForEach(monthGroups, id: \.month) { group in
                             monthBlock(group.month, columns: group.columns)
                                 .id(group.month)
@@ -94,6 +138,11 @@ struct HydrationGridView: View {
                         proxy.scrollTo(last, anchor: .trailing)
                     }
                 }
+                .onChange(of: showAllHistory) { _, _ in
+                    if let last = monthGroups.last?.month {
+                        proxy.scrollTo(last, anchor: .trailing)
+                    }
+                }
             }
 
             legend
@@ -102,9 +151,12 @@ struct HydrationGridView: View {
         .background(Color.black)
         .cornerRadius(20)
         .shadow(color: .black.opacity(0.25), radius: 10, x: 0, y: 4)
-        .onAppear { ratios = store.contributionRatios(days: 400) }
+        .onAppear { ratios = store.contributionRatios(days: ratioDays) }
+        .onChange(of: showAllHistory) { _, _ in
+            ratios = store.contributionRatios(days: ratioDays)
+        }
         .onChange(of: store.todayWaterMl) { _, _ in
-            ratios = store.contributionRatios(days: 400)
+            ratios = store.contributionRatios(days: ratioDays)
         }
     }
 
