@@ -4,7 +4,8 @@ import SwiftData
 // MARK: - HomeView
 
 struct HomeView: View {
-    @AppStorage("userFirstName") private var userName: String = ""
+    @ObservedObject private var healthStore = HealthDataManager.shared
+    private var userName: String { healthStore.firstName }
     @EnvironmentObject var store: AppDataStore
     @EnvironmentObject var confettiManager: ConfettiManager
     @EnvironmentObject var weatherManager: WeatherManager
