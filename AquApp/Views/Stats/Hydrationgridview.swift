@@ -4,7 +4,6 @@ import SwiftData
 struct HydrationGridView: View {
     @EnvironmentObject var store: AppDataStore
     @State private var ratios: [Date: Double] = [:]
-    @State private var showHistorySheet = false
 
     private let calendar  = Calendar.current
     private let cellSize: CGFloat = 11
@@ -71,20 +70,6 @@ struct HydrationGridView: View {
                     .foregroundColor(.white.opacity(0.6))
 
                 Spacer()
-
-                Button {
-                    showHistorySheet = true
-                } label: {
-                    Text(String(localized: "stats.grid.see_all"))
-                        .font(.system(size: 10, weight: .bold))
-                        .foregroundColor(.white)
-                        .padding(.horizontal, 10)
-                        .padding(.vertical, 5)
-                        .background(Color.white.opacity(0.14))
-                        .cornerRadius(8)
-                }
-                .buttonStyle(.plain)
-                .accessibilityLabel(String(localized: "stats.grid.see_all"))
             }
 
             ScrollViewReader { proxy in
@@ -113,12 +98,6 @@ struct HydrationGridView: View {
         .onAppear { ratios = store.contributionRatios(days: 400) }
         .onChange(of: store.todayWaterMl) { _, _ in
             ratios = store.contributionRatios(days: 400)
-        }
-        .sheet(isPresented: $showHistorySheet) {
-            HydrationHistoryView()
-                .environmentObject(store)
-                .presentationDetents([.large])
-                .presentationDragIndicator(.visible)
         }
     }
 
