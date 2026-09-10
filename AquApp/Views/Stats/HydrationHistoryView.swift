@@ -140,14 +140,29 @@ struct HydrationHistoryView: View {
             }
             .padding(.horizontal, 24)
 
-            // Grille 4 colonnes x 3 lignes
-            LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: monthGap), count: 4), spacing: monthGap) {
-                ForEach(monthGroups, id: \.month) { group in
-                    monthBlock(group.month, columns: group.columns)
+            // Grille horizontale avec scroll
+            ScrollViewReader { proxy in
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(alignment: .top, spacing: monthGap) {
+                        ForEach(monthGroups, id: \.month) { group in
+                            monthBlock(group.month, columns: group.columns)
+                                .id(group.month)
+                        }
+                    }
+                    .padding(.vertical, 2)
+                    .padding(.horizontal, 24)
+                }
+                .onAppear {
+                    if let last = monthGroups.last?.month {
+                        proxy.scrollTo(last, anchor: .trailing)
+                    }
+                }
+                .onChange(of: selectedYear) { _, _ in
+                    if let last = monthGroups.last?.month {
+                        proxy.scrollTo(last, anchor: .trailing)
+                    }
                 }
             }
-            .padding(.horizontal, 24)
-            .padding(.vertical, 12)
 
             // Légende
             legend
