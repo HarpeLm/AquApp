@@ -3,12 +3,12 @@ import SwiftData
 
 // MARK: - HydrationGridView
 // Grille contribution horizontale, petits carreaux, groupée PAR MOIS (12 derniers mois).
-// Bouton "Voir tout" : ouvre un sheet plein écran avec sélecteur d'année.
+// Bouton "Voir tout" : ouvre un sheet avec sélecteur d'année.
 
 struct HydrationGridView: View {
     @EnvironmentObject var store: AppDataStore
     @State private var ratios: [Date: Double] = [:]
-    @State private var showHistorySheet = false  // ← NOUVEAU
+    @State private var showHistorySheet = false
 
     private let calendar  = Calendar.current
     private let cellSize: CGFloat = 11
@@ -80,7 +80,7 @@ struct HydrationGridView: View {
 
                 Spacer()
 
-                // ── Bouton "Voir tout" → ouvre le sheet plein écran ───────
+                // ── Bouton "Voir tout" → ouvre le sheet ───────────────────
                 Button {
                     showHistorySheet = true
                 } label: {
@@ -123,10 +123,12 @@ struct HydrationGridView: View {
         .onChange(of: store.todayWaterMl) { _, _ in
             ratios = store.contributionRatios(days: 400)
         }
-        // ── Sheet plein écran pour l'historique par année ────────────────
-        .fullScreenCover(isPresented: $showHistorySheet) {
+        // ── Sheet avec detents contrôlés ─────────────────────────────────
+        .sheet(isPresented: $showHistorySheet) {
             HydrationHistoryView()
                 .environmentObject(store)
+                .presentationDetents([.medium, .large])
+                .presentationDragIndicator(.visible)
         }
     }
 
