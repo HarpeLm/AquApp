@@ -51,6 +51,7 @@ struct ProfileBodyView: View {
                 .shadow(color: .black.opacity(0.05), radius: 8, x: 0, y: 2)
             }
             .buttonStyle(.plain)
+            .accessibilityIdentifier("profile.card.body")
         }
         .padding(.horizontal)
     }
@@ -263,6 +264,7 @@ struct BodyEditSheet: View {
         }
         .background(Color("AppBackground"))
         .ignoresSafeArea(edges: .bottom)
+        .accessibilityIdentifier("sheet.body")
         .onAppear {
             localWeight = weightKg
             localHeight = heightCm
