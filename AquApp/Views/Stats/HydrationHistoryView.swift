@@ -9,8 +9,8 @@ import SwiftUI
 import SwiftData
 
 // MARK: - HydrationHistoryView
-// Sheet plein écran : historique complet d'une année sélectionnée,
-// 12 mois affichés en grille 4 colonnes x 3 lignes (tout sur un écran).
+// Sheet avec detents contrôlés : historique complet d'une année sélectionnée,
+// 12 mois affichés en grille 4 colonnes x 3 lignes.
 
 struct HydrationHistoryView: View {
     @EnvironmentObject var store: AppDataStore
@@ -66,7 +66,6 @@ struct HydrationHistoryView: View {
 
     // MARK: - Stats de comparaison
 
-    /// Stats de l'année précédente (si disponible dans l'historique)
     private var previousYearStats: (reachedDays: Int, percentage: Double)? {
         let previousYear = selectedYear - 1
         guard yearsRange.contains(previousYear) else { return nil }
@@ -74,7 +73,6 @@ struct HydrationHistoryView: View {
         let start = calendar.date(from: DateComponents(year: previousYear, month: 1, day: 1))!
         let end   = calendar.date(from: DateComponents(year: previousYear, month: 12, day: 31))!
         
-        // On récupère les ratios (4000 jours couvrent ~11 ans, suffisant pour l'année précédente)
         let allRatios = store.contributionRatios(days: 4000)
         let prevRatios = allRatios.filter { $0.key >= start && $0.key <= end }
 
@@ -85,7 +83,6 @@ struct HydrationHistoryView: View {
         return (reachedDays, percentage)
     }
 
-    /// Texte dynamique : comparaison OU jours atteints
     private var comparisonText: String {
         if let prevStats = previousYearStats {
             let currentTotalDays = calendar.range(of: .day, in: .year, for: yearRange.start)?.count ?? 365
@@ -155,7 +152,7 @@ struct HydrationHistoryView: View {
                 }
                 .padding(.horizontal)
 
-                // Grille 4 colonnes x 3 lignes (tout sur un écran)
+                // Grille 4 colonnes x 3 lignes
                 LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: monthGap), count: 4), spacing: monthGap) {
                     ForEach(monthGroups, id: \.month) { group in
                         monthBlock(group.month, columns: group.columns)
@@ -164,11 +161,9 @@ struct HydrationHistoryView: View {
                 .padding(.horizontal)
                 .padding(.vertical, 8)
 
-                // Légende
+                // Légende (collée en bas, plus de Spacer)
                 legend
                     .padding(.horizontal)
-
-                Spacer()
             }
             .padding(.top)
             .background(Color("AppBackground"))
@@ -264,7 +259,7 @@ struct HydrationHistoryView: View {
         }
     }
 
-    // MARK: - Années disponibles (depuis firstLaunchDate jusqu'à aujourd'hui)
+    // MARK: - Années disponibles
 
     private var yearsRange: [Int] {
         let currentYear = Calendar.current.component(.year, from: Date())
