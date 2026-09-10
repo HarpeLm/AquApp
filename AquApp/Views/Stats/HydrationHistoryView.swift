@@ -8,13 +8,8 @@
 import SwiftUI
 import SwiftData
 
-// MARK: - HydrationHistoryView
-// Sheet avec detents contrôlés : historique complet d'une année sélectionnée,
-// 12 mois affichés en grille 4 colonnes x 3 lignes.
-
 struct HydrationHistoryView: View {
     @EnvironmentObject var store: AppDataStore
-    @Environment(\.dismiss) private var dismiss
 
     @State private var selectedYear: Int = Calendar.current.component(.year, from: Date())
     @State private var ratios: [Date: Double] = [:]
@@ -24,15 +19,12 @@ struct HydrationHistoryView: View {
     private let spacing:  CGFloat = 3
     private let monthGap: CGFloat = 14
 
-    // MARK: - Plage de l'année sélectionnée
-
     private var yearRange: (start: Date, end: Date) {
         let start = calendar.date(from: DateComponents(year: selectedYear, month: 1, day: 1))!
         let end   = calendar.date(from: DateComponents(year: selectedYear, month: 12, day: 31))!
         return (start, end)
     }
 
-    /// Groupes de mois pour l'année sélectionnée
     private var monthGroups: [(month: Date, columns: [[Date?]])] {
         let (start, end) = yearRange
         var result: [(Date, [[Date?]])] = []
@@ -63,8 +55,6 @@ struct HydrationHistoryView: View {
     private var reachedTotal: Int {
         ratios.values.filter { $0 >= 1.0 }.count
     }
-
-    // MARK: - Stats de comparaison
 
     private var previousYearStats: (reachedDays: Int, percentage: Double)? {
         let previousYear = selectedYear - 1
@@ -106,95 +96,78 @@ struct HydrationHistoryView: View {
         return .blue
     }
 
-    // MARK: - Body
-
     var body: some View {
-        NavigationStack {
-            VStack(alignment: .leading, spacing: 16) {
+        VStack(alignment: .leading, spacing: 20) {
 
-                // Sélecteur d'année
+            // Sélecteur d'année
+            HStack {
+                Text(String(localized: "stats.history.year"))
+                    .font(.system(size: 16, weight: .bold))
+                    .foregroundColor(.primary)
+                Spacer()
+                Picker(String(localized: "stats.history.year"), selection: $selectedYear) {
+                    ForEach(yearsRange, id: \.self) { year in
+                        Text(verbatim: "\(year)").tag(year)
+                    }
+                }
+                .pickerStyle(.menu)
+                .tint(.accentColor)
+            }
+            .padding(.horizontal, 24)
+            .padding(.top, 8)
+
+            // Compteur + Comparaison
+            VStack(alignment: .leading, spacing: 8) {
                 HStack {
-                    Text(String(localized: "stats.history.year"))
-                        .font(.system(size: 15, weight: .bold))
-                        .foregroundColor(.primary)
+                    Text(String(localized: "stats.grid.title"))
+                        .font(.system(size: 14, weight: .semibold))
+                        .foregroundColor(.secondary)
                     Spacer()
-                    Picker(String(localized: "stats.history.year"), selection: $selectedYear) {
-                        ForEach(yearsRange, id: \.self) { year in
-                            Text(verbatim: "\(year)").tag(year)
-                        }
-                    }
-                    .pickerStyle(.menu)
-                    .tint(.accentColor)
+                    Text("\(reachedTotal)")
+                        .font(.system(size: 14, weight: .bold))
+                        .foregroundColor(.primary)
                 }
-                .padding(.horizontal)
 
-                // Compteur + Comparaison dynamique
-                VStack(alignment: .leading, spacing: 8) {
-                    HStack {
-                        Text(String(localized: "stats.grid.title"))
-                            .font(.system(size: 13, weight: .semibold))
-                            .foregroundColor(.secondary)
-                        Spacer()
-                        Text("\(reachedTotal)")
-                            .font(.system(size: 13, weight: .bold))
-                            .foregroundColor(.primary)
-                    }
-
-                    HStack {
-                        Image(systemName: previousYearStats != nil ? "arrow.up.arrow.down" : "checkmark.circle.fill")
-                            .font(.system(size: 10))
-                            .foregroundColor(comparisonIconColor)
-                        Text(comparisonText)
-                            .font(.system(size: 11))
-                            .foregroundColor(.secondary)
-                        Spacer()
-                    }
-                }
-                .padding(.horizontal)
-
-                // Grille 4 colonnes x 3 lignes
-                LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: monthGap), count: 4), spacing: monthGap) {
-                    ForEach(monthGroups, id: \.month) { group in
-                        monthBlock(group.month, columns: group.columns)
-                    }
-                }
-                .padding(.horizontal)
-                .padding(.vertical, 8)
-
-                // Légende (collée en bas, plus de Spacer)
-                legend
-                    .padding(.horizontal)
-            }
-            .padding(.top)
-            .background(Color("AppBackground"))
-            .navigationTitle(String(localized: "stats.history.title"))
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button {
-                        dismiss()
-                    } label: {
-                        Image(systemName: "xmark.circle.fill")
-                            .font(.system(size: 20))
-                            .foregroundColor(.secondary)
-                    }
+                HStack {
+                    Image(systemName: previousYearStats != nil ? "arrow.up.arrow.down" : "checkmark.circle.fill")
+                        .font(.system(size: 11))
+                        .foregroundColor(comparisonIconColor)
+                    Text(comparisonText)
+                        .font(.system(size: 12))
+                        .foregroundColor(.secondary)
+                    Spacer()
                 }
             }
-            .onAppear { ratios = store.contributionRatios(days: 4000) }
-            .onChange(of: selectedYear) { _, _ in
-                ratios = store.contributionRatios(days: 4000)
+            .padding(.horizontal, 24)
+
+            // Grille 4 colonnes x 3 lignes
+            LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: monthGap), count: 4), spacing: monthGap) {
+                ForEach(monthGroups, id: \.month) { group in
+                    monthBlock(group.month, columns: group.columns)
+                }
             }
+            .padding(.horizontal, 24)
+            .padding(.vertical, 12)
+
+            // Légende
+            legend
+                .padding(.horizontal, 24)
+
+            Spacer(minLength: 0)
+        }
+        .background(Color("AppBackground"))
+        .onAppear { ratios = store.contributionRatios(days: 4000) }
+        .onChange(of: selectedYear) { _, _ in
+            ratios = store.contributionRatios(days: 4000)
         }
     }
-
-    // MARK: - Bloc mois
 
     private func monthBlock(_ month: Date, columns: [[Date?]]) -> some View {
         VStack(alignment: .leading, spacing: 6) {
             Text(month.formatted(.dateTime.month(.abbreviated)))
-                .font(.system(size: 9, weight: .bold))
+                .font(.system(size: 10, weight: .bold))
                 .foregroundColor(.secondary)
-                .padding(.bottom, 1)
+                .padding(.bottom, 2)
 
             HStack(alignment: .top, spacing: spacing) {
                 ForEach(columns.indices, id: \.self) { c in
@@ -211,8 +184,6 @@ struct HydrationHistoryView: View {
             }
         }
     }
-
-    // MARK: - Case jour
 
     private func cell(for date: Date) -> some View {
         let isFuture = date > calendar.startOfDay(for: Date())
@@ -232,8 +203,6 @@ struct HydrationHistoryView: View {
         default:      return Color(hex: "4DA8F5")
         }
     }
-
-    // MARK: - Légende
 
     private var legend: some View {
         HStack(spacing: 6) {
@@ -259,16 +228,12 @@ struct HydrationHistoryView: View {
         }
     }
 
-    // MARK: - Années disponibles
-
     private var yearsRange: [Int] {
         let currentYear = Calendar.current.component(.year, from: Date())
         let launchYear  = Calendar.current.component(.year, from: store.firstLaunchDate)
         return Array(launchYear...currentYear).reversed()
     }
 }
-
-// MARK: - Preview
 
 #Preview {
     let config    = ModelConfiguration(isStoredInMemoryOnly: true)

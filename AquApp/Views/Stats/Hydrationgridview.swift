@@ -1,10 +1,6 @@
 import SwiftUI
 import SwiftData
 
-// MARK: - HydrationGridView
-// Grille contribution horizontale, petits carreaux, groupée PAR MOIS (12 derniers mois).
-// Bouton "Voir tout" : ouvre un sheet avec sélecteur d'année.
-
 struct HydrationGridView: View {
     @EnvironmentObject var store: AppDataStore
     @State private var ratios: [Date: Double] = [:]
@@ -14,8 +10,6 @@ struct HydrationGridView: View {
     private let cellSize: CGFloat = 11
     private let spacing:  CGFloat = 3
     private let monthGap: CGFloat = 14
-
-    // MARK: - Plage & groupes par mois (12 derniers mois)
 
     private var dayRange: (start: Date, end: Date) {
         let today = calendar.startOfDay(for: Date())
@@ -64,8 +58,6 @@ struct HydrationGridView: View {
         ratios.values.filter { $0 >= 1.0 }.count
     }
 
-    // MARK: - Body
-
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             HStack(spacing: 8) {
@@ -80,7 +72,6 @@ struct HydrationGridView: View {
 
                 Spacer()
 
-                // ── Bouton "Voir tout" → ouvre le sheet ───────────────────
                 Button {
                     showHistorySheet = true
                 } label: {
@@ -123,16 +114,13 @@ struct HydrationGridView: View {
         .onChange(of: store.todayWaterMl) { _, _ in
             ratios = store.contributionRatios(days: 400)
         }
-        // ── Sheet avec detents contrôlés ─────────────────────────────────
         .sheet(isPresented: $showHistorySheet) {
             HydrationHistoryView()
                 .environmentObject(store)
-                .presentationDetents([.medium, .large])
+                .presentationDetents([.large])
                 .presentationDragIndicator(.visible)
         }
     }
-
-    // MARK: - Bloc mois (en-tête + semaines)
 
     private func monthBlock(_ month: Date, columns: [[Date?]]) -> some View {
         VStack(alignment: .leading, spacing: 6) {
@@ -157,8 +145,6 @@ struct HydrationGridView: View {
         }
     }
 
-    // MARK: - Case jour
-
     private func cell(for date: Date) -> some View {
         let isFuture = date > calendar.startOfDay(for: Date())
         let ratio    = ratios[date] ?? 0
@@ -179,8 +165,6 @@ struct HydrationGridView: View {
         default:      return Color(hex: "4DA8F5")
         }
     }
-
-    // MARK: - Légende
 
     private var legend: some View {
         HStack(spacing: 6) {
@@ -206,8 +190,6 @@ struct HydrationGridView: View {
         }
     }
 }
-
-// MARK: - Preview
 
 #Preview {
     let config    = ModelConfiguration(isStoredInMemoryOnly: true)
