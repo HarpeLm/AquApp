@@ -144,11 +144,7 @@ struct ProfileView: View {
                             .transition(.move(edge: .top).combined(with: .opacity))
                         }
                         
-                        // ── SECTION : bannière Premium (upgrade ou actif)
-                        ProfilePremiumBannerView(isPremiumUser: isPremiumUser) {
-                            showPremiumSheet = true
-                        }
-                        
+  
                         // ── SECTION : Hydratation (objectif quotidien)
                         ProfileHydrationView(dailyGoalMl: dailyGoalMl) {
                             showGoalEditor = true
@@ -170,6 +166,11 @@ struct ProfileView: View {
                         ProfileAppearanceView(colorSchemeRaw: $colorSchemeRaw)
                             .environmentObject(storeKit)
                             .environmentObject(appIconManager)
+                        
+                        // ── SECTION : bannière Premium (tout en bas, avant les infos)
+                        ProfilePremiumBannerView(isPremiumUser: isPremiumUser) {
+                            showPremiumSheet = true
+                        }
                         
                         // ── Info app
                         appInfoSection
