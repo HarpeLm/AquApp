@@ -167,6 +167,36 @@ struct ProfileView: View {
                             .environmentObject(storeKit)
                             .environmentObject(appIconManager)
                         
+                        // ── DEBUG : Toggle Premium (à retirer avant release)
+                        #if DEBUG
+                        Button {
+                            let newValue = !isPremiumUser
+                            premiumStore.set(newValue)
+                        } label: {
+                            HStack(spacing: 10) {
+                                Image(systemName: isPremiumUser ? "checkmark.seal.fill" : "crown.fill")
+                                    .font(.system(size: 16, weight: .bold))
+                                VStack(alignment: .leading, spacing: 2) {
+                                    Text(isPremiumUser ? "Premium Actif ✓" : "Activer Premium (Debug)")
+                                        .font(.system(size: 14, weight: .semibold))
+                                    Text(isPremiumUser ? "Tap to disable" : "Tap to enable")
+                                        .font(.system(size: 11))
+                                        .foregroundColor(.secondary)
+                                }
+                                Spacer()
+                                Image(systemName: "arrow.triangle.2.circlepath")
+                                    .font(.system(size: 14))
+                            }
+                            .foregroundColor(isPremiumUser ? .green : .orange)
+                            .padding(14)
+                            .background(
+                                RoundedRectangle(cornerRadius: 12)
+                                    .fill((isPremiumUser ? Color.green : Color.orange).opacity(0.12))
+                            )
+                        }
+                        .padding(.horizontal)
+                        #endif
+                        
                         // ── SECTION : bannière Premium (tout en bas, avant les infos)
                         ProfilePremiumBannerView(isPremiumUser: isPremiumUser) {
                             showPremiumSheet = true
