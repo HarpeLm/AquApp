@@ -63,16 +63,22 @@ final class AppDataStore: ObservableObject {
         recalculateGoalStreak()
     }
 
-    /// Recale l'XP eau du jour sur les entrées réellement présentes.
-    /// Appelé à chaque add/delete/flush widget pour garantir la cohérence.
-    private func syncWaterXP() {
-        xpManager?.syncWaterXP(from: cachedWaterEntries().map(\.amountMl))
+    /// Recale l'XP eau d'un jour donné sur ses entrées réellement présentes.
+    /// Couvre aujourd'hui ET les jours passés (suppression depuis l'historique).
+    private func syncWaterXP(for date: Date) {
+        let day = Calendar.current.startOfDay(for: date)
+        let amounts: [Double]
+        if Calendar.current.isDateInToday(date) {
+            amounts = cachedWaterEntries().map(\.amountMl)
+        } else {
+            let dayEnd = Calendar.current.date(byAdding: .day, value: 1, to: day)!
+            amounts = fetchWater(from: day, to: dayEnd).map(\.amountMl)
+        }
+        xpManager?.syncWaterXP(for: day, amountsMl: amounts)
     }
-    
+
     // MARK: - Bootstrap au lancement
 
-    /// Initialise totalWaterMl / totalAlcoholMl depuis la DB si le Keychain
-    /// est vide (1er lancement ou wipe). 1 full fetch au lancement uniquement.
     private func bootstrapCumulativeTotals() {
         if HealthDataManager.shared.totalWaterMl == 0,
            let sum = sumWaterMl(), sum > 0 {
@@ -84,9 +90,6 @@ final class AppDataStore: ObservableObject {
         }
     }
 
-    /// Force un recalcul complet de sober_streak depuis SwiftData au lancement.
-    /// Ferme le risque de désynchronisation après restore iCloud / migration.
-    /// Le cas différentiel (O(1)) reste pour les mutations en cours de session.
     private func fullScanSoberStreakAtLaunch() {
         guard cachedAlcoholEntries().isEmpty else {
             HealthDataManager.shared.setSoberStreak(0)
@@ -98,8 +101,6 @@ final class AppDataStore: ObservableObject {
         achievementManager?.onSoberStreakUpdated(streak: streak)
     }
 
-    /// Recalcule les totaux cumulés depuis SwiftData.
-    /// À appeler après un restore iCloud / migration de données.
     public func recalculateCumulativeTotals() {
         if let w = sumWaterMl() { HealthDataManager.shared.setTotalWaterMl(w) }
         if let a = sumAlcoholMl() { HealthDataManager.shared.setTotalAlcoholMl(a) }
@@ -172,9 +173,8 @@ final class AppDataStore: ObservableObject {
         HealthDataManager.shared.addWaterMl(amountMl)
 
         HealthKitWriter.shared.write(amountMl: amountMl, date: date, entryID: entry.id)
-        syncWaterXP()
-
-        invalidateCache()
+        invalidateCache()          // ← AVANT le sync (cache frais)
+        syncWaterXP(for: date)
         updateDayRecord(for: date)
         recalculateGoalStreak()
 
@@ -202,7 +202,7 @@ final class AppDataStore: ObservableObject {
             waterEntries:     waterEntries,
             alcoholCount:     cachedAlcoholEntries().count
         )
-        
+
         fetchAndCacheTodaySteps { [weak self] steps in
             Task { @MainActor [weak self] in
                 guard let self else { return }
@@ -223,7 +223,7 @@ final class AppDataStore: ObservableObject {
         save()
         HealthDataManager.shared.addWaterMl(-entry.amountMl)
         invalidateCache()
-        syncWaterXP()                // ← AJOUTE CETTE LIGNE (rembourse l'XP)
+        syncWaterXP(for: entry.date)   // ← rembourse l'XP, même pour un jour passé
         updateDayRecord(for: entry.date)
         recalculateGoalStreak()
         objectWillChange.send()
@@ -395,8 +395,6 @@ final class AppDataStore: ObservableObject {
         HealthDataManager.shared.soberStreak
     }
 
-    /// Recalcul différentiel (O(1)) appelé à chaque mutation.
-    /// Le full scan est fait au lancement par fullScanSoberStreakAtLaunch().
     func recalculateSoberStreak() {
         let calendar = Calendar.current
 
@@ -509,7 +507,7 @@ final class AppDataStore: ObservableObject {
 
         save()
         invalidateCache()
-        syncWaterXP()
+        for day in datesAffected { syncWaterXP(for: day) }   // ← XP de chaque jour affecté
         for day in datesAffected { updateDayRecord(for: day) }
         recalculateGoalStreak()
         if needsSoberRecalc { recalculateSoberStreak() }
@@ -544,8 +542,6 @@ final class AppDataStore: ObservableObject {
         oldRecords.forEach { modelContext.delete($0) }
         save()
         invalidateCache()
-        // Recalcule les totaux après purge : la différence est perdue mais la
-        // cohérence Keychain/DB est restaurée.
         recalculateCumulativeTotals()
     }
 
@@ -665,21 +661,7 @@ final class AppDataStore: ObservableObject {
         store.execute(query)
     }
 
-    // MARK: - Requêtes agrégées (fetch complet, utilisé uniquement au bootstrap / restore)
-    //
-    // Les valeurs totales courantes (totalWaterMl, totalAlcoholMl) sont gérées
-    // par HealthDataManager avec un total cumulé incrémental O(1) — aucun
-    // full fetch à chaque mutation.
-    // sumWaterMl() / sumAlcoholMl() / countDistinctWaterDays() ne sont appelées
-    // qu'au bootstrap (init), après un restore iCloud, ou après la purge
-    // 30 jours non-premium.
-    //
-    // NOTE : SwiftData n'expose pas encore d'API publique d'agrégation SUM
-    // (#Expression n'est pas stable pour ce cas sur iOS 17/18). Un fallback
-    // via NSFetchRequest avec expressionForAggregateKey serait possible
-    // via la stack CoreData sous-jacente, mais introduirait une complexité
-    // injustifiée pour le volume actuel.
-    // TODO (iOS 18+) : réévaluer #AggregateQuery dès qu'il devient stable.
+    // MARK: - Requêtes agrégées (bootstrap / restore uniquement)
 
     private func sumWaterMl() -> Double? {
         let descriptor = FetchDescriptor<WaterEntry>()
