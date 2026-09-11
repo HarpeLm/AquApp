@@ -54,9 +54,7 @@ enum XPLevel: Int, CaseIterable {
 
     var displayColor: Color { color }
 
-    var next: XPLevel? {
-        XPLevel(rawValue: rawValue + 1)
-    }
+    var next: XPLevel? { XPLevel(rawValue: rawValue + 1) }
 
     static func level(for xp: Int) -> XPLevel {
         XPLevel.allCases.reversed().first { xp >= $0.threshold } ?? .goutte
@@ -106,7 +104,7 @@ final class XPManager: ObservableObject {
     private let defaults        = UserDefaults.standard
     private let dailyWaterXPCap = 20
 
-    // MARK: - Stockage de l'XP eau PAR JOUR (clé = yyyyMMdd du jour concerné)
+    // MARK: - Stockage XP eau PAR JOUR (clé = yyyyMMdd)
 
     private func waterXPKey(for day: Date) -> String {
         let f = DateFormatter(); f.dateFormat = "yyyyMMdd"
@@ -211,9 +209,7 @@ final class XPManager: ObservableObject {
 
     // MARK: - Computed properties
 
-    var xpInCurrentLevel: Int {
-        totalXP - currentLevel.threshold
-    }
+    var xpInCurrentLevel: Int { totalXP - currentLevel.threshold }
 
     var currentLevelRange: Int {
         guard let next = currentLevel.next else { return 1 }
