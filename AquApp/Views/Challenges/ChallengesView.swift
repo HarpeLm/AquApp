@@ -76,7 +76,7 @@ struct Challenge: Identifiable {
         case "flash_hydrate":
             return String(format: String(localized: "challenge.flash.progress"), UnitFormatter.volume(currentProgress))
         case "matin_champion":
-            return String(format: String(localized: "challenge.matin.progress"), UnitFormatter.volume(currentProgress))
+            return String(format: String(localized: "challenge.matin.progress"), Int(currentProgress))
         case "recuperation":
             return String(format: String(localized: "challenge.recuperation.progress"), UnitFormatter.volume(currentProgress))
         default:
@@ -682,18 +682,33 @@ struct ChallengeRow: View {
                     .minimumScaleFactor(0.8).lineLimit(2)
 
                 if challenge.status == .inProgress && !challenge.progressLabel.isEmpty {
-                    VStack(alignment: .trailing, spacing: 2) {
+                    let ratio = challenge.progressRatio.isFinite ? min(max(challenge.progressRatio, 0), 1) : 0
+                    VStack(alignment: .leading, spacing: 6) {
+                        HStack {
+                            Text(challenge.progressLabel)
+                                .font(.system(size: 11, weight: .medium))
+                                .foregroundColor(.secondary)
+                            Spacer()
+                            Text("\(Int(ratio * 100))%")
+                                .font(.system(size: 11, weight: .bold))
+                                .foregroundColor(challenge.symbolColor)
+                                .monospacedDigit()
+                        }
                         GeometryReader { geo in
                             ZStack(alignment: .leading) {
-                                RoundedRectangle(cornerRadius: 4).fill(Color(UIColor.systemGray5)).frame(height: 5)
-                                RoundedRectangle(cornerRadius: 4).fill(challenge.symbolColor)
-                                    .frame(width: geo.size.width * challenge.progressRatio, height: 5)
+                                RoundedRectangle(cornerRadius: 4)
+                                    .fill(Color.white.opacity(0.12))          // track visible en dark ET light
+                                RoundedRectangle(cornerRadius: 4)
+                                    .fill(LinearGradient(                      // dégradé vif par défi
+                                        colors: [challenge.symbolColor.opacity(0.85), challenge.symbolColor],
+                                        startPoint: .leading, endPoint: .trailing))
+                                    .frame(width: ratio == 0 ? 0 : max(6, geo.size.width * ratio)) // min 6pt si > 0
+                                    .animation(.easeInOut(duration: 0.5), value: ratio)
                             }
                         }
-                        .frame(height: 5).accessibilityHidden(true)
-                        Text(challenge.progressLabel).font(.system(size: 11)).foregroundColor(.secondary)
+                        .frame(height: 8)
                     }
-                    .padding(.top, 4)
+                    .padding(.top, 6)
                 }
             }
 
