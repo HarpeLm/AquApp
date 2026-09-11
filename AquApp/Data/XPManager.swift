@@ -164,3 +164,56 @@ final class XPManager: ObservableObject {
         return next.threshold - totalXP
     }
 }
+
+
+// MARK: - XP eau synchronisée sur les entrées réelles (add/delete cohérent)
+
+/// NOUVEAU : signalé à l'UI quand de l'XP est retiré (futur toast "-X XP")
+@Published private(set) var lastLoss: Int? = nil
+
+/// Barème identique à XPSource.water(ml:) — 1 à 4 XP selon le volume
+static func waterXP(for ml: Double) -> Int {
+    switch ml {
+    case ..<201:  return 1
+    case ..<401:  return 2
+    case ..<601:  return 3
+    default:      return 4
+    }
+}
+
+/// Recalcule l'XP eau du jour depuis les entrées RÉELLES et ajuste totalXP
+/// par delta. Add = monte, Delete = descend, toujours cohérent avec l'historique.
+/// Supprime le farm add/delete (delta nul si le contenu n'a pas changé).
+func syncWaterXP(from amountsTodayMl: [Double]) {
+    let desired = min(dailyWaterXPCap,
+                      amountsTodayMl.reduce(0) { $0 + Self.waterXP(for: $1) })
+    let current = waterXPToday
+    let delta   = desired - current
+    guard delta != 0 else { return }
+
+    waterXPToday = desired
+
+    let previousLevel = currentLevel
+    totalXP = max(0, totalXP + delta)
+    HealthDataManager.shared.setXPTotal(totalXP)
+    currentLevel = XPLevel.level(for: totalXP)
+
+    if delta > 0 {
+        lastGain = delta
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) { [weak self] in
+            self?.lastGain = nil
+        }
+    } else {
+        lastLoss = -delta
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) { [weak self] in
+            self?.lastLoss = nil
+        }
+    }
+
+    if currentLevel != previousLevel {
+        didLevelUp = currentLevel.rawValue > previousLevel.rawValue
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) { [weak self] in
+            self?.didLevelUp = false
+        }
+    }
+}
