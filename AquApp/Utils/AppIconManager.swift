@@ -92,7 +92,7 @@ final class AppIconManager: ObservableObject {
         #else
         guard UIApplication.shared.supportsAlternateIcons else { return }
         isChanging = true
-        nonisolated(unsafe) let iconName = icon.alternateIconName
+        let iconName = icon.alternateIconName
         UIApplication.shared.setAlternateIconName(iconName) { [weak self] error in
             Task { @MainActor [weak self] in
                 guard let self else { return }

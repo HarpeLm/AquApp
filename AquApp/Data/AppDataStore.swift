@@ -697,7 +697,7 @@ final class AppDataStore: ObservableObject {
     }
 
     private func fetchAllWater() -> [WaterEntry] {
-        var descriptor = FetchDescriptor<WaterEntry>(
+        let descriptor = FetchDescriptor<WaterEntry>(
             sortBy: [SortDescriptor(\.date, order: .reverse)]
         )
         return (try? modelContext.fetch(descriptor)) ?? []
@@ -718,7 +718,7 @@ final class AppDataStore: ObservableObject {
     }
 
     private func fetchAllAlcohol() -> [WaterAlcoholEntry] {
-        var descriptor = FetchDescriptor<WaterAlcoholEntry>(
+        let descriptor = FetchDescriptor<WaterAlcoholEntry>(
             sortBy: [SortDescriptor(\.date, order: .reverse)]
         )
         return (try? modelContext.fetch(descriptor)) ?? []

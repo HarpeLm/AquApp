@@ -1,8 +1,6 @@
 import SwiftUI
 import SwiftData
 
-// MARK: - ProfileView
-
 struct ProfileView: View {
     @ObservedObject private var healthStore = HealthDataManager.shared
     @AppStorage("dailyGoalMl") private var dailyGoalMl: Double = 2170
@@ -40,7 +38,7 @@ struct ProfileView: View {
         return build.isEmpty ? version : "\(version) (\(build))"
     }
 
-    // MARK: - IDs (static let → Preview stable)
+    // MARK: - IDs (static let → typés une seule fois → Preview stable)
 
     private static let achievementIDs: [String] = [
         "constance", "semaine_sobre", "sleep_hydrated", "heatwave",
@@ -62,7 +60,7 @@ struct ProfileView: View {
         Self.challengeIDs.filter { HealthDataManager.shared.isChallengeCompleted($0) }.count
     }
 
-    // MARK: - Badges
+    // MARK: - Badges (cosmétiques + succès + défis)
 
     private var allBadges: [(id: String, sfSymbol: String, color: Color, title: String, isPro: Bool)] {
         var list: [(id: String, sfSymbol: String, color: Color, title: String, isPro: Bool)] = [
@@ -135,8 +133,15 @@ struct ProfileView: View {
                                 .transition(.move(edge: .top).combined(with: .opacity))
                         }
 
-                        hydrationSection.padding(.horizontal)
-                        physicalProfileSection.padding(.horizontal)
+                        ProfileHydrationView(dailyGoalMl: dailyGoalMl) { showGoalEditor = true }
+
+                        ProfileBodyView(
+                            weightKg: healthStore.weightKg,
+                            heightCm: healthStore.heightCm,
+                            genderRaw: healthStore.gender
+                        ) { showBodyEditor = true }
+
+                        ProfileNotificationView(notificationsOn: $notificationsOn)
 
                         ProfileAppearanceView(colorSchemeRaw: $colorSchemeRaw)
                             .environmentObject(storeKit)
@@ -164,7 +169,10 @@ struct ProfileView: View {
                         .padding(.horizontal)
                         #endif
 
+                        ProfilePremiumBannerView(isPremiumUser: isPremiumUser) { showPremiumSheet = true }
+
                         appInfoSection.padding(.top, 8)
+
                         Color.clear.frame(height: 16)
                     }
                     .padding(.bottom, 32)
@@ -198,6 +206,13 @@ struct ProfileView: View {
             .presentationDetents([.large])
             .presentationDragIndicator(.hidden)
             .presentationCornerRadius(24)
+        }
+        .sheet(isPresented: $showPremiumSheet) {
+            PremiumSheet(isPremiumUser: isPremiumUserBinding, isPresented: $showPremiumSheet)
+                .environmentObject(storeKit)
+                .presentationDetents([.large])
+                .presentationDragIndicator(.hidden)
+                .presentationCornerRadius(24)
         }
     }
 
@@ -287,66 +302,12 @@ struct ProfileView: View {
         ) { withAnimation { showBadgePicker = false } }
     }
 
-    private var hydrationSection: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            HStack(spacing: 8) {
-                Image(systemName: "drop.fill").font(.system(size: 14, weight: .semibold)).foregroundColor(Color(hex: "4DA8F5"))
-                Text("Hydration").font(.system(size: 18, weight: .bold))
-            }
-            Button { showGoalEditor = true } label: {
-                HStack(spacing: 16) {
-                    ZStack {
-                        Circle().fill(Color.blue.opacity(0.12)).frame(width: 40, height: 40)
-                        Image(systemName: "target").font(.system(size: 16, weight: .medium)).foregroundColor(.blue)
-                    }
-                    Text("Daily goal").font(.system(size: 15)).foregroundColor(.primary)
-                    Spacer()
-                    Text("\(Int(dailyGoalMl)) ml").font(.system(size: 15)).foregroundColor(.secondary)
-                    Image(systemName: "chevron.right").font(.system(size: 12)).foregroundColor(Color(UIColor.systemGray3))
-                }
-                .padding(.vertical, 12)
-            }
-            .buttonStyle(.plain)
-        }
-    }
-
-    private var physicalProfileSection: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            HStack(spacing: 8) {
-                Image(systemName: "person.fill").font(.system(size: 14, weight: .semibold)).foregroundColor(Color(hex: "9B59B6"))
-                Text("Physical profile").font(.system(size: 18, weight: .bold))
-            }
-            bodyRow(icon: "scalemass.fill", iconColor: .green, bgColor: .green, title: "Weight", value: "\(Int(healthStore.weightKg)) kg")
-            bodyRow(icon: "ruler",         iconColor: .blue,  bgColor: .blue,  title: "Height", value: "\(Int(healthStore.heightCm)) cm")
-            bodyRow(icon: "person",        iconColor: .purple,bgColor: .purple,title: "Gender", value: genderLabel(healthStore.gender))
-        }
-    }
-
-    private func bodyRow(icon: String, iconColor: Color, bgColor: Color, title: String, value: String) -> some View {
-        Button { showBodyEditor = true } label: {
-            HStack(spacing: 16) {
-                ZStack {
-                    Circle().fill(bgColor.opacity(0.12)).frame(width: 40, height: 40)
-                    Image(systemName: icon).font(.system(size: 16, weight: .medium)).foregroundColor(iconColor)
-                }
-                Text(title).font(.system(size: 15)).foregroundColor(.primary)
-                Spacer()
-                Text(value).font(.system(size: 15)).foregroundColor(.secondary)
-                Image(systemName: "chevron.right").font(.system(size: 12)).foregroundColor(Color(UIColor.systemGray3))
-            }
-            .padding(.vertical, 12)
-        }
-        .buttonStyle(.plain)
-    }
-
     private var appInfoSection: some View {
         VStack(spacing: 4) {
             Text("AquApp").font(.system(size: 13, weight: .semibold)).foregroundColor(.secondary)
             Text("Version \(appVersion)").font(.system(size: 12)).foregroundColor(Color(UIColor.systemGray3))
         }
     }
-
-    // MARK: - Helpers
 
     private func statItem(value: String, label: String, color: Color) -> some View {
         VStack(spacing: 4) {
@@ -360,18 +321,7 @@ struct ProfileView: View {
         if let badge = allBadges.first(where: { $0.id == badgeID }) { return AnyShapeStyle(badge.color) }
         return AnyShapeStyle(Color.blue)
     }
-
-    private func genderLabel(_ gender: String) -> String {
-        switch gender {
-        case "male": return "Male"
-        case "female": return "Female"
-        case "other": return "Other"
-        default: return "Not specified"
-        }
-    }
 }
-
-// MARK: - Preview
 
 #Preview {
     let config = ModelConfiguration(isStoredInMemoryOnly: true)

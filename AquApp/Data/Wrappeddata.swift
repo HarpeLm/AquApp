@@ -138,14 +138,14 @@ struct WrappedDataBuilder {
         let yearEnd      = calendar.date(from: comps) ?? Date()
 
         // ── Fetch eau de l'année ──────────────────────────────────────────────
-        var waterDesc = FetchDescriptor<WaterEntry>(
+        let waterDesc = FetchDescriptor<WaterEntry>(
             predicate: #Predicate { $0.date >= yearStart && $0.date < yearEnd },
             sortBy: [SortDescriptor(\.date)]
         )
         let waterEntries = (try? modelContext.fetch(waterDesc)) ?? []
 
         // ── Fetch alcool de l'année ───────────────────────────────────────────
-        var alcDesc = FetchDescriptor<WaterAlcoholEntry>(
+        let alcDesc = FetchDescriptor<WaterAlcoholEntry>(
             predicate: #Predicate { $0.date >= yearStart && $0.date < yearEnd },
             sortBy: [SortDescriptor(\.date)]
         )
@@ -171,7 +171,7 @@ struct WrappedDataBuilder {
         let bestMonthName   = monthName(bestMonthNum)
 
         // ── Objectifs atteints ────────────────────────────────────────────────
-        var dayRecordDesc = FetchDescriptor<DayRecord>(
+        let dayRecordDesc = FetchDescriptor<DayRecord>(
             predicate: #Predicate { $0.date >= yearStart && $0.date < yearEnd }
         )
         let dayRecords  = (try? modelContext.fetch(dayRecordDesc)) ?? []
