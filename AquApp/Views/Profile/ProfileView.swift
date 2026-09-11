@@ -25,6 +25,8 @@ struct ProfileView: View {
     @EnvironmentObject var storeKit: StoreKitManager
     @EnvironmentObject var xpManager: XPManager
     @EnvironmentObject var appIconManager: AppIconManager
+    @EnvironmentObject var achievementManager: AchievementManager
+    @EnvironmentObject var challengeManager: ChallengeManager
     
     @State private var showBadgePicker  = false
     @State private var showGoalEditor   = false
@@ -67,31 +69,62 @@ struct ProfileView: View {
         Self.challengeIDs.filter { HealthDataManager.shared.isChallengeCompleted($0) }.count
     }
     
-    // MARK: - Badges (données pour BadgePickerSection / ProfileHeaderView)
-    
+    // MARK: - Badges (cosmétiques + succès + défis)
+
     private var allBadges: [(id: String, sfSymbol: String, color: Color, title: String, isPro: Bool)] {
-        [
-            ("drop", "drop.fill", Color(hex: "4DA8F5"), "Drop", false),
-            ("wave", "waveform.path.ecg", Color(hex: "10B981"), "Wave", false),
-            ("flame", "flame.fill", Color.orange, "Flame", false),
-            ("leaf", "leaf.fill", Color.green, "Leaf", false),
-            ("star", "star.fill", Color.yellow, "Star", false),
-            ("bolt", "bolt.fill", Color(hex: "F59E0B"), "Bolt", false),
-            ("crown", "crown.fill", Color.purple, "Crown", true),
-            ("diamond", "diamond.fill", Color.cyan, "Diamond", true),
-            ("heart", "heart.fill", Color.red, "Heart", true),
-            ("moon", "moon.stars.fill", Color.indigo, "Moon", true),
-            ("sun", "sun.max.fill", Color.orange, "Sun", false),
-            ("cloud", "cloud.sun.fill", Color(hex: "4DA8F5"), "Cloud", false),
+        var list: [(id: String, sfSymbol: String, color: Color, title: String, isPro: Bool)] = [
+            // ── Cosmétiques gratuits
+            (id: "drop",  sfSymbol: "drop.fill",         color: Color(hex: "4DA8F5"), title: "Drop",  isPro: false),
+            (id: "wave",  sfSymbol: "waveform.path.ecg", color: Color(hex: "10B981"), title: "Wave",  isPro: false),
+            (id: "flame", sfSymbol: "flame.fill",        color: .orange,              title: "Flame", isPro: false),
+            (id: "leaf",  sfSymbol: "leaf.fill",         color: .green,               title: "Leaf",  isPro: false),
+            (id: "star",  sfSymbol: "star.fill",         color: .yellow,              title: "Star",  isPro: false),
+            (id: "bolt",  sfSymbol: "bolt.fill",         color: Color(hex: "F59E0B"), title: "Bolt",  isPro: false),
+            (id: "sun",   sfSymbol: "sun.max.fill",      color: .orange,              title: "Sun",   isPro: false),
+            (id: "cloud", sfSymbol: "cloud.sun.fill",    color: Color(hex: "4DA8F5"), title: "Cloud", isPro: false),
+            // ── Cosmétiques Premium (paliers)
+            (id: "crown",   sfSymbol: "crown.fill",      color: .purple,              title: "Crown",   isPro: true),
+            (id: "diamond", sfSymbol: "diamond.fill",    color: .cyan,                title: "Diamond", isPro: true),
+            (id: "heart",   sfSymbol: "heart.fill",      color: .red,                 title: "Heart",   isPro: true),
+            (id: "moon",    sfSymbol: "moon.stars.fill", color: .indigo,              title: "Moon",    isPro: true),
         ]
+
+        // ── Badges de SUCCÈS : générés depuis le manager
+        //    (symbole, couleur et titre localisé existent déjà dans Achievement)
+        for a in achievementManager.achievements + achievementManager.monthlyAchievements {
+            list.append((id: "ach_\(a.id)", sfSymbol: a.sfSymbol, color: a.symbolColor, title: a.title, isPro: a.isPro))
+        }
+
+        // ── Badges de DÉFIS : générés depuis le manager
+        for c in challengeManager.challenges {
+            list.append((id: "cha_\(c.id)", sfSymbol: c.sfSymbol, color: c.symbolColor, title: c.title, isPro: c.isPro))
+        }
+
+        return list
     }
-    
+
     private var unlockedBadgeIDs: Set<String> {
         var unlocked: Set<String> = ["drop", "wave", "flame", "leaf", "star", "bolt", "sun", "cloud"]
-        if completedAchievements >= 4 { unlocked.insert("crown") }
-        if completedAchievements >= 8 { unlocked.insert("diamond") }
-        if completedAchievements >= 12 { unlocked.insert("heart") }
-        if completedAchievements >= 16 { unlocked.insert("moon") }
+
+        // Paliers cosmétiques Premium
+        let total = completedAchievements + completedChallenges
+        if total >= 4  { unlocked.insert("crown") }
+        if total >= 8  { unlocked.insert("diamond") }
+        if total >= 12 { unlocked.insert("heart") }
+        if total >= 16 { unlocked.insert("moon") }
+
+        // Succès complétés → badge débloqué
+        for a in achievementManager.achievements + achievementManager.monthlyAchievements
+        where HealthDataManager.shared.isAchievementCompleted(a.id) {
+            unlocked.insert("ach_\(a.id)")
+        }
+
+        // Défis complétés → badge débloqué
+        for c in challengeManager.challenges
+        where HealthDataManager.shared.isChallengeCompleted(c.id) {
+            unlocked.insert("cha_\(c.id)")
+        }
+
         return unlocked
     }
     
@@ -270,14 +303,12 @@ struct ProfileView: View {
         configurations: config
     )
     let store = AppDataStore(modelContext: container.mainContext)
-    let storeKit = StoreKitManager()
-    let xpManager = XPManager()
-    let appIconManager = AppIconManager()
-    
     return ProfileView()
         .environmentObject(store)
-        .environmentObject(storeKit)
-        .environmentObject(xpManager)
-        .environmentObject(appIconManager)
+        .environmentObject(StoreKitManager())
+        .environmentObject(XPManager())
+        .environmentObject(AppIconManager())
+        .environmentObject(AchievementManager())
+        .environmentObject(ChallengeManager())    
         .modelContainer(container)
 }
