@@ -1,6 +1,10 @@
 import SwiftUI
 import SwiftData
 
+// MARK: - ProfileView
+// Rôle : UNIQUEMENT assembler les sections/components/sheets dédiés.
+// Chaque bloc UI vit dans son fichier (Sections/, Components/, Sheets/).
+
 struct ProfileView: View {
     @ObservedObject private var healthStore = HealthDataManager.shared
     @AppStorage("dailyGoalMl") private var dailyGoalMl: Double = 2170
@@ -38,7 +42,7 @@ struct ProfileView: View {
         return build.isEmpty ? version : "\(version) (\(build))"
     }
 
-    // MARK: - IDs (static let → typés une seule fois → Preview stable)
+    // MARK: - IDs de référence (static let → Preview stable)
 
     private static let achievementIDs: [String] = [
         "constance", "semaine_sobre", "sleep_hydrated", "heatwave",
@@ -88,11 +92,13 @@ struct ProfileView: View {
 
     private var unlockedBadgeIDs: Set<String> {
         var unlocked: Set<String> = ["drop", "wave", "flame", "leaf", "star", "bolt", "sun", "cloud"]
+        // Scénario 3 : cosmétiques Premium = Premium ET palier sur le total
         let total = completedAchievements + completedChallenges
         if isPremiumUser && total >= 4  { unlocked.insert("crown") }
         if isPremiumUser && total >= 8  { unlocked.insert("diamond") }
         if isPremiumUser && total >= 12 { unlocked.insert("heart") }
         if isPremiumUser && total >= 16 { unlocked.insert("moon") }
+        // Scénario 1 : succès/défis complétés = acquis À VIE
         for a in achievementManager.achievements + achievementManager.monthlyAchievements
         where HealthDataManager.shared.isAchievementCompleted(a.id) {
             unlocked.insert("ach_\(a.id)")
@@ -104,12 +110,7 @@ struct ProfileView: View {
         return unlocked
     }
 
-    private var effectiveBadgeID: String {
-        guard !selectedBadgeID.isEmpty, unlockedBadgeIDs.contains(selectedBadgeID) else { return "" }
-        return selectedBadgeID
-    }
-
-    // MARK: - Body
+    // MARK: - Body (assemblage uniquement)
 
     var body: some View {
         NavigationStack {
@@ -118,37 +119,73 @@ struct ProfileView: View {
                     VStack(spacing: 24) {
                         Color.clear.frame(height: 0).id("top")
 
+                        // Titre de page
                         VStack(alignment: .leading, spacing: 4) {
-                            Text("Profile").font(.system(size: 32, weight: .bold))
-                            Text("Manage your preferences").font(.subheadline).foregroundColor(.secondary)
+                            Text("Profile")
+                                .font(.system(size: 32, weight: .bold))
+                            Text("Manage your preferences")
+                                .font(.subheadline)
+                                .foregroundColor(.secondary)
                         }
                         .frame(maxWidth: .infinity, alignment: .leading)
-                        .padding(.horizontal).padding(.top, 8)
+                        .padding(.horizontal)
+                        .padding(.top, 8)
 
-                        profileHeaderCard.padding(.horizontal)
+                        // ── SECTION : Header (avatar + nom + badge + stats + XP liquide)
+                        ProfileHeaderView(
+                            userName: healthStore.firstName.isEmpty ? "User" : healthStore.firstName,
+                            isPremiumUser: isPremiumUser,
+                            allBadges: allBadges,
+                            unlockedBadgeIDs: unlockedBadgeIDs,
+                            selectedBadgeID: $selectedBadgeID,
+                            showBadgePicker: $showBadgePicker,
+                            currentStreak: store.currentStreak,
+                            totalCompleted: completedAchievements + completedChallenges,
+                            totalWaterLiters: store.totalWaterLiters
+                        )
+                        .environmentObject(xpManager)
 
+                        // ── COMPONENT : picker de badges (dépliable)
                         if showBadgePicker {
-                            badgePickerSection
-                                .padding(.horizontal)
-                                .transition(.move(edge: .top).combined(with: .opacity))
+                            BadgePickerSection(
+                                allBadges: allBadges,
+                                selectedBadgeID: $selectedBadgeID,
+                                isPremiumUser: isPremiumUser,
+                                unlockedBadgeIDs: unlockedBadgeIDs
+                            ) {
+                                withAnimation { showBadgePicker = false }
+                            }
+                            .padding(.horizontal)
+                            .transition(.move(edge: .top).combined(with: .opacity))
                         }
 
-                        ProfileHydrationView(dailyGoalMl: dailyGoalMl) { showGoalEditor = true }
+                        // ── SECTION : Hydratation (objectif quotidien)
+                        ProfileHydrationView(dailyGoalMl: dailyGoalMl) {
+                            showGoalEditor = true
+                        }
 
+                        // ── SECTION : Profil physique (poids / taille / genre)
                         ProfileBodyView(
                             weightKg: healthStore.weightKg,
                             heightCm: healthStore.heightCm,
                             genderRaw: healthStore.gender
-                        ) { showBodyEditor = true }
+                        ) {
+                            showBodyEditor = true
+                        }
 
+                        // ── SECTION : Notifications (gère elle-même sa sheet)
                         ProfileNotificationView(notificationsOn: $notificationsOn)
 
+                        // ── SECTION : Apparence (icône d'app + thème)
                         ProfileAppearanceView(colorSchemeRaw: $colorSchemeRaw)
                             .environmentObject(storeKit)
                             .environmentObject(appIconManager)
 
+                        // ── DEBUG : Toggle Premium (absent en build Release)
                         #if DEBUG
-                        Button { premiumStore.set(!isPremiumUser) } label: {
+                        Button {
+                            premiumStore.set(!isPremiumUser)
+                        } label: {
                             HStack(spacing: 10) {
                                 Image(systemName: isPremiumUser ? "checkmark.seal.fill" : "crown.fill")
                                     .font(.system(size: 16, weight: .bold))
@@ -156,22 +193,31 @@ struct ProfileView: View {
                                     Text(isPremiumUser ? "Premium Actif ✓" : "Activer Premium (Debug)")
                                         .font(.system(size: 14, weight: .semibold))
                                     Text(isPremiumUser ? "Tap to disable" : "Tap to enable")
-                                        .font(.system(size: 11)).foregroundColor(.secondary)
+                                        .font(.system(size: 11))
+                                        .foregroundColor(.secondary)
                                 }
                                 Spacer()
-                                Image(systemName: "arrow.triangle.2.circlepath").font(.system(size: 14))
+                                Image(systemName: "arrow.triangle.2.circlepath")
+                                    .font(.system(size: 14))
                             }
                             .foregroundColor(isPremiumUser ? .green : .orange)
                             .padding(14)
-                            .background(RoundedRectangle(cornerRadius: 12)
-                                .fill((isPremiumUser ? Color.green : Color.orange).opacity(0.12)))
+                            .background(
+                                RoundedRectangle(cornerRadius: 12)
+                                    .fill((isPremiumUser ? Color.green : Color.orange).opacity(0.12))
+                            )
                         }
                         .padding(.horizontal)
                         #endif
 
-                        ProfilePremiumBannerView(isPremiumUser: isPremiumUser) { showPremiumSheet = true }
+                        // ── SECTION : bannière Premium (tout en bas, avant les infos)
+                        ProfilePremiumBannerView(isPremiumUser: isPremiumUser) {
+                            showPremiumSheet = true
+                        }
 
-                        appInfoSection.padding(.top, 8)
+                        // ── Info app
+                        appInfoSection
+                            .padding(.top, 8)
 
                         Color.clear.frame(height: 16)
                     }
@@ -180,8 +226,11 @@ struct ProfileView: View {
                 .background(Color("AppBackground"))
                 .navigationBarHidden(true)
                 .onChange(of: scrollToTopID) { _, _ in
-                    withAnimation(.easeOut(duration: 0.3)) { proxy.scrollTo("top") }
+                    withAnimation(.easeOut(duration: 0.3)) {
+                        proxy.scrollTo("top")
+                    }
                 }
+                // Scénario 2 : nettoyage silencieux d'un badge équipé devenu verrouillé
                 .onChange(of: unlockedBadgeIDs) { _, newSet in
                     if !selectedBadgeID.isEmpty && !newSet.contains(selectedBadgeID) {
                         selectedBadgeID = ""
@@ -189,6 +238,7 @@ struct ProfileView: View {
                 }
             }
         }
+        // ── SHEETS (fichiers Sheets/) ─────────────────────────────────────
         .sheet(isPresented: $showGoalEditor) {
             GoalEditorSheet(dailyGoalMl: $dailyGoalMl, isPresented: $showGoalEditor)
                 .presentationDetents([.medium, .large])
@@ -216,117 +266,27 @@ struct ProfileView: View {
         }
     }
 
-    // MARK: - Header
-
-    private var profileHeaderCard: some View {
-        VStack(spacing: 20) {
-            HStack(spacing: 16) {
-                ZStack {
-                    Circle().fill(gradientForBadge(effectiveBadgeID)).frame(width: 70, height: 70)
-                    Text(healthStore.firstName.prefix(1).uppercased())
-                        .font(.system(size: 28, weight: .bold)).foregroundColor(.white)
-                }
-                VStack(alignment: .leading, spacing: 4) {
-                    HStack(spacing: 6) {
-                        Text(healthStore.firstName.isEmpty ? "User" : healthStore.firstName)
-                            .font(.system(size: 22, weight: .bold))
-                        if !effectiveBadgeID.isEmpty {
-                            Image(systemName: "crown.fill").font(.system(size: 12)).foregroundColor(.yellow)
-                        }
-                    }
-                    Button { showBadgePicker = true } label: {
-                        HStack(spacing: 4) {
-                            Image(systemName: "trophy.fill").font(.system(size: 10))
-                            Text("Choose a badge").font(.system(size: 12, weight: .medium))
-                        }
-                        .foregroundColor(.white).padding(.horizontal, 10).padding(.vertical, 4)
-                        .background(Color.blue.opacity(0.8)).cornerRadius(6)
-                    }
-                }
-                Spacer()
-            }
-            HStack(spacing: 0) {
-                statItem(value: "\(store.currentStreak)", label: "Streak days", color: .orange)
-                Divider().frame(height: 40)
-                statItem(value: "\(completedAchievements + completedChallenges)", label: "Achievements\n& challenges", color: .blue)
-                Divider().frame(height: 40)
-                statItem(value: String(format: "%.1f L", store.totalAlcoholLiters), label: "Total drunk", color: .purple)
-            }
-            .padding(.vertical, 8)
-            xpLevelSection
-        }
-        .padding(20).background(Color("AppCardBackground")).cornerRadius(20)
-        .shadow(color: .black.opacity(0.05), radius: 8, x: 0, y: 2)
-    }
-
-    private var xpLevelSection: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            HStack {
-                VStack(alignment: .leading, spacing: 2) {
-                    Text("Level \(xpManager.currentLevel.rawValue)").font(.system(size: 14, weight: .bold))
-                    Text(xpManager.currentLevel.localizedName).font(.system(size: 13, weight: .medium)).foregroundColor(.blue)
-                }
-                Spacer()
-                Text("\(xpManager.xpInCurrentLevel) / \(xpManager.currentLevelRange) XP")
-                    .font(.system(size: 12)).foregroundColor(.secondary)
-            }
-            GeometryReader { geo in
-                ZStack(alignment: .leading) {
-                    RoundedRectangle(cornerRadius: 4).fill(Color(UIColor.systemGray5)).frame(height: 8)
-                    RoundedRectangle(cornerRadius: 4)
-                        .fill(LinearGradient(colors: [Color(hex: "4DA8F5"), Color(hex: "2B87E8")], startPoint: .leading, endPoint: .trailing))
-                        .frame(width: max(0, geo.size.width * (xpManager.progressRatio.isFinite ? xpManager.progressRatio : 0)), height: 8)
-                        .animation(.easeInOut(duration: 0.6), value: xpManager.progressRatio)
-                }
-            }
-            .frame(height: 8)
-            HStack {
-                Text("\(xpManager.xpInCurrentLevel) XP accumulated").font(.system(size: 11)).foregroundColor(.secondary)
-                Spacer()
-                if let left = xpManager.xpUntilNextLevel, let next = xpManager.currentLevel.next {
-                    Text("\(left) XP left → \(next.localizedName)").font(.system(size: 11)).foregroundColor(.secondary)
-                } else {
-                    Text("Max level reached!").font(.system(size: 11)).foregroundColor(.green)
-                }
-            }
-        }
-        .padding(16).background(Color.black.opacity(0.2)).cornerRadius(12)
-    }
-
-    private var badgePickerSection: some View {
-        BadgePickerSection(
-            allBadges: allBadges,
-            selectedBadgeID: $selectedBadgeID,
-            isPremiumUser: isPremiumUser,
-            unlockedBadgeIDs: unlockedBadgeIDs
-        ) { withAnimation { showBadgePicker = false } }
-    }
+    // MARK: - Seul petit bloc local (spécifique à cette page)
 
     private var appInfoSection: some View {
         VStack(spacing: 4) {
-            Text("AquApp").font(.system(size: 13, weight: .semibold)).foregroundColor(.secondary)
-            Text("Version \(appVersion)").font(.system(size: 12)).foregroundColor(Color(UIColor.systemGray3))
+            Text("AquApp")
+                .font(.system(size: 13, weight: .semibold))
+                .foregroundColor(.secondary)
+            Text("Version \(appVersion)")
+                .font(.system(size: 12))
+                .foregroundColor(Color(UIColor.systemGray3))
         }
-    }
-
-    private func statItem(value: String, label: String, color: Color) -> some View {
-        VStack(spacing: 4) {
-            Text(value).font(.system(size: 20, weight: .bold)).foregroundColor(color)
-            Text(label).font(.system(size: 11)).foregroundColor(.secondary).multilineTextAlignment(.center).lineLimit(2)
-        }
-        .frame(maxWidth: .infinity)
-    }
-
-    private func gradientForBadge(_ badgeID: String) -> AnyShapeStyle {
-        if let badge = allBadges.first(where: { $0.id == badgeID }) { return AnyShapeStyle(badge.color) }
-        return AnyShapeStyle(Color.blue)
     }
 }
+
+// MARK: - Preview
 
 #Preview {
     let config = ModelConfiguration(isStoredInMemoryOnly: true)
     let container = try! ModelContainer(
-        for: WaterEntry.self, WaterAlcoholEntry.self, DayRecord.self, configurations: config
+        for: WaterEntry.self, WaterAlcoholEntry.self, DayRecord.self,
+        configurations: config
     )
     let store = AppDataStore(modelContext: container.mainContext)
     return ProfileView()
