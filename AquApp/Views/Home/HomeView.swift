@@ -417,7 +417,7 @@ struct SwipeToDeleteView<Content: View>: View {
                             }
                             if value.translation.width < -80 {
                                 withAnimation(.easeInOut(duration: 0.2)) {
-                                    offset = -UIScreen.main.bounds.width
+                                    offset = -UIScreen.current.bounds.width
                                 }
                                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
                                     onDelete()

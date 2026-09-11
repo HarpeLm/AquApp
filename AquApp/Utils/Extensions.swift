@@ -21,3 +21,17 @@ extension Color {
         self.init(.sRGB, red: Double(r)/255, green: Double(g)/255, blue: Double(b)/255, opacity: Double(a)/255)
     }
 }
+
+// MARK: - UIScreen compatible iOS 26+
+
+extension UIScreen {
+    /// Remplace `UIScreen.main` (déprécié iOS 26) :
+    /// prend l'écran de la scène active de l'app.
+    @MainActor
+    static var current: UIScreen {
+        UIApplication.shared.connectedScenes
+            .compactMap { $0 as? UIWindowScene }
+            .first?.screen
+            ?? .screens.first!
+    }
+}
