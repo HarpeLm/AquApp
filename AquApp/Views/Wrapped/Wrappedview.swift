@@ -209,7 +209,6 @@ struct WrappedView: View {
 
     private func exportAndShare(format: WrappedShareFormat) {
         let renderer = ImageRenderer(content: WrappedShareCard(data: data, format: format))
-        renderer.scale = UIScreen.main.scale
         if let uiImage = renderer.uiImage {
             shareImage = uiImage
             WrappedHapticsManager.shared.play(for: .share)
