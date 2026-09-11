@@ -3,7 +3,6 @@ import SwiftUI
 import Combine
 
 // MARK: - AppIcon
-
 enum AppIcon: String, CaseIterable, Identifiable {
     case ocean       = "Ocean"
     case minuit      = "Minuit"
@@ -35,19 +34,6 @@ enum AppIcon: String, CaseIterable, Identifiable {
 
     var isPremium: Bool { self != .ocean }
 
-    // MARK: - Nom de l'asset de prévisualisation
-    //
-    // iOS ne permet PAS de lire les icônes alternatives via UIImage(named:).
-    // Solution : ajouter dans Assets.xcassets un Image Set nommé
-    // "preview_Ocean", "preview_Minuit", etc. contenant la même image
-    // 1024×1024 que l'icône correspondante.
-    //
-    // Étapes dans Xcode :
-    //   1. Clic droit sur Assets.xcassets > New Image Set
-    //   2. Nommer : preview_Ocean (preview_Minuit, preview_Givre…)
-    //   3. Glisser l'image 1024×1024 de l'icône dans le slot "Universal"
-    //   4. Répéter pour chaque icône
-    //
     var previewAssetName: String {
         "preview_\(rawValue)"
     }
@@ -78,7 +64,6 @@ enum AppIcon: String, CaseIterable, Identifiable {
 }
 
 // MARK: - AppIconManager
-
 @MainActor
 final class AppIconManager: ObservableObject {
     @Published var currentIcon:  AppIcon = .ocean
@@ -98,10 +83,6 @@ final class AppIconManager: ObservableObject {
         guard currentIcon != icon else { return }
 
         #if targetEnvironment(simulator)
-        // ── Simulateur ────────────────────────────────────────────────────────
-        // setAlternateIconName ne fonctionne pas de façon fiable sur simulateur
-        // après le premier appel. On simule le changement directement en mémoire
-        // pour pouvoir tester le flux UI sans appareil physique.
         isChanging = true
         Task {
             try? await Task.sleep(for: .seconds(0.4))
@@ -112,33 +93,23 @@ final class AppIconManager: ObservableObject {
             toastMessage = nil
         }
         #else
-        // ── Appareil physique ─────────────────────────────────────────────────
         guard UIApplication.shared.supportsAlternateIcons else { return }
-
         isChanging = true
 
-        // setAlternateIconName appelle son completion sur un thread quelconque.
-        // nonisolated permet d'appeler cette fonction depuis @MainActor sans
-        // que le compilateur exige que le callback soit lui aussi sur le main actor.
-        // Task { @MainActor in } ramène les mutations @Published sur le bon thread.
         nonisolated(unsafe) let iconName = icon.alternateIconName
         UIApplication.shared.setAlternateIconName(iconName) { [weak self] error in
             Task { @MainActor [weak self] in
                 guard let self else { return }
                 self.isChanging = false
-
                 if let error {
                     print("⚠️ setAlternateIconName error: \(error.localizedDescription)")
                 }
-
-                // Resynchroniser currentIcon depuis l'état réel d'iOS
                 let appliedName = UIApplication.shared.alternateIconName
                 if let appliedName, let appliedIcon = AppIcon(rawValue: appliedName) {
                     self.currentIcon = appliedIcon
                 } else {
                     self.currentIcon = .ocean
                 }
-
                 if self.currentIcon == icon {
                     self.toastMessage = String(localized: "profile.app_icon.changed_toast")
                     try? await Task.sleep(for: .seconds(2.5))
@@ -149,7 +120,6 @@ final class AppIconManager: ObservableObject {
         #endif
     }
 
-    /// Appelé quand le premium est annulé — remet l'icône Ocean (principale)
     func resetToOceanIfNeeded() {
         guard currentIcon.isPremium else { return }
         guard UIApplication.shared.supportsAlternateIcons else { return }
@@ -163,11 +133,11 @@ final class AppIconManager: ObservableObject {
 }
 
 // MARK: - AppIconPickerView
-
 struct AppIconPickerView: View {
     @EnvironmentObject var iconManager: AppIconManager
     @EnvironmentObject var storeKit:    StoreKitManager
     @ObservedObject private var premiumStore = PremiumManager.shared
+
     private var isPremiumUser: Bool {
         get { premiumStore.isPremium }
         nonmutating set { premiumStore.set(newValue) }
@@ -175,28 +145,24 @@ struct AppIconPickerView: View {
     private var isPremiumUserBinding: Binding<Bool> {
         Binding(get: { premiumStore.isPremium }, set: { premiumStore.set($0) })
     }
-    @State private var showPremiumSheet = false
 
+    @State private var showPremiumSheet = false
     private let columns = Array(repeating: GridItem(.flexible(), spacing: 12), count: 4)
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
-
             SectionHeader(
                 title:    String(localized: "profile.section.app_icon"),
                 sfSymbol: "app.badge",
                 color:    Color(hex: "4DA8F5")
             )
-
             VStack(alignment: .leading, spacing: 0) {
-
                 Text(String(localized: "profile.app_icon.subtitle"))
                     .font(.system(size: 13))
                     .foregroundColor(.secondary)
                     .padding(.horizontal, 16)
                     .padding(.top, 14)
                     .padding(.bottom, 12)
-
                 LazyVGrid(columns: columns, spacing: 14) {
                     ForEach(AppIcon.allCases) { icon in
                         AppIconCell(
@@ -214,7 +180,6 @@ struct AppIconPickerView: View {
                     }
                 }
                 .padding(.horizontal, 14)
-
                 if let toast = iconManager.toastMessage {
                     HStack(spacing: 8) {
                         Image(systemName: "checkmark.circle.fill")
@@ -228,7 +193,6 @@ struct AppIconPickerView: View {
                     .padding(.top, 8)
                     .transition(.opacity.combined(with: .move(edge: .bottom)))
                 }
-
                 Spacer().frame(height: 14)
             }
             .background(Color("AppCardBackground"))
@@ -247,7 +211,6 @@ struct AppIconPickerView: View {
 }
 
 // MARK: - AppIconCell
-
 struct AppIconCell: View {
     let icon:       AppIcon
     let isSelected: Bool
@@ -258,14 +221,7 @@ struct AppIconCell: View {
     var body: some View {
         Button(action: onTap) {
             VStack(spacing: 6) {
-
                 ZStack(alignment: .topTrailing) {
-
-                    // ── Aperçu de l'icône ───────────────────────────────────
-                    // Charge l'asset "preview_NomIcone" depuis Assets.xcassets.
-                    // Si l'asset n'existe pas encore, fallback sur le dégradé.
-                    // → Voir commentaire sur previewAssetName pour les étapes
-                    //   à suivre dans Xcode pour ajouter les assets.
                     AppIconPreview(icon: icon)
                         .frame(width: 58, height: 58)
                         .overlay(
@@ -279,7 +235,6 @@ struct AppIconCell: View {
                         .scaleEffect(isChanging ? 0.94 : 1.0)
                         .animation(.spring(response: 0.25), value: isChanging)
 
-                    // Badge couronne (Premium verrouillé)
                     if !isUnlocked {
                         ZStack {
                             Circle().fill(Color.orange).frame(width: 18, height: 18)
@@ -300,14 +255,12 @@ struct AppIconCell: View {
                 }
                 .frame(width: 62, height: 62)
 
-                // Nom
                 Text(icon.localizedName)
                     .font(.system(size: 10, weight: .medium))
                     .foregroundColor(isSelected ? Color(hex: "4DA8F5") : .secondary)
                     .lineLimit(1)
                     .minimumScaleFactor(0.7)
 
-                // Pill état
                 Group {
                     if isSelected {
                         Text(String(localized: "profile.app_icon.active_badge"))
@@ -347,23 +300,16 @@ struct AppIconCell: View {
 }
 
 // MARK: - AppIconPreview
-// Affiche la vraie image de l'icône depuis un asset dédié "preview_NomIcone".
-// Si l'asset est absent, affiche le dégradé de couleur comme fallback.
-
 private struct AppIconPreview: View {
     let icon: AppIcon
-
     var body: some View {
         if UIImage(named: icon.previewAssetName) != nil {
-            // ✅ Asset "preview_Ocean" / "preview_Minuit"… trouvé
             Image(icon.previewAssetName)
                 .resizable()
                 .scaledToFill()
                 .frame(width: 58, height: 58)
                 .clipShape(RoundedRectangle(cornerRadius: 14))
         } else {
-            // ⚠️ Fallback : dégradé + mini goutte
-            // → Ajoute les assets "preview_NomIcone" dans Assets.xcassets
             ZStack {
                 RoundedRectangle(cornerRadius: 14)
                     .fill(LinearGradient(
@@ -379,11 +325,9 @@ private struct AppIconPreview: View {
     }
 }
 
-// MARK: - AppDropPreview (fallback mini goutte)
-
+// MARK: - AppDropPreview
 struct AppDropPreview: View {
     let icon: AppIcon
-
     var body: some View {
         if icon.dropFilled {
             DropPathShape()
@@ -395,14 +339,12 @@ struct AppDropPreview: View {
     }
 }
 
-// MARK: - DropPathShape (partagée avec PremiumSheet.swift)
-
+// MARK: - DropPathShape
 struct DropPathShape: Shape {
     func path(in rect: CGRect) -> Path {
         var p  = Path()
         let cx = rect.midX
         let r  = rect.width / 2.0
-
         p.move(to: CGPoint(x: cx, y: rect.minY))
         p.addCurve(
             to:       CGPoint(x: cx + r,  y: rect.maxY - r),
