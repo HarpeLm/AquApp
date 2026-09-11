@@ -45,7 +45,7 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		709EC209304858190042EF7B /* Exceptions for "AquApp" folder in "AquApp" target */ = {
+		7017778C3053505A007F31D1 /* Exceptions for "AquApp" folder in "AquApp" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Info.plist,
@@ -68,7 +68,7 @@
 		70AB0CAD2F66CB0F00DF04B8 /* AquApp */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
-				709EC209304858190042EF7B /* Exceptions for "AquApp" folder in "AquApp" target */,
+				7017778C3053505A007F31D1 /* Exceptions for "AquApp" folder in "AquApp" target */,
 			);
 			path = AquApp;
 			sourceTree = "<group>";
@@ -407,7 +407,7 @@
 				DEVELOPMENT_TEAM = B2WR9NJN4S;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = "";
+				INFOPLIST_FILE = AquApp/Info.plist;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.healthcare-fitness";
 				INFOPLIST_KEY_NSHealthShareUsageDescription = "Pour suivre vos pas et votre sommeil.";
 				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "Pour enregistrer votre consommation d'eau.";
@@ -446,7 +446,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = "";
+				INFOPLIST_FILE = AquApp/Info.plist;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.healthcare-fitness";
 				INFOPLIST_KEY_NSHealthShareUsageDescription = "Pour suivre vos pas et votre sommeil.";
 				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "Pour enregistrer votre consommation d'eau.";
