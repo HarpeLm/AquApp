@@ -63,6 +63,12 @@ final class AppDataStore: ObservableObject {
         recalculateGoalStreak()
     }
 
+    /// Recale l'XP eau du jour sur les entrées réellement présentes.
+    /// Appelé à chaque add/delete/flush widget pour garantir la cohérence.
+    private func syncWaterXP() {
+        xpManager?.syncWaterXP(from: cachedWaterEntries().map(\.amountMl))
+    }
+    
     // MARK: - Bootstrap au lancement
 
     /// Initialise totalWaterMl / totalAlcoholMl depuis la DB si le Keychain
@@ -166,7 +172,7 @@ final class AppDataStore: ObservableObject {
         HealthDataManager.shared.addWaterMl(amountMl)
 
         HealthKitWriter.shared.write(amountMl: amountMl, date: date, entryID: entry.id)
-        Task { @MainActor in xpManager?.add(.water(ml: amountMl)) }
+        syncWaterXP()
 
         invalidateCache()
         updateDayRecord(for: date)
@@ -217,9 +223,9 @@ final class AppDataStore: ObservableObject {
         save()
         HealthDataManager.shared.addWaterMl(-entry.amountMl)
         invalidateCache()
+        syncWaterXP()                // ← AJOUTE CETTE LIGNE (rembourse l'XP)
         updateDayRecord(for: entry.date)
         recalculateGoalStreak()
-
         objectWillChange.send()
     }
 
@@ -503,6 +509,7 @@ final class AppDataStore: ObservableObject {
 
         save()
         invalidateCache()
+        syncWaterXP()
         for day in datesAffected { updateDayRecord(for: day) }
         recalculateGoalStreak()
         if needsSoberRecalc { recalculateSoberStreak() }
