@@ -3,6 +3,7 @@ import SwiftUI
 import Combine
 
 // MARK: - AppIcon
+
 enum AppIcon: String, CaseIterable, Identifiable {
     case ocean       = "Ocean"
     case minuit      = "Minuit"
@@ -28,15 +29,10 @@ enum AppIcon: String, CaseIterable, Identifiable {
         }
     }
 
-    /// Nom de l'icône alternative passé à setAlternateIconName.
-    /// nil pour l'icône principale (Ocean).
     var alternateIconName: String? { self == .ocean ? nil : rawValue }
-
     var isPremium: Bool { self != .ocean }
 
-    var previewAssetName: String {
-        "preview_\(rawValue)"
-    }
+    var previewAssetName: String { "preview_\(rawValue)" }
 
     var backgroundColors: [Color] {
         switch self {
@@ -64,6 +60,7 @@ enum AppIcon: String, CaseIterable, Identifiable {
 }
 
 // MARK: - AppIconManager
+
 @MainActor
 final class AppIconManager: ObservableObject {
     @Published var currentIcon:  AppIcon = .ocean
@@ -95,7 +92,6 @@ final class AppIconManager: ObservableObject {
         #else
         guard UIApplication.shared.supportsAlternateIcons else { return }
         isChanging = true
-
         nonisolated(unsafe) let iconName = icon.alternateIconName
         UIApplication.shared.setAlternateIconName(iconName) { [weak self] error in
             Task { @MainActor [weak self] in
@@ -133,6 +129,7 @@ final class AppIconManager: ObservableObject {
 }
 
 // MARK: - AppIconPickerView
+
 struct AppIconPickerView: View {
     @EnvironmentObject var iconManager: AppIconManager
     @EnvironmentObject var storeKit:    StoreKitManager
@@ -163,6 +160,7 @@ struct AppIconPickerView: View {
                     .padding(.horizontal, 16)
                     .padding(.top, 14)
                     .padding(.bottom, 12)
+
                 LazyVGrid(columns: columns, spacing: 14) {
                     ForEach(AppIcon.allCases) { icon in
                         AppIconCell(
@@ -180,6 +178,7 @@ struct AppIconPickerView: View {
                     }
                 }
                 .padding(.horizontal, 14)
+
                 if let toast = iconManager.toastMessage {
                     HStack(spacing: 8) {
                         Image(systemName: "checkmark.circle.fill")
@@ -211,6 +210,7 @@ struct AppIconPickerView: View {
 }
 
 // MARK: - AppIconCell
+
 struct AppIconCell: View {
     let icon:       AppIcon
     let isSelected: Bool
@@ -300,6 +300,7 @@ struct AppIconCell: View {
 }
 
 // MARK: - AppIconPreview
+
 private struct AppIconPreview: View {
     let icon: AppIcon
     var body: some View {
@@ -326,20 +327,20 @@ private struct AppIconPreview: View {
 }
 
 // MARK: - AppDropPreview
+
 struct AppDropPreview: View {
     let icon: AppIcon
     var body: some View {
         if icon.dropFilled {
-            DropPathShape()
-                .fill(Color.white.opacity(0.92))
+            DropPathShape().fill(Color.white.opacity(0.92))
         } else {
-            DropPathShape()
-                .stroke(icon.dropStrokeColor, lineWidth: 3.5)
+            DropPathShape().stroke(icon.dropStrokeColor, lineWidth: 3.5)
         }
     }
 }
 
 // MARK: - DropPathShape
+
 struct DropPathShape: Shape {
     func path(in rect: CGRect) -> Path {
         var p  = Path()
@@ -360,8 +361,8 @@ struct DropPathShape: Shape {
         )
         p.addCurve(
             to:       CGPoint(x: cx, y: rect.minY),
-            control1: CGPoint(x: cx - r,          y: rect.maxY - r * 1.5),
-            control2: CGPoint(x: cx - r * 0.85,   y: rect.minY + rect.height * 0.42)
+            control1: CGPoint(x: cx - r,        y: rect.maxY - r * 1.5),
+            control2: CGPoint(x: cx - r * 0.85, y: rect.minY + rect.height * 0.42)
         )
         p.closeSubpath()
         return p
