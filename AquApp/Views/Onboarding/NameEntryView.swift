@@ -75,7 +75,6 @@ struct NameEntryView: View {
                                             lineWidth: 1.5
                                         )
                                 )
-                                .withDoneButton()
                                 .accessibilityIdentifier("onboarding.name")
                                 .onSubmit {
                                     if !isButtonDisabled { saveName() }
