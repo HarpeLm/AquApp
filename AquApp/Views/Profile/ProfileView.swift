@@ -2,8 +2,6 @@ import SwiftUI
 import SwiftData
 
 // MARK: - ProfileView
-// Rôle : UNIQUEMENT assembler les sections/components/sheets dédiés.
-// L'avatar photo est géré par ProfileAvatarView, monté dans ProfileHeaderView.
 
 struct ProfileView: View {
     @ObservedObject private var healthStore = HealthDataManager.shared
@@ -92,13 +90,11 @@ struct ProfileView: View {
 
     private var unlockedBadgeIDs: Set<String> {
         var unlocked: Set<String> = ["drop", "wave", "flame", "leaf", "star", "bolt", "sun", "cloud"]
-        // Scénario 3 : cosmétiques Premium = Premium ET palier sur le total
         let total = completedAchievements + completedChallenges
         if isPremiumUser && total >= 4  { unlocked.insert("crown") }
         if isPremiumUser && total >= 8  { unlocked.insert("diamond") }
         if isPremiumUser && total >= 12 { unlocked.insert("heart") }
         if isPremiumUser && total >= 16 { unlocked.insert("moon") }
-        // Scénario 1 : succès/défis complétés = acquis À VIE
         for a in achievementManager.achievements + achievementManager.monthlyAchievements
         where HealthDataManager.shared.isAchievementCompleted(a.id) {
             unlocked.insert("ach_\(a.id)")
@@ -119,7 +115,6 @@ struct ProfileView: View {
                     VStack(spacing: 24) {
                         Color.clear.frame(height: 0).id("top")
 
-                        // Titre de page
                         VStack(alignment: .leading, spacing: 4) {
                             Text("Profile")
                                 .font(.system(size: 32, weight: .bold))
@@ -230,7 +225,6 @@ struct ProfileView: View {
                         proxy.scrollTo("top")
                     }
                 }
-                // Scénario 2 : nettoyage silencieux d'un badge équipé devenu verrouillé
                 .onChange(of: unlockedBadgeIDs) { _, newSet in
                     if !selectedBadgeID.isEmpty && !newSet.contains(selectedBadgeID) {
                         selectedBadgeID = ""
@@ -238,7 +232,6 @@ struct ProfileView: View {
                 }
             }
         }
-        // ── SHEETS (fichiers Sheets/) ─────────────────────────────────────
         .sheet(isPresented: $showGoalEditor) {
             GoalEditorSheet(dailyGoalMl: $dailyGoalMl, isPresented: $showGoalEditor)
                 .presentationDetents([.medium, .large])
@@ -265,8 +258,6 @@ struct ProfileView: View {
                 .presentationCornerRadius(24)
         }
     }
-
-    // MARK: - Seul petit bloc local (spécifique à cette page)
 
     private var appInfoSection: some View {
         VStack(spacing: 4) {
