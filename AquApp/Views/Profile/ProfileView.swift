@@ -140,7 +140,7 @@ struct ProfileView: View {
                             selectedBadgeID: $selectedBadgeID,
                             showBadgePicker: $showBadgePicker,
                             currentStreak: store.currentStreak,
-                            totalCompleted: completedAchievements + completedChallenges,
+                            unlockedBadgesCount: unlockedBadgeIDs.count,
                             totalWaterLiters: store.totalWaterLiters
                         )
                         .environmentObject(xpManager)
