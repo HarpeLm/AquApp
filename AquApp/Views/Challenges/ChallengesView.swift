@@ -70,15 +70,15 @@ struct Challenge: Identifiable {
         case "regulier":
             return String(format: String(localized: "challenge.progress_times"), Int(currentProgress))
         case "grand_buveur":
-            return String(format: String(localized: "challenge.progress_ml"), UnitFormatter.volume(currentProgress))
+            return String(format: String(localized: "challenge.progress_ml"), Int(currentProgress))          // ← Int, plus UnitFormatter.volume
         case "cadence_parfaite":
             return String(format: String(localized: "challenge.cadence.progress"), Int(currentProgress), Int(targetProgress))
         case "flash_hydrate":
-            return String(format: String(localized: "challenge.flash.progress"), UnitFormatter.volume(currentProgress))
+            return String(format: String(localized: "challenge.flash.progress"), Int(currentProgress))       // ← Int
         case "matin_champion":
-            return String(format: String(localized: "challenge.matin.progress"), Int(currentProgress))
+            return String(format: String(localized: "challenge.matin.progress"), Int(currentProgress))       // ← Int
         case "recuperation":
-            return String(format: String(localized: "challenge.recuperation.progress"), UnitFormatter.volume(currentProgress))
+            return String(format: String(localized: "challenge.recuperation.progress"), Int(currentProgress)) // ← Int
         default:
             return ""
         }
