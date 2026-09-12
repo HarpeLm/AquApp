@@ -116,9 +116,9 @@ struct ProfileView: View {
                         Color.clear.frame(height: 0).id("top")
 
                         VStack(alignment: .leading, spacing: 4) {
-                            Text("Profile")
+                            Text("profile.title")          // → "Profil"
                                 .font(.system(size: 32, weight: .bold))
-                            Text("Manage your preferences")
+                            Text("profile.subtitle")       // → "Gérez vos préférences"
                                 .font(.subheadline)
                                 .foregroundColor(.secondary)
                         }
