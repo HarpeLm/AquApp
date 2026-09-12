@@ -2003,10 +2003,24 @@
       }
     },
     "goal.editor.heatwave_note" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Objectif augmenté pendant la canicule"
+          }
+        }
+      }
     },
     "goal.editor.presets" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Suggestions rapides"
+          }
+        }
+      }
     },
     "goal.editor.recalculate" : {
       "extractionState" : "stale",
@@ -2053,7 +2067,14 @@
       }
     },
     "goal.editor.subtitle" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ajustez votre objectif quotidien"
+          }
+        }
+      }
     },
     "goal.editor.suggestions" : {
       "extractionState" : "stale",
@@ -2830,10 +2851,24 @@
       }
     },
     "onboarding.body.sub" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pour calculer votre objectif personnalisé"
+          }
+        }
+      }
     },
     "onboarding.body.title" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Votre profil"
+          }
+        }
+      }
     },
     "onboarding.continue" : {
       "localizations" : {
