@@ -13,7 +13,7 @@ struct ProfileHeaderView: View {
 
     // Stats injectées depuis ProfileView
     let currentStreak:         Int
-    let totalCompleted:        Int
+    let unlockedBadgesCount:        Int
     let totalWaterLiters:      Double
 
     // XP
@@ -129,7 +129,7 @@ struct ProfileHeaderView: View {
                 )
                 Divider().frame(height: 36)
                 ProfileStatCell(
-                    value:  "\(totalCompleted)",
+                    value:  "\(unlockedBadgesCount)",
                     label:  String(localized: "profile.stats.achievements"),
                     color:  Color(hex: "4DA8F5"),
                     symbol: "star.fill"
@@ -308,15 +308,19 @@ private struct XPProgressBlock: View {
 #Preview {
     let xp = XPManager()
     ProfileHeaderView(
-        userName:          "Fabian Dargaud",
-        isPremiumUser:     true,
-        allBadges:         [],
-        unlockedBadgeIDs:  [],
-        selectedBadgeID:   .constant(""),
-        showBadgePicker:   .constant(false),
-        currentStreak:     12,
-        totalCompleted:    8,
-        totalWaterLiters:  48.3
+        userName: "Fabian",
+        isPremiumUser: true,
+        allBadges: [
+            (id: "drop",  sfSymbol: "drop.fill",  color: Color(hex: "4DA8F5"), title: "Drop",  isPro: false),
+            (id: "wave",  sfSymbol: "waveform.path.ecg", color: Color(hex: "10B981"), title: "Wave", isPro: false),
+            (id: "crown", sfSymbol: "crown.fill", color: .purple,              title: "Crown", isPro: true)
+        ],
+        unlockedBadgeIDs: ["drop", "wave"],
+        selectedBadgeID: .constant("drop"),
+        showBadgePicker: .constant(false),
+        currentStreak: 12,
+        unlockedBadgesCount: 5,
+        totalWaterLiters: 48.3
     )
     .environmentObject(xp)
     .padding(.vertical)
