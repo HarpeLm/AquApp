@@ -1,10 +1,9 @@
 import SwiftUI
 
 // MARK: - ProfileHeaderView
-// Carte unifiée : avatar · nom · badge · stats · barre XP liquide
+// Carte unifiée : avatar (photo galerie OU initiale) · nom · badge · stats · XP liquide
 
 struct ProfileHeaderView: View {
-
     let userName:        String
     let isPremiumUser:   Bool
     let allBadges:       [(id: String, sfSymbol: String, color: Color, title: String, isPro: Bool)]
@@ -21,6 +20,7 @@ struct ProfileHeaderView: View {
     @EnvironmentObject var xpManager: XPManager
 
     // ── Helpers ───────────────────────────────────────────────────────────────
+
     var selectedBadge: (id: String, sfSymbol: String, color: Color, title: String, isPro: Bool)? {
         allBadges.first { $0.id == selectedBadgeID }
     }
@@ -33,35 +33,26 @@ struct ProfileHeaderView: View {
         return colors[abs(userName.hashValue) % colors.count]
     }
 
-    var initials: String {
-        let parts = userName.trimmingCharacters(in: .whitespaces).components(separatedBy: " ")
-        let first = parts.first?.prefix(1) ?? ""
-        let last  = parts.count > 1 ? (parts.last?.prefix(1) ?? "") : ""
-        return "\(first)\(last)".uppercased()
-    }
-
     var body: some View {
         VStack(spacing: 0) {
 
             // ── Ligne avatar + nom ────────────────────────────────────────────
             HStack(spacing: 16) {
 
-                // Avatar
-                ZStack {
-                    Circle()
-                        .fill(LinearGradient(
-                            colors: [avatarColor, avatarColor.opacity(0.7)],
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
-                        ))
-                        .frame(width: 64, height: 64)
-                    Text(initials.isEmpty ? "?" : initials)
-                        .font(.system(size: 24, weight: .bold))
-                        .foregroundColor(.white)
-                }
+                // AVATAR : photo depuis la galerie ou initiale par défaut.
+                // Tap = PhotosPicker · Appui long = "Retirer la photo"
+                // Persistance JPEG via ProfilePhotoManager (Application Support).
+                ProfileAvatarView(
+                    firstName: userName,
+                    background: AnyShapeStyle(LinearGradient(
+                        colors: [avatarColor, avatarColor.opacity(0.7)],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    )),
+                    size: 64
+                )
                 // Halo subtil selon la couleur du niveau
                 .shadow(color: xpManager.currentLevel.color.opacity(0.35), radius: 8, x: 0, y: 2)
-                .accessibilityHidden(true)
 
                 // Nom + badge
                 VStack(alignment: .leading, spacing: 6) {
@@ -218,7 +209,6 @@ struct ProfileStatCell: View {
 // MARK: - XPProgressBlock
 
 private struct XPProgressBlock: View {
-
     @ObservedObject var xp: XPManager
     @State private var animatedProgress: Double = 0
 
@@ -227,10 +217,8 @@ private struct XPProgressBlock: View {
 
     var body: some View {
         VStack(spacing: 0) {
-
             // ── Ligne niveau + fraction XP ────────────────────────────────────
             HStack(alignment: .center) {
-
                 // Pastille niveau
                 HStack(spacing: 7) {
                     ZStack {
