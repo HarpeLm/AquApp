@@ -760,3 +760,20 @@ coverage/
 ......
 ......
 ......
+# User data Xcode
+*.xcuserstate
+xcuserdata/
+*.xcscmblueprint
+*.xccheckout
+
+# Derived data
+DerivedData/
+build/
+
+# macOS / IDE
+.DS_Store
+.mimosa/
+*.moved-aside
+
+# Breakpoints locaux
+*.xcbkptlist
