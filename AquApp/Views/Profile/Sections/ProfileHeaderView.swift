@@ -51,8 +51,6 @@ struct ProfileHeaderView: View {
                     )),
                     size: 64
                 )
-                // Halo subtil selon la couleur du niveau
-                .shadow(color: xpManager.currentLevel.color.opacity(0.35), radius: 8, x: 0, y: 2)
 
                 // Nom + badge
                 VStack(alignment: .leading, spacing: 6) {
@@ -158,21 +156,6 @@ struct ProfileHeaderView: View {
         .background(Color("AppCardBackground"))
         .cornerRadius(20)
         .shadow(color: .black.opacity(0.06), radius: 12, x: 0, y: 3)
-        // Halo coloré subtil selon le niveau
-        .overlay(
-            RoundedRectangle(cornerRadius: 20)
-                .stroke(
-                    LinearGradient(
-                        colors: [
-                            Color(hex: "4DA8F5").opacity(0.20),
-                            Color(hex: "4DA8F5").opacity(0.04)
-                        ],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    ),
-                    lineWidth: 1
-                )
-        )
         .padding(.horizontal)
     }
 }
