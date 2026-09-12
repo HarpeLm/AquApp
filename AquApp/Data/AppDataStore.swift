@@ -8,7 +8,6 @@ import Foundation
 
 @MainActor
 final class AppDataStore: ObservableObject {
-
     private let modelContext: ModelContext
     var modelContextPublic: ModelContext { modelContext }
     weak var confettiManager: ConfettiManager?
@@ -16,7 +15,7 @@ final class AppDataStore: ObservableObject {
     weak var challengeManager: ChallengeManager?
     weak var xpManager: XPManager?
 
-    @AppStorage("dailyGoalMl")   var dailyGoalMl: Double = 2170
+    @AppStorage("dailyGoalMl") var dailyGoalMl: Double = 2170
     var isPremiumUser: Bool {
         get { PremiumManager.shared.isPremium }
         set { PremiumManager.shared.set(newValue) }
@@ -27,7 +26,7 @@ final class AppDataStore: ObservableObject {
 
     // MARK: - Cache du jour
 
-    private var _cachedWaterEntries:   [WaterEntry]?
+    private var _cachedWaterEntries: [WaterEntry]?
     private var _cachedAlcoholEntries: [WaterAlcoholEntry]?
     private var _cacheDay: Date = .distantPast
 
@@ -64,8 +63,7 @@ final class AppDataStore: ObservableObject {
     }
 
     /// Recale l'XP eau d'un jour donné sur ses entrées réellement présentes.
-    /// Couvre aujourd'hui ET les jours passés (suppression depuis l'historique).
-    private func syncWaterXP(for date: Date) {
+    private func syncWaterXP(for date: Date = Date()) {
         let day = Calendar.current.startOfDay(for: date)
         let amounts: [Double]
         if Calendar.current.isDateInToday(date) {
@@ -110,14 +108,10 @@ final class AppDataStore: ObservableObject {
 
     func recalculateAllAchievementsFromHistory() {
         guard let am = achievementManager else { return }
-
         let totalMl = HealthDataManager.shared.totalWaterMl
         am.onWaterAdded(totalCumulatedMl: totalMl)
-
         am.onGoalReached(streak: currentStreak, totalDays: totalGoalDays)
-
         am.onSoberStreakUpdated(streak: soberDaysStreak)
-
         let heatwaveDays = HealthDataManager.shared.heatwaveDays
         if heatwaveDays > 0 {
             am.restoreHeatwaveProgress(days: heatwaveDays)
@@ -166,14 +160,12 @@ final class AppDataStore: ObservableObject {
         }
 
         let wasGoalReached = todayGoalReached
-
         let entry = WaterEntry(amountMl: amountMl, date: date)
         modelContext.insert(entry)
         save()
         HealthDataManager.shared.addWaterMl(amountMl)
-
         HealthKitWriter.shared.write(amountMl: amountMl, date: date, entryID: entry.id)
-        invalidateCache()          // ← AVANT le sync (cache frais)
+        invalidateCache()
         syncWaterXP(for: date)
         updateDayRecord(for: date)
         recalculateGoalStreak()
@@ -189,27 +181,27 @@ final class AppDataStore: ObservableObject {
 
         achievementManager?.onWaterAdded(totalCumulatedMl: HealthDataManager.shared.totalWaterMl)
 
-        let nineAM       = Calendar.current.date(bySettingHour: 9, minute: 0, second: 0, of: Date())!
+        let nineAM = Calendar.current.date(bySettingHour: 9, minute: 0, second: 0, of: Date())!
         let waterEntries = cachedWaterEntries()
         let mlBeforeNine = waterEntries.filter { $0.date < nineAM }.reduce(0) { $0 + $1.amountMl }
 
         challengeManager?.onWaterUpdated(
-            totalTodayMl:     todayWaterMlRaw,
-            dailyGoalMl:      dailyGoalMl,
+            totalTodayMl: todayWaterMlRaw,
+            dailyGoalMl: dailyGoalMl,
             dailyGoalReached: todayGoalReached,
-            drinkCount:       waterEntries.count,
-            mlBeforeNine:     mlBeforeNine,
-            waterEntries:     waterEntries,
-            alcoholCount:     cachedAlcoholEntries().count
+            drinkCount: waterEntries.count,
+            mlBeforeNine: mlBeforeNine,
+            waterEntries: waterEntries,
+            alcoholCount: cachedAlcoholEntries().count
         )
 
         fetchAndCacheTodaySteps { [weak self] steps in
             Task { @MainActor [weak self] in
                 guard let self else { return }
                 self.achievementManager?.onMarathonienCheck(
-                    drinkCount:  waterEntries.count,
+                    drinkCount: waterEntries.count,
                     goalReached: self.todayGoalReached,
-                    steps:       steps
+                    steps: steps
                 )
             }
         }
@@ -223,7 +215,7 @@ final class AppDataStore: ObservableObject {
         save()
         HealthDataManager.shared.addWaterMl(-entry.amountMl)
         invalidateCache()
-        syncWaterXP(for: entry.date)   // ← rembourse l'XP, même pour un jour passé
+        syncWaterXP(for: entry.date)
         updateDayRecord(for: entry.date)
         recalculateGoalStreak()
         objectWillChange.send()
@@ -245,7 +237,7 @@ final class AppDataStore: ObservableObject {
         updateDayRecord(for: date)
         recalculateSoberStreak()
         challengeManager?.onAlcoholUpdated(
-            alcoholCount:     cachedAlcoholEntries().count,
+            alcoholCount: cachedAlcoholEntries().count,
             dailyGoalReached: todayGoalReached
         )
         objectWillChange.send()
@@ -259,7 +251,7 @@ final class AppDataStore: ObservableObject {
         updateDayRecord(for: entry.date)
         recalculateSoberStreak()
         challengeManager?.onAlcoholUpdated(
-            alcoholCount:     cachedAlcoholEntries().count,
+            alcoholCount: cachedAlcoholEntries().count,
             dailyGoalReached: todayGoalReached
         )
         objectWillChange.send()
@@ -268,26 +260,26 @@ final class AppDataStore: ObservableObject {
     // MARK: - Graphique 7 jours
 
     var last7DaysWater: [(day: String, ml: Double)] {
-        let calendar  = Calendar.current
+        let calendar = Calendar.current
         let formatter = DateFormatter()
-        formatter.locale     = Locale.current
+        formatter.locale = Locale.current
         formatter.dateFormat = "EEE"
 
-        let weekStart  = calendar.date(byAdding: .day, value: -6, to: calendar.startOfDay(for: Date()))!
-        let weekEnd    = calendar.date(byAdding: .day, value: 1, to: Date())!
+        let weekStart = calendar.date(byAdding: .day, value: -6, to: calendar.startOfDay(for: Date()))!
+        let weekEnd = calendar.date(byAdding: .day, value: 1, to: Date())!
         let allEntries = fetchWater(from: weekStart, to: weekEnd)
-        let grouped    = Dictionary(grouping: allEntries) { calendar.startOfDay(for: $0.date) }
+        let grouped = Dictionary(grouping: allEntries) { calendar.startOfDay(for: $0.date) }
 
-        let allAlcohol     = fetchAlcohol(from: weekStart, to: weekEnd)
+        let allAlcohol = fetchAlcohol(from: weekStart, to: weekEnd)
         let groupedAlcohol = Dictionary(grouping: allAlcohol) { calendar.startOfDay(for: $0.date) }
 
         return (0..<7).reversed().map { offset in
-            let date        = calendar.date(byAdding: .day, value: -offset, to: Date())!
-            let dayStart    = calendar.startOfDay(for: date)
-            let waterMl     = grouped[dayStart]?.reduce(0) { $0 + $1.amountMl } ?? 0
+            let date = calendar.date(byAdding: .day, value: -offset, to: Date())!
+            let dayStart = calendar.startOfDay(for: date)
+            let waterMl = grouped[dayStart]?.reduce(0) { $0 + $1.amountMl } ?? 0
             let alcoholComp = groupedAlcohol[dayStart]?.reduce(0.0) { $0 + $1.compensationMl } ?? 0.0
-            let total       = max(0, waterMl - alcoholComp)
-            let label       = String(formatter.string(from: date).prefix(3).capitalized)
+            let total = max(0, waterMl - alcoholComp)
+            let label = String(formatter.string(from: date).prefix(3).capitalized)
             return (day: label, ml: total)
         }
     }
@@ -310,8 +302,8 @@ final class AppDataStore: ObservableObject {
 
     var currentWeekStart: Date {
         let calendar = Calendar.current
-        let today    = calendar.startOfDay(for: Date())
-        let weekday  = calendar.component(.weekday, from: today)
+        let today = calendar.startOfDay(for: Date())
+        let weekday = calendar.component(.weekday, from: today)
         let daysFromMonday = (weekday == 1) ? 6 : weekday - 2
         return calendar.date(byAdding: .day, value: -daysFromMonday, to: today)!
     }
@@ -323,7 +315,7 @@ final class AppDataStore: ObservableObject {
     var avgMlPerDay: Double {
         let entries = fetchWater(from: currentWeekStart, to: currentWeekEnd)
         guard !entries.isEmpty else { return 0 }
-        let byDay  = Dictionary(grouping: entries) { $0.day }
+        let byDay = Dictionary(grouping: entries) { $0.day }
         let totals = byDay.values.map { $0.reduce(0) { $0 + $1.amountMl } }
         return totals.reduce(0, +) / Double(max(totals.count, 1))
     }
@@ -343,9 +335,9 @@ final class AppDataStore: ObservableObject {
     }
 
     func weekTotalMl(from start: Date, to end: Date) -> Double {
-        let waterEntries   = fetchWater(from: start, to: end)
+        let waterEntries = fetchWater(from: start, to: end)
         let alcoholEntries = fetchAlcohol(from: start, to: end)
-        let waterTotal  = waterEntries.reduce(0.0) { $0 + $1.amountMl }
+        let waterTotal = waterEntries.reduce(0.0) { $0 + $1.amountMl }
         let alcoholComp = alcoholEntries.reduce(0.0) { $0 + $1.compensationMl }
         return max(0, waterTotal - alcoholComp)
     }
@@ -361,15 +353,15 @@ final class AppDataStore: ObservableObject {
     }
 
     func recalculateGoalStreak() {
-        let calendar    = Calendar.current
+        let calendar = Calendar.current
         let installDate = calendar.startOfDay(for: firstLaunchDate)
-        let today       = calendar.startOfDay(for: Date())
+        let today = calendar.startOfDay(for: Date())
 
-        let todayWater   = cachedWaterEntries().reduce(0) { $0 + $1.amountMl }
+        let todayWater = cachedWaterEntries().reduce(0) { $0 + $1.amountMl }
         let todayGoalMet = todayWater >= dailyGoalMl
 
         var streakFromPast = 0
-        var checkDate      = calendar.date(byAdding: .day, value: -1, to: today)!
+        var checkDate = calendar.date(byAdding: .day, value: -1, to: today)!
 
         while checkDate >= installDate {
             guard let record = fetchDayRecord(for: checkDate) else { break }
@@ -382,7 +374,7 @@ final class AppDataStore: ObservableObject {
         }
 
         let streak = todayGoalMet ? streakFromPast + 1 : streakFromPast
-        let total  = (try? modelContext.fetch(FetchDescriptor<DayRecord>()))?.filter { $0.goalReached }.count ?? 0
+        let total = (try? modelContext.fetch(FetchDescriptor<DayRecord>()))?.filter { $0.goalReached }.count ?? 0
 
         HealthDataManager.shared.setCurrentStreak(streak)
         HealthDataManager.shared.setTotalGoalDays(total)
@@ -406,8 +398,7 @@ final class AppDataStore: ObservableObject {
         }
 
         let storedStreak = HealthDataManager.shared.soberStreak
-
-        let yesterday    = calendar.date(byAdding: .day, value: -1, to: Date())!
+        let yesterday = calendar.date(byAdding: .day, value: -1, to: Date())!
         let yesterdayEnd = calendar.date(byAdding: .day, value: 1, to: calendar.startOfDay(for: yesterday))!
         let alcoholYesterday = fetchAlcohol(from: calendar.startOfDay(for: yesterday), to: yesterdayEnd)
 
@@ -419,21 +410,20 @@ final class AppDataStore: ObservableObject {
     }
 
     private func fullScanSoberStreak() -> Int {
-        let calendar    = Calendar.current
+        let calendar = Calendar.current
         let installDate = calendar.startOfDay(for: firstLaunchDate)
-        let today       = calendar.startOfDay(for: Date())
-        let yesterday   = calendar.date(byAdding: .day, value: -1, to: today)!
+        let today = calendar.startOfDay(for: Date())
+        let yesterday = calendar.date(byAdding: .day, value: -1, to: today)!
 
         let allAlcohol = fetchAlcohol(from: installDate, to: yesterday)
-
         let alcoholDays = Set(allAlcohol.map { calendar.startOfDay(for: $0.date) })
 
-        var streak    = 1
+        var streak = 1
         var checkDate = yesterday
 
         while checkDate >= installDate {
             if alcoholDays.contains(checkDate) { break }
-            streak   += 1
+            streak += 1
             checkDate = calendar.date(byAdding: .day, value: -1, to: checkDate)!
         }
 
@@ -469,7 +459,7 @@ final class AppDataStore: ObservableObject {
 
         for entry in pending {
             guard
-                let amount    = entry["amountMl"]  as? Double,
+                let amount = entry["amountMl"] as? Double,
                 let timestamp = entry["timestamp"] as? TimeInterval
             else { continue }
 
@@ -482,14 +472,14 @@ final class AppDataStore: ObservableObject {
                 continue
             }
 
-            let date      = Date(timeIntervalSince1970: timestamp)
-            let intentID  = entry["siriIntentID"] as? String
+            let date = Date(timeIntervalSince1970: timestamp)
+            let intentID = entry["siriIntentID"] as? String
             let isAlcohol = entry["isAlcohol"] as? Bool ?? false
 
             if isAlcohol {
                 if let id = intentID, existingAlcoholIDs.contains(id) { continue }
                 let kindRaw = entry["alcoholKindRaw"] as? String ?? AlcoholKind.other.rawValue
-                let kind    = AlcoholKind.migratedAlcoholKind(from: kindRaw)
+                let kind = AlcoholKind.migratedAlcoholKind(from: kindRaw)
                 let alcoholEntry = WaterAlcoholEntry(amountMl: amount, alcoholType: kind, date: date, siriIntentID: intentID)
                 modelContext.insert(alcoholEntry)
                 HealthDataManager.shared.addAlcoholMl(amount)
@@ -507,7 +497,7 @@ final class AppDataStore: ObservableObject {
 
         save()
         invalidateCache()
-        for day in datesAffected { syncWaterXP(for: day) }   // ← XP de chaque jour affecté
+        for day in datesAffected { syncWaterXP(for: day) }
         for day in datesAffected { updateDayRecord(for: day) }
         recalculateGoalStreak()
         if needsSoberRecalc { recalculateSoberStreak() }
@@ -526,7 +516,7 @@ final class AppDataStore: ObservableObject {
 
     // MARK: - Historique complet (Premium)
 
-    func allWaterEntries() -> [WaterEntry]        { fetchAllWater() }
+    func allWaterEntries() -> [WaterEntry] { fetchAllWater() }
     func allAlcoholEntries() -> [WaterAlcoholEntry] { fetchAllAlcohol() }
 
     // MARK: - Nettoyage non-Premium
@@ -534,7 +524,7 @@ final class AppDataStore: ObservableObject {
     func cleanOldDataIfNeeded() {
         guard !isPremiumUser else { return }
         let cutoff = Calendar.current.date(byAdding: .day, value: -30, to: Date())!
-        fetchWater(to: cutoff).forEach   { modelContext.delete($0) }
+        fetchWater(to: cutoff).forEach { modelContext.delete($0) }
         fetchAlcohol(to: cutoff).forEach { modelContext.delete($0) }
         let oldRecords = (try? modelContext.fetch(FetchDescriptor<DayRecord>(
             predicate: #Predicate { $0.date < cutoff }
@@ -548,16 +538,16 @@ final class AppDataStore: ObservableObject {
     // MARK: - DayRecord
 
     private func updateDayRecord(for date: Date) {
-        let day    = Calendar.current.startOfDay(for: date)
+        let day = Calendar.current.startOfDay(for: date)
         let dayEnd = Calendar.current.date(byAdding: .day, value: 1, to: day)!
 
         let netMl: Double
         if Calendar.current.isDateInToday(date) {
-            let waterRaw    = cachedWaterEntries().reduce(0.0)   { $0 + $1.amountMl }
+            let waterRaw = cachedWaterEntries().reduce(0.0) { $0 + $1.amountMl }
             let alcoholComp = cachedAlcoholEntries().reduce(0.0) { $0 + $1.compensationMl }
             netMl = max(0, waterRaw - alcoholComp)
         } else {
-            let waterRaw    = fetchWater(from: day, to: dayEnd).reduce(0.0)   { $0 + $1.amountMl }
+            let waterRaw = fetchWater(from: day, to: dayEnd).reduce(0.0) { $0 + $1.amountMl }
             let alcoholComp = fetchAlcohol(from: day, to: dayEnd).reduce(0.0) { $0 + $1.compensationMl }
             netMl = max(0, waterRaw - alcoholComp)
         }
@@ -575,7 +565,7 @@ final class AppDataStore: ObservableObject {
 
     func fetchDayRecord(for day: Date) -> DayRecord? {
         let start = Calendar.current.startOfDay(for: day)
-        let end   = Calendar.current.date(byAdding: .day, value: 1, to: start)!
+        let end = Calendar.current.date(byAdding: .day, value: 1, to: start)!
         let descriptor = FetchDescriptor<DayRecord>(
             predicate: #Predicate { $0.date >= start && $0.date < end }
         )
@@ -595,10 +585,10 @@ final class AppDataStore: ObservableObject {
 
     func contributionRatios(days: Int = 365) -> [Date: Double] {
         let calendar = Calendar.current
-        let today    = calendar.startOfDay(for: Date())
-        let start    = calendar.date(byAdding: .day, value: -(days - 1), to: today)!
+        let today = calendar.startOfDay(for: Date())
+        let start = calendar.date(byAdding: .day, value: -(days - 1), to: today)!
 
-        let allWater   = (try? modelContext.fetch(FetchDescriptor<WaterEntry>())) ?? []
+        let allWater = (try? modelContext.fetch(FetchDescriptor<WaterEntry>())) ?? []
         let allAlcohol = (try? modelContext.fetch(FetchDescriptor<WaterAlcoholEntry>())) ?? []
         let allRecords = (try? modelContext.fetch(FetchDescriptor<DayRecord>())) ?? []
 
@@ -620,7 +610,7 @@ final class AppDataStore: ObservableObject {
         var allDays = Set(waterByDay.keys)
         allDays.formUnion(goalByDay.keys)
         for day in allDays where day <= today {
-            let net  = max(0, (waterByDay[day] ?? 0) - (alcoholCompByDay[day] ?? 0))
+            let net = max(0, (waterByDay[day] ?? 0) - (alcoholCompByDay[day] ?? 0))
             let goal = goalByDay[day] ?? dailyGoalMl
             guard goal > 0 else { continue }
             if waterByDay[day] == nil {
@@ -644,14 +634,14 @@ final class AppDataStore: ObservableObject {
             completion(UserDefaults.standard.double(forKey: "cached_steps_today"))
             return
         }
-        let stepType  = HKQuantityType.quantityType(forIdentifier: .stepCount)!
-        let store     = HKHealthStore()
+        let stepType = HKQuantityType.quantityType(forIdentifier: .stepCount)!
+        let store = HKHealthStore()
         guard store.authorizationStatus(for: stepType) != .notDetermined else {
             completion(UserDefaults.standard.double(forKey: "cached_steps_today"))
             return
         }
-        let calendar  = Calendar.current
-        let startDay  = calendar.startOfDay(for: Date())
+        let calendar = Calendar.current
+        let startDay = calendar.startOfDay(for: Date())
         let predicate = HKQuery.predicateForSamples(withStart: startDay, end: Date(), options: .strictStartDate)
         let query = HKStatisticsQuery(quantityType: stepType, quantitySamplePredicate: predicate, options: .cumulativeSum) { _, result, _ in
             let steps = result?.sumQuantity()?.doubleValue(for: HKUnit.count()) ?? 0
@@ -743,61 +733,61 @@ final class AppDataStore: ObservableObject {
             return
         }
 
-        defaults.set(todayWaterMl,    forKey: "widget_today_ml")
+        defaults.set(todayWaterMl, forKey: "widget_today_ml")
         defaults.set(effectiveGoalMl, forKey: "widget_goal_ml")
-        defaults.set(currentStreak,   forKey: "widget_streak")
+        defaults.set(currentStreak, forKey: "widget_streak")
         defaults.set(soberDaysStreak, forKey: "widget_sober_streak")
         defaults.set(activeDaysTotal, forKey: "widget_active_days")
-        defaults.set(dailyGoalMl,     forKey: "widget_daily_goal_ml")
+        defaults.set(dailyGoalMl, forKey: "widget_daily_goal_ml")
 
-        let calendar  = Calendar.current
+        let calendar = Calendar.current
         let formatter = DateFormatter()
-        formatter.locale     = Locale.current
+        formatter.locale = Locale.current
         formatter.dateFormat = "EEE"
 
         let sevenDaysAgo = calendar.date(byAdding: .day, value: -6, to: calendar.startOfDay(for: Date()))!
-        let tomorrow     = calendar.date(byAdding: .day, value: 1, to: Date())!
+        let tomorrow = calendar.date(byAdding: .day, value: 1, to: Date())!
 
-        let allWater   = fetchWater(from: sevenDaysAgo, to: tomorrow)
+        let allWater = fetchWater(from: sevenDaysAgo, to: tomorrow)
         let allAlcohol = fetchAlcohol(from: sevenDaysAgo, to: tomorrow)
 
-        let waterByDay   = Dictionary(grouping: allWater)   { calendar.startOfDay(for: $0.date) }
+        let waterByDay = Dictionary(grouping: allWater) { calendar.startOfDay(for: $0.date) }
         let alcoholByDay = Dictionary(grouping: allAlcohol) { calendar.startOfDay(for: $0.date) }
 
         var weekData: [[String: Any]] = []
 
         for offset in 0..<7 {
-            let date        = calendar.date(byAdding: .day, value: -offset, to: Date())!
-            let dayStart    = calendar.startOfDay(for: date)
+            let date = calendar.date(byAdding: .day, value: -offset, to: Date())!
+            let dayStart = calendar.startOfDay(for: date)
 
             let waterMl: Double
             let alcoholComp: Double
             let reached: Bool
             if offset == 0 {
-                waterMl     = todayWaterMlRaw
+                waterMl = todayWaterMlRaw
                 alcoholComp = todayAlcoholCompensationMl
-                reached     = todayGoalReached
+                reached = todayGoalReached
             } else {
-                waterMl     = waterByDay[dayStart]?.reduce(0) { $0 + $1.amountMl } ?? 0
+                waterMl = waterByDay[dayStart]?.reduce(0) { $0 + $1.amountMl } ?? 0
                 alcoholComp = alcoholByDay[dayStart]?.reduce(0.0) { $0 + $1.compensationMl } ?? 0.0
-                reached     = fetchDayRecord(for: dayStart)?.goalReached ?? false
+                reached = fetchDayRecord(for: dayStart)?.goalReached ?? false
             }
 
             let netMl = max(0, waterMl - alcoholComp)
             let label = String(formatter.string(from: date).prefix(1).uppercased())
 
             weekData.append([
-                "label":       label,
-                "ml":          netMl,
+                "label": label,
+                "ml": netMl,
                 "goalReached": reached,
-                "offset":      offset
+                "offset": offset
             ])
 
             if offset >= 1 && offset <= 3 {
                 let legacyLabel = String(formatter.string(from: date).prefix(3).capitalized)
                 defaults.set(legacyLabel, forKey: "widget_day\(offset)_label")
-                defaults.set(netMl,       forKey: "widget_day\(offset)_ml")
-                defaults.set(reached,     forKey: "widget_day\(offset)_goalReached")
+                defaults.set(netMl, forKey: "widget_day\(offset)_ml")
+                defaults.set(reached, forKey: "widget_day\(offset)_goalReached")
             }
         }
 
@@ -810,7 +800,7 @@ final class AppDataStore: ObservableObject {
 
     private func todayRange() -> (Date, Date) {
         let start = Calendar.current.startOfDay(for: Date())
-        let end   = Calendar.current.date(byAdding: .day, value: 1, to: start)!
+        let end = Calendar.current.date(byAdding: .day, value: 1, to: start)!
         return (start, end)
     }
 }
