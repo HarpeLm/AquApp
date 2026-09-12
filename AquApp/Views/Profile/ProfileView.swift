@@ -3,7 +3,7 @@ import SwiftData
 
 // MARK: - ProfileView
 // Rôle : UNIQUEMENT assembler les sections/components/sheets dédiés.
-// Chaque bloc UI vit dans son fichier (Sections/, Components/, Sheets/).
+// L'avatar photo est géré par ProfileAvatarView, monté dans ProfileHeaderView.
 
 struct ProfileView: View {
     @ObservedObject private var healthStore = HealthDataManager.shared
@@ -131,7 +131,7 @@ struct ProfileView: View {
                         .padding(.horizontal)
                         .padding(.top, 8)
 
-                        // ── SECTION : Header (avatar + nom + badge + stats + XP liquide)
+                        // ── SECTION : Header (avatar photo + nom + badge + stats + XP)
                         ProfileHeaderView(
                             userName: healthStore.firstName.isEmpty ? "User" : healthStore.firstName,
                             isPremiumUser: isPremiumUser,
