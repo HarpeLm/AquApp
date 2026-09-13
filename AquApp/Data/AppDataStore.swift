@@ -358,7 +358,7 @@ final class AppDataStore: ObservableObject {
         let today = calendar.startOfDay(for: Date())
 
         let todayWater = cachedWaterEntries().reduce(0) { $0 + $1.amountMl }
-        let todayGoalMet = todayWater >= dailyGoalMl
+        let todayGoalMet = todayWater >= effectiveGoalMl
 
         var streakFromPast = 0
         var checkDate = calendar.date(byAdding: .day, value: -1, to: today)!
@@ -566,12 +566,14 @@ final class AppDataStore: ObservableObject {
             netMl = max(0, waterRaw - alcoholComp)
         }
 
-        let reached = netMl >= dailyGoalMl
+        let goalForDay = Calendar.current.isDateInToday(date) ? effectiveGoalMl : dailyGoalMl
+        let reached = netMl >= goalForDay
 
         if let existing = fetchDayRecord(for: day) {
             existing.goalReached = reached
+            existing.goalMl = goalForDay
         } else {
-            let record = DayRecord(date: day, goalMl: dailyGoalMl, goalReached: reached)
+            let record = DayRecord(date: day, goalMl: goalForDay, goalReached: reached)
             modelContext.insert(record)
         }
         save()
@@ -625,7 +627,7 @@ final class AppDataStore: ObservableObject {
         allDays.formUnion(goalByDay.keys)
         for day in allDays where day <= today {
             let net = max(0, (waterByDay[day] ?? 0) - (alcoholCompByDay[day] ?? 0))
-            let goal = goalByDay[day] ?? dailyGoalMl
+            let goal = goalByDay[day] ?? (calendar.isDateInToday(day) ? effectiveGoalMl : dailyGoalMl)
             guard goal > 0 else { continue }
             if waterByDay[day] == nil {
                 if let reached = allRecords.first(where: { calendar.startOfDay(for: $0.date) == day })?.goalReached, reached {
