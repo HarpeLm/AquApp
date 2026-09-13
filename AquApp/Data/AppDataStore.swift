@@ -566,6 +566,7 @@ final class AppDataStore: ObservableObject {
             netMl = max(0, waterRaw - alcoholComp)
         }
 
+        // Utilise effectiveGoalMl pour aujourd'hui (canicule), dailyGoalMl pour le passé
         let goalForDay = Calendar.current.isDateInToday(date) ? effectiveGoalMl : dailyGoalMl
         let reached = netMl >= goalForDay
 
