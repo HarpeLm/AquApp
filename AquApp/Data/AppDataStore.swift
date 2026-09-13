@@ -389,22 +389,36 @@ final class AppDataStore: ObservableObject {
 
     func recalculateSoberStreak() {
         let calendar = Calendar.current
-
+        
+        // Si alcool aujourd'hui → streak = 0
         guard cachedAlcoholEntries().isEmpty else {
             HealthDataManager.shared.setSoberStreak(0)
             achievementManager?.onSoberStreakUpdated(streak: 0)
             objectWillChange.send()
             return
         }
-
-        let storedStreak = HealthDataManager.shared.soberStreak
-        let yesterday = calendar.date(byAdding: .day, value: -1, to: Date())!
+        
+        // Vérifier si on a déjà recalculé aujourd'hui
+        let today = calendar.startOfDay(for: Date())
+        let lastRecalcDate = UserDefaults.standard.object(forKey: "last_sober_recalc") as? Date
+        
+        if let lastRecalc = lastRecalcDate, calendar.isDate(lastRecalc, inSameDayAs: today) {
+            // Déjà recalculé aujourd'hui → ne pas incrémenter
+            return
+        }
+        
+        // Vérifier hier
+        let yesterday = calendar.date(byAdding: .day, value: -1, to: today)!
         let yesterdayEnd = calendar.date(byAdding: .day, value: 1, to: calendar.startOfDay(for: yesterday))!
         let alcoholYesterday = fetchAlcohol(from: calendar.startOfDay(for: yesterday), to: yesterdayEnd)
-
+        
+        // Calculer le nouveau streak
+        let storedStreak = HealthDataManager.shared.soberStreak
         let streak = alcoholYesterday.isEmpty ? storedStreak + 1 : 1
-
+        
+        // Sauvegarder
         HealthDataManager.shared.setSoberStreak(streak)
+        UserDefaults.standard.set(today, forKey: "last_sober_recalc")
         achievementManager?.onSoberStreakUpdated(streak: streak)
         objectWillChange.send()
     }
