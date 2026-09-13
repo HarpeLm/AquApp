@@ -70,7 +70,7 @@ Captures réalisées sur iPhone — modes clair et sombre.
 * Live Activities
 * Dynamic Island
 * Intégration Siri & Raccourcis avec App Intents
-* Intégration HealthKit en écriture
+* Intégration HealthKit (lecture pas/sommeil + écriture volumes eau)
 * Notifications locales
 * Support de plusieurs langues
 
@@ -90,8 +90,8 @@ Dans la version actuelle :
 * ❌ Aucun tracking publicitaire
 * ❌ Aucune collecte comportementale
 * ✅ Données stockées localement
-* ✅ HealthKit utilisé uniquement après autorisation
-* ✅ Écriture HealthKit uniquement pour les données concernées
+* ✅ HealthKit utilisé après autorisation
+* ✅ Écriture HealthKit pour les données concernées
 * ✅ Données sensibles stockées dans le Keychain lorsque nécessaire
 
 L’objectif est de permettre une expérience complète sans avoir besoin d’envoyer vos habitudes d’hydratation vers un serveur.
