@@ -1,193 +1,328 @@
-# AquApp 💧
+AquApp 💧
 
-[![iOS CI](https://github.com/HarpeLm/AquApp/actions/workflows/ci.yml/badge.svg)](https://github.com/HarpeLm/AquApp/actions/workflows/ci.yml)
-[![iOS 17+](https://img.shields.io/badge/iOS-17.0%2B-blue.svg)](https://developer.apple.com/ios/)
-[![Swift 5.9+](https://img.shields.io/badge/Swift-5.9%2B-orange.svg)](https://swift.org)
-[![Xcode 15+](https://img.shields.io/badge/Xcode-15%2B-blueviolet.svg)](https://developer.apple.com/xcode/)
-[![License MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
-[![Statut](https://img.shields.io/badge/statut-pré--release-yellow.svg)](https://github.com/HarpeLm/AquApp/projects)
+Votre compagnon quotidien pour mieux vous hydrater.
 
-**AquApp est votre compagnon quotidien d'hydratation** : suivez votre consommation d'eau (et d'alcool), atteignez vos objectifs, construisez des séries et découvrez vos statistiques — le tout dans une interface SwiftUI rapide, ludique et respectueuse de votre vie privée.
+AquApp est une application iOS de suivi d’hydratation conçue pour rendre la consommation d’eau simple, motivante et personnalisée.
 
----
+Suivez votre eau et votre consommation d’alcool, atteignez vos objectifs, construisez vos séries, débloquez des succès et analysez vos habitudes — sans compte, sans serveur et sans tracking.
 
-## 📱 Captures d'écran
+⸻
 
-| Accueil | Statistiques | Défis | Profil |
-|:---:|:---:|:---:|:---:|
-| ![Accueil](docs/screenshots/01-home.png) | ![Stats](docs/screenshots/02-stats.png) | ![Défis](docs/screenshots/03-challenges.png) | ![Profil](docs/screenshots/04-profile.png) |
+📱 Aperçu
 
-> 📸 *Ajoutez vos captures dans `docs/screenshots/` (iPhone 17 Pro, mode sombre & clair).*
+Accueil	Statistiques	Défis	Profil
+			
 
----
+Captures réalisées sur iPhone — modes clair et sombre.
 
-## ✨ Fonctionnalités
+⸻
 
-### 💧 Suivi intelligent
-- Ajout d'eau en 1 tap (préréglages + quantité personnalisée au slider)
-- Suivi de l'alcool avec **compensation en eau automatique** selon le type de boisson
-- Objectif quotidien personnalisé (poids, taille, sexe, activité) et recalculable
-- **Objectif canicule** : ajustement automatique selon la météo locale
-- Rappels hydratation configurables (plage horaire, fréquence, messages)
+✨ Fonctionnalités
 
-### 🎮 Gamification
-- **XP & 8 niveaux** (Goutte → Aqua Légende) avec barre de progression liquide animée
-- **16 succès** permanents + mensuels (Dry January, Sober October…)
-- **10 défis quotidiens** (Matinal, Cadence Parfaite, Flash Hydraté…)
-- Badges équipables sur le profil (cosmétiques + succès + défis)
-- Séries (streaks) d'objectifs et de jours sobres
+💧 Hydratation
 
-### 📊 Statistiques
-- Graphiques 7 jours / mois / historique complet
-- Grille annuelle type « contributions GitHub »
-- Analyse alcool (volume, compensation, tendances)
-- **AquApp Wrapped** : bilan annuel partageable (story / carré)
+* Ajout d’eau en un tap avec préréglages
+* Quantité personnalisée
+* Objectif quotidien personnalisé
+* Calcul basé sur le profil et le niveau d’activité
+* Ajustement de l’objectif en cas de forte chaleur
+* Rappels d’hydratation configurables
+* Suivi quotidien et historique
 
-### 🎨 Personnalisation & Premium
-- 8 icônes d'app alternatives (Océan, Minuit, Givre, Lagon, Aurora…)
-- Thème clair / sombre / système
-- Photo de profil depuis la galerie
-- Premium (StoreKit) : icônes exclusives, historique illimité, succès Pro
+🍷 Alcool
 
-### 🔌 Intégrations système
-- **Widgets** écran d'accueil & **Live Activities** (Dynamic Island / lock screen)
-- **Siri & Raccourcis** (App Intents) : « Ajoute 250 ml d'eau »…
-- **Santé Apple** (HealthKit, optionnel) : écriture des volumes bus
-- Interface localisée en **40 langues**
+* Enregistrement des consommations
+* Compensation en eau selon le type de boisson
+* Suivi des tendances et volumes consommés
+* Séries de jours sans alcool
 
-### 🔒 Vie privée
-- Données **100 % locales** : SwiftData + Keychain (statut Premium, totaux)
-- Aucun compte, aucun analytics, aucun serveur
-- HealthKit en écriture seule, sur autorisation explicite
+🎮 Gamification
 
----
+* Système d’XP et 8 niveaux
+* 16 succès permanents et saisonniers
+* 10 défis quotidiens
+* Badges équipables
+* Séries d’objectifs
+* Séries de jours sans alcool
+* Animations et progression visuelle
 
-## 🚀 Installation
+📊 Statistiques
 
-### Prérequis
-| Outil | Version minimale |
-|---|---|
-| macOS | Sonoma 14+ |
-| Xcode | 15.4+ (recommandé : dernière version) |
-| iOS (device/simulateur) | 17.0+ |
-| Compte Apple Developer | Requis pour device physique, HealthKit & StoreKit |
+* Historique sur 7 jours
+* Statistiques mensuelles
+* Historique complet
+* Grille annuelle inspirée des contributions GitHub
+* Analyse de la consommation d’alcool
+* Suivi de la compensation en eau
+* AquApp Wrapped : bilan annuel partageable
 
-### Étapes
-```bash
+🎨 Personnalisation
+
+* 8 icônes alternatives
+* Thème clair, sombre ou système
+* Photo de profil
+* Badges personnalisables
+* Fonctionnalités Premium via StoreKit
+
+🔌 Intégration iOS
+
+* Widgets Home Screen
+* Live Activities
+* Dynamic Island
+* Intégration Siri & Raccourcis avec App Intents
+* Intégration HealthKit en écriture
+* Notifications locales
+* Support de plusieurs langues
+
+⸻
+
+🔒 Privacy first
+
+AquApp est conçu autour d’un principe simple :
+
+Vos données vous appartiennent.
+
+Dans la version actuelle :
+
+* ❌ Aucun compte
+* ❌ Aucun serveur applicatif
+* ❌ Aucun analytics
+* ❌ Aucun tracking publicitaire
+* ❌ Aucune collecte comportementale
+* ✅ Données stockées localement
+* ✅ HealthKit utilisé uniquement après autorisation
+* ✅ Écriture HealthKit uniquement pour les données concernées
+* ✅ Données sensibles stockées dans le Keychain lorsque nécessaire
+
+L’objectif est de permettre une expérience complète sans avoir besoin d’envoyer vos habitudes d’hydratation vers un serveur.
+
+⸻
+
+🛠️ Technologies
+
+AquApp est développé nativement pour Apple avec :
+
+* Swift
+* SwiftUI
+* SwiftData
+* HealthKit
+* WidgetKit
+* ActivityKit
+* App Intents / Siri
+* StoreKit 2
+* UserNotifications
+* Keychain Services
+* GitHub Actions
+
+Architecture basée sur des ObservableObject injectés dans l’environnement, avec séparation entre modèles, données, managers et vues.
+
+⸻
+
+🏗️ Architecture
+
+AquApp/
+├── AquAppApp.swift
+│
+├── Data/
+│   ├── AppDataStore.swift
+│   ├── XPManager.swift
+│   └── StoreKitManager.swift
+│
+├── Models/
+│   ├── WaterEntry.swift
+│   ├── WaterAlcoholEntry.swift
+│   └── DayRecord.swift
+│
+├── Utils/
+│   ├── HealthDataManager.swift
+│   ├── KeychainManager.swift
+│   ├── PremiumManager.swift
+│   ├── AppIconManager.swift
+│   └── HealthKitWriter.swift
+│
+├── Views/
+│   ├── Home/
+│   ├── Stats/
+│   ├── Challenges/
+│   ├── Achievements/
+│   ├── Profile/
+│   ├── Wrapped/
+│   └── Onboarding/
+│
+├── Widgets/
+│   ├── WidgetKit
+│   └── ActivityKit
+│
+├── Localizable.xcstrings
+│
+├── AquAppTests/
+└── AquAppUiTests/
+
+Principes
+
+* SwiftUI pour l’interface
+* SwiftData pour la persistance
+* Keychain pour les données nécessitant un stockage sécurisé
+* App Groups pour la communication avec les widgets
+* Managers spécialisés pour les intégrations système
+* Logique métier testée indépendamment lorsque possible
+
+⸻
+
+🧪 Tests & qualité
+
+AquApp dispose d’une suite de tests unitaires et UI couvrant notamment :
+
+* Formules d’hydratation
+* Compensation liée à l’alcool
+* XP et progression
+* Streaks
+* Persistance SwiftData
+* Migration des données
+* Formatage des unités
+* Logique météo
+* Onboarding
+* Navigation
+* Statistiques
+* Succès
+* Premium
+* Stabilité générale
+
+L’intégration continue exécute automatiquement le build et les tests sur GitHub Actions.
+
+Lancer les tests
+
+Dans Xcode :
+
+⌘U
+
+Ou en ligne de commande :
+
+xcodebuild test \
+  -scheme AquApp \
+  -project AquApp.xcodeproj \
+  -destination 'platform=iOS Simulator,name=iPhone 17 Pro' \
+  -only-testing:AquAppTests
+
+⸻
+
+🚀 Installation
+
+Prérequis
+
+Outil	Version
+macOS	Sonoma 14+
+Xcode	15.4+
+iOS	17.0+
+Apple Developer Account	Requis pour certaines capabilities
+
+Installation
+
 git clone https://github.com/HarpeLm/AquApp.git
 cd AquApp
 open AquApp.xcodeproj
-```
-1. Sélectionnez la target **AquApp** → *Signing & Capabilities* → votre Team
-2. Choisissez un simulateur iOS 17+ (ou votre iPhone)
-3. `⌘R` — c'est parti !
 
-> ⚠️ Sur device physique, les capabilities **HealthKit**, **App Groups** (widgets) et **In-App Purchase** nécessitent un provisioning valide. Le test StoreKit fonctionne en sandbox via le compte de test Xcode.
+Puis :
 
----
+1. Sélectionnez la target AquApp
+2. Configurez votre Team dans Signing & Capabilities
+3. Sélectionnez un simulateur ou un iPhone
+4. Lancez avec ⌘R
 
-## 🏗️ Architecture technique
+Certaines fonctionnalités nécessitent les capabilities Apple correspondantes, notamment :
 
-```
-AquApp/
-├── AquAppApp.swift            # Point d'entrée + injection des managers
-├── Data/
-│   ├── AppDataStore.swift     # Source de vérité SwiftData (entrées, streaks, stats)
-│   ├── XPManager.swift        # XP, niveaux, sync eau réversible par jour
-│   └── StoreKitManager.swift  # Achats & statut Premium
-├── Models/                    # WaterEntry, WaterAlcoholEntry, DayRecord…
-├── Utils/
-│   ├── HealthDataManager.swift # Profil, totaux Keychain, succès persistés
-│   ├── KeychainManager.swift   # Stockage sécurisé (Premium, totaux cumulés)
-│   ├── PremiumManager.swift    # Source de vérité Premium (non spoofable)
-│   ├── AppIconManager.swift    # Icônes alternatives (setAlternateIconName)
-│   └── HealthKitWriter.swift   # Écriture HealthKit optionnelle
-├── Views/
-│   ├── Home/                  # Dashboard + sheets d'ajout (eau/alcool)
-│   ├── Stats/                 # Graphiques + grille annuelle
-│   ├── Challenges/  ├── Achievements/
-│   ├── Profile/               # Sections / Components / Sheets dédiés
-│   ├── Wrapped/               # Bilan annuel animé
-│   └── Onboarding/            # Premier lancement (nom, profil, objectif)
-├── Widgets/                   # WidgetKit + ActivityKit (Live Activities)
-└── Localizable.xcstrings      # 40 langues
+* HealthKit
+* App Groups
+* In-App Purchase
+* Widgets
+* Live Activities
 
-AquAppTests/                   # ~165 tests unitaires (formules, XP, stores…)
-AquAppUiTests/                 # Tests UI (onboarding, navigation, stabilité)
-.github/workflows/ci.yml       # CI : build + tests sur simulateur à chaque push
-```
+⸻
 
-**Principes** : MVVM léger (managers `ObservableObject` injectés), persistance SwiftData, totaux cumulatifs O(1) en Keychain, synchronisation widget via App Group, et une règle d'or : *chaque vue de section vit dans son propre fichier*.
+🗺️ Roadmap
 
----
+✅ Disponible
 
-## 🧪 Tests
+* Suivi de l’eau
+* Suivi de l’alcool
+* Compensation en eau
+* Objectifs personnalisés
+* Ajustement météo
+* XP et niveaux
+* Succès
+* Défis
+* Badges
+* Statistiques
+* Wrapped annuel
+* Widgets
+* Live Activities
+* Siri / App Intents
+* HealthKit
+* Personnalisation
+* Stockage sécurisé
 
-```bash
-# Via Xcode
-⌘U
+🚧 En cours
 
-# Ou en ligne de commande
-xcodebuild test -scheme AquApp -project AquApp.xcodeproj \
-  -destination 'platform=iOS Simulator,name=iPhone 17 Pro' \
-  -only-testing:AquAppTests
-```
+* v1.0 — Soumission App Store
+* Activation des abonnements Premium
+* Tests et optimisation finale App Store
+* Finalisation des traductions
 
-- **~165 tests unitaires** : formules alcool & compensation, XP/cap quotidien, streaks, stores SwiftData en mémoire, migration v1.1, UnitFormatter, météo (contrat canicule)…
-- **Tests UI** : onboarding, navigation, home, stats, succès, premium, stabilité
-- **CI GitHub Actions** : build + tests à chaque push sur `main` (artefacts `.xcresult` téléchargeables)
+🔮 À venir
 
----
+* Synchronisation iCloud / CloudKit
+* Nouveaux formats de widgets
+* Partage avancé du Wrapped
+* Version watchOS
 
-## 🗺️ Roadmap
+⸻
 
-- [x] Suivi eau + alcool avec compensation
-- [x] Gamification complète (XP, succès, défis, badges)
-- [x] Widgets & Live Activities
-- [x] Wrapped annuel
-- [x] Sécurité : Premium & totaux migrés en Keychain
-- [ ] **v1.0 — Soumission App Store** (en cours)
-- [ ] Activation réelle des abonnements Premium
-- [ ] Synchronisation iCloud (CloudKit)
-- [ ] Nouveaux widgets (complications, grand format)
-- [ ] Partage Wrapped vers réseaux sociaux
-- [ ] Version watchOS (compagnon)
+🧭 Statut
 
----
+Pré-release active
 
-## 📌 Statut du projet
+AquApp est actuellement en préparation pour sa première publication sur l’App Store.
 
-**Pré-release active** : l'app est complète et testée sur device, la soumission App Store est en préparation. L'application est entièrement gratuite pendant la phase de lancement ; le Premium arrivera juste après la v1.0.
+La version pré-release est gratuite. Les fonctionnalités Premium seront activées progressivement après la sortie de la v1.0.
 
----
+⸻
 
-## 🤝 Contribuer
+🤝 Contribuer
 
-Les contributions sont bienvenues !
-1. Fork le projet
-2. Créez une branche (`git checkout -b feature/ma-fonctionnalite`)
-3. Committez (`git commit -m 'feat: ma fonctionnalité'`)
-4. Pushez (`git push origin feature/ma-fonctionnalite`)
-5. Ouvrez une Pull Request
+Les contributions sont les bienvenues.
 
-Merci de garder les tests verts (`⌘U`) avant toute PR. 🙏
+1. Forkez le projet
+2. Créez une branche :
 
----
+git checkout -b feature/ma-fonctionnalite
 
-## 👤 Auteur
+3. Implémentez votre modification
+4. Ajoutez ou mettez à jour les tests
+5. Vérifiez que la CI passe
+6. Ouvrez une Pull Request
 
-**Fabian Dargaud** — [GitHub](https://github.com/HarpeLm)
+Merci de conserver les tests verts avant toute PR.
 
----
+⸻
 
-## 📄 Licence
+👤 Auteur
 
-Distribué sous licence **MIT**. Voir le fichier [LICENSE](LICENSE) pour plus d'informations.
+Fabian Dargaud
 
----
+GitHub : @HarpeLm
+
+⸻
+
+📄 Licence
+
+AquApp est distribué sous licence MIT.
+
+Voir LICENSE pour plus d’informations.
+
+⸻
 
 <div align="center">
 
-**Fait avec 💙 et beaucoup d'eau — AquApp**
+💧 Fait avec Swift, SwiftUI et beaucoup d’eau.
 
 </div>
