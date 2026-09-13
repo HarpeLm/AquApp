@@ -83,8 +83,8 @@ final class StoreKitManager: ObservableObject {
             switch result {
             case .success(let verification):
                 let transaction = try checkVerified(verification)
-                await updatePremiumStatus(for: transaction)
                 await transaction.finish()
+                await refreshPurchaseStatus()  // ← Re-vérifie TOUS les entitlements
             case .userCancelled:
                 break
             case .pending:
@@ -117,7 +117,7 @@ final class StoreKitManager: ObservableObject {
         }
     }
 
-    // MARK: - Statut Premium
+    // MARK: - Statut Premium (SOURCE DE VÉRITÉ UNIQUE)
 
     func refreshPurchaseStatus() async {
         var active = false
@@ -140,13 +140,13 @@ final class StoreKitManager: ObservableObject {
     // MARK: - Écoute des transactions en temps réel
 
     private func listenForTransactions() -> Task<Void, Error> {
-        Task.detached(priority: .background) { [weak self] in
+        Task { [weak self] in  // ← Task normal au lieu de detached
             for await result in StoreKit.Transaction.updates {
                 guard let self else { break }
                 do {
                     let transaction = try self.checkVerified(result)
-                    await self.updatePremiumStatus(for: transaction)
                     await transaction.finish()
+                    await self.refreshPurchaseStatus()  // ← Re-vérifie TOUS les entitlements
                 } catch {
                     print("⚠️ StoreKit – transaction update invalide : \(error)")
                 }
@@ -161,19 +161,6 @@ final class StoreKitManager: ObservableObject {
         case .verified(let value):  return value
         case .unverified(_, let e): throw e
         }
-    }
-
-    private func updatePremiumStatus(for transaction: StoreKit.Transaction) async {
-        var active = false
-        if StoreKitManager.allProductIDs.contains(transaction.productID),
-           transaction.revocationDate == nil {
-            if let expirationDate = transaction.expirationDate {
-                active = expirationDate > Date()
-            } else {
-                active = true
-            }
-        }
-        isPremiumUser = active
     }
 
     /// Formate la période d'essai en texte lisible (ex. "7 jours offerts")
