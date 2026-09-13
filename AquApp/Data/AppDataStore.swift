@@ -162,7 +162,13 @@ final class AppDataStore: ObservableObject {
         let wasGoalReached = todayGoalReached
         let entry = WaterEntry(amountMl: amountMl, date: date)
         modelContext.insert(entry)
-        save()
+        
+        guard save() else {
+            modelContext.rollback()
+            return
+        }
+        
+        // Seulement APRÈS succès SwiftData
         HealthDataManager.shared.addWaterMl(amountMl)
         HealthKitWriter.shared.write(amountMl: amountMl, date: date, entryID: entry.id)
         invalidateCache()
@@ -210,9 +216,14 @@ final class AppDataStore: ObservableObject {
     }
 
     func deleteWater(_ entry: WaterEntry) {
-        HealthKitWriter.shared.delete(entryID: entry.id, date: entry.date)
         modelContext.delete(entry)
-        save()
+        
+        guard save() else {
+            modelContext.rollback()
+            return
+        }
+        
+        HealthKitWriter.shared.delete(entryID: entry.id, date: entry.date)
         HealthDataManager.shared.addWaterMl(-entry.amountMl)
         invalidateCache()
         syncWaterXP(for: entry.date)
@@ -231,7 +242,12 @@ final class AppDataStore: ObservableObject {
 
         let entry = WaterAlcoholEntry(amountMl: amountMl, alcoholType: type, date: date)
         modelContext.insert(entry)
-        save()
+        
+        guard save() else {
+            modelContext.rollback()
+            return
+        }
+        
         HealthDataManager.shared.addAlcoholMl(amountMl)
         invalidateCache()
         updateDayRecord(for: date)
@@ -242,10 +258,16 @@ final class AppDataStore: ObservableObject {
         )
         objectWillChange.send()
     }
-
+    
+    
     func deleteAlcohol(_ entry: WaterAlcoholEntry) {
         modelContext.delete(entry)
-        save()
+        
+        guard save() else {
+            modelContext.rollback()
+            return
+        }
+        
         HealthDataManager.shared.addAlcoholMl(-entry.amountMl)
         invalidateCache()
         updateDayRecord(for: entry.date)
@@ -566,7 +588,6 @@ final class AppDataStore: ObservableObject {
             netMl = max(0, waterRaw - alcoholComp)
         }
 
-        // Utilise effectiveGoalMl pour aujourd'hui (canicule), dailyGoalMl pour le passé
         let goalForDay = Calendar.current.isDateInToday(date) ? effectiveGoalMl : dailyGoalMl
         let reached = netMl >= goalForDay
 
@@ -733,13 +754,16 @@ final class AppDataStore: ObservableObject {
 
     // MARK: - Save
 
-    private func save() {
+    @discardableResult
+    private func save() -> Bool {
         do {
             try modelContext.save()
+            syncWidgetData()
+            return true
         } catch {
             print("⚠️ AppDataStore – échec de la sauvegarde : \(error)")
+            return false
         }
-        syncWidgetData()
     }
 
     // MARK: - Widget Data Sync
