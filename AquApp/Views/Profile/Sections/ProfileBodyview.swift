@@ -284,7 +284,6 @@ struct BodyEditSheet: View {
         HealthDataManager.shared.setWeight(safeWeight)
         HealthDataManager.shared.setHeight(safeHeight)
         HealthDataManager.shared.setGender(localGender.rawValue)
-        UserDefaults.standard.set(safeGoal, forKey: "dailyGoalMl")
         isPresented = false
     }
 }

@@ -95,10 +95,8 @@ struct HydrationGridView: View {
         .background(Color.black)
         .cornerRadius(20)
         .shadow(color: .black.opacity(0.25), radius: 10, x: 0, y: 4)
-        .onAppear { ratios = store.contributionRatios(days: 400) }
-        .onChange(of: store.todayWaterMl) { _, _ in
-            ratios = store.contributionRatios(days: 400)
-        }
+        // Recalculée à l'affichage puis à chaque changement de données (y compris jours passés et objectif).
+        .task(id: store.dataVersion) { ratios = store.contributionRatios(days: 400) }
     }
 
     private func monthBlock(_ month: Date, columns: [[Date?]]) -> some View {

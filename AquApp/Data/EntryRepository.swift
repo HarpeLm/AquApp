@@ -23,6 +23,12 @@ final class EntryRepository {
     private var cachedAlcohol: [WaterAlcoholEntry]?
     private var cacheDay: Date = .distantPast
 
+    // Jours ayant au moins une entrée d'eau. Calculé une fois depuis la base, puis
+    // tenu à jour par insert/delete : seuls les jours touchés par une suppression
+    // sont revérifiés au save. Rien n'est persisté, donc aucun compteur ne peut dériver.
+    private var waterDays: Set<Date>?
+    private var daysToRecheck: Set<Date> = []
+
     init(context: ModelContext) {
         self.context = context
     }
@@ -44,6 +50,12 @@ final class EntryRepository {
         cachedAlcohol = nil
     }
 
+    /// Pour les points d'entrée externes : la base a pu être modifiée par un autre chemin.
+    func invalidateCaches() {
+        invalidateTodayCache()
+        waterDays = nil
+    }
+
     // Eau et alcool sont rafraîchis ensemble : un seul horodatage de jour pour les deux.
     private func refreshTodayCacheIfNeeded() {
         let (start, end) = Self.dayRange(containing: Date())
@@ -55,15 +67,35 @@ final class EntryRepository {
 
     // MARK: - Écriture
 
-    func insert<T: PersistentModel>(_ model: T) { context.insert(model) }
-    func delete<T: PersistentModel>(_ model: T) { context.delete(model) }
-    func rollback() { context.rollback() }
+    func insert<T: PersistentModel>(_ model: T) {
+        context.insert(model)
+        if let entry = model as? WaterEntry {
+            waterDays?.insert(Calendar.current.startOfDay(for: entry.date))
+        }
+    }
+
+    func delete<T: PersistentModel>(_ model: T) {
+        if let entry = model as? WaterEntry {
+            daysToRecheck.insert(Calendar.current.startOfDay(for: entry.date))
+        }
+        context.delete(model)
+    }
+
+    func rollback() {
+        context.rollback()
+        waterDays = nil
+        daysToRecheck = []
+    }
 
     @discardableResult
     func save() -> Bool {
         do {
             try context.save()
             invalidateTodayCache()
+            for day in daysToRecheck where hasNoWater(on: day) {
+                waterDays?.remove(day)
+            }
+            daysToRecheck = []
             return true
         } catch {
             print("⚠️ EntryRepository – échec de la sauvegarde : \(error)")
@@ -85,14 +117,48 @@ final class EntryRepository {
 
     func allWater() -> [WaterEntry] { water() }
 
+    /// Volume brut par jour. Entrées triées → une passe avec des bornes de jour
+    /// calculées ~1 fois par jour : startOfDay par entrée coûtait ~10 ms sur un an.
+    /// (propertiesToFetch testé : 2× plus lent, SwiftData refaute chaque valeur.)
+    func waterMlByDay(from start: Date, to end: Date) -> [Date: Double] {
+        let calendar = Calendar.current
+        let descriptor = FetchDescriptor<WaterEntry>(
+            predicate: #Predicate { $0.date >= start && $0.date < end },
+            sortBy: [SortDescriptor(\.date)]
+        )
+        var result: [Date: Double] = [:]
+        var dayStart = calendar.startOfDay(for: start)
+        var nextDay = calendar.date(byAdding: .day, value: 1, to: dayStart)!
+        for entry in (try? context.fetch(descriptor)) ?? [] {
+            while entry.date >= nextDay {
+                dayStart = nextDay
+                nextDay = calendar.date(byAdding: .day, value: 1, to: dayStart)!
+            }
+            result[dayStart, default: 0] += entry.amountMl
+        }
+        return result
+    }
+
     func totalWaterMl() -> Double? {
         guard let results = try? context.fetch(FetchDescriptor<WaterEntry>()) else { return nil }
         return results.reduce(0.0) { $0 + $1.amountMl }
     }
 
-    func distinctWaterDayCount() -> Int? {
-        guard let results = try? context.fetch(FetchDescriptor<WaterEntry>()) else { return nil }
-        return Set(results.map { Calendar.current.startOfDay(for: $0.date) }).count
+    func distinctWaterDayCount() -> Int {
+        if waterDays == nil {
+            var descriptor = FetchDescriptor<WaterEntry>()
+            descriptor.propertiesToFetch = [\.date]
+            let dates = (try? context.fetch(descriptor))?.map(\.date) ?? []
+            waterDays = Set(dates.map { Calendar.current.startOfDay(for: $0) })
+        }
+        return waterDays?.count ?? 0
+    }
+
+    private func hasNoWater(on day: Date) -> Bool {
+        let (start, end) = Self.dayRange(containing: day)
+        var descriptor = FetchDescriptor<WaterEntry>(predicate: #Predicate { $0.date >= start && $0.date < end })
+        descriptor.fetchLimit = 1
+        return ((try? context.fetchCount(descriptor)) ?? 0) == 0
     }
 
     func waterIntentIDs() -> Set<String> {

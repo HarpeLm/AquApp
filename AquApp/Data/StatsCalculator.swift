@@ -58,7 +58,7 @@ struct StatsCalculator {
     }
 
     var activeDaysTotal: Int {
-        repository.distinctWaterDayCount() ?? 0
+        repository.distinctWaterDayCount()
     }
 
     // MARK: - Semaine en cours
@@ -105,37 +105,29 @@ struct StatsCalculator {
         let calendar = Calendar.current
         let today = calendar.startOfDay(for: Date())
         let start = calendar.date(byAdding: .day, value: -(days - 1), to: today)!
+        let end = calendar.date(byAdding: .day, value: 1, to: today)!
 
-        let allRecords = repository.allDayRecords()
-
-        var waterByDay: [Date: Double] = [:]
-        for entry in repository.allWater() where entry.date >= start {
-            waterByDay[calendar.startOfDay(for: entry.date), default: 0] += entry.amountMl
-        }
+        // Uniquement la fenêtre affichée : le coût ne dépend plus de l'ancienneté de l'historique.
+        let waterByDay = repository.waterMlByDay(from: start, to: end)
         var alcoholCompByDay: [Date: Double] = [:]
-        for entry in repository.allAlcohol() where entry.date >= start {
+        for entry in repository.alcohol(from: start, to: end) {
             alcoholCompByDay[calendar.startOfDay(for: entry.date), default: 0] += entry.compensationMl
         }
-
-        var goalByDay: [Date: Double] = [:]
-        for record in allRecords where record.date >= start {
-            goalByDay[calendar.startOfDay(for: record.date)] = record.goalMl
+        var recordByDay: [Date: DayRecord] = [:]
+        for record in repository.dayRecords(since: start) {
+            recordByDay[calendar.startOfDay(for: record.date)] = record
         }
 
         var result: [Date: Double] = [:]
-        var allDays = Set(waterByDay.keys)
-        allDays.formUnion(goalByDay.keys)
-        for day in allDays where day <= today {
-            let net = max(0, (waterByDay[day] ?? 0) - (alcoholCompByDay[day] ?? 0))
-            let goal = goalByDay[day] ?? (calendar.isDateInToday(day) ? effectiveGoalMl : dailyGoalMl)
+        for day in Set(waterByDay.keys).union(recordByDay.keys) where day <= today {
+            let record = recordByDay[day]
+            let goal = record?.goalMl ?? (calendar.isDateInToday(day) ? effectiveGoalMl : dailyGoalMl)
             guard goal > 0 else { continue }
-            if waterByDay[day] == nil {
-                if let reached = allRecords.first(where: { calendar.startOfDay(for: $0.date) == day })?.goalReached, reached {
-                    result[day] = 1.0
-                }
+            guard let water = waterByDay[day] else {
+                if record?.goalReached == true { result[day] = 1.0 }
                 continue
             }
-            result[day] = net / goal
+            result[day] = max(0, water - (alcoholCompByDay[day] ?? 0)) / goal
         }
 
         result[today] = todayProgress

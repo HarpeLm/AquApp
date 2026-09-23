@@ -5,7 +5,11 @@ import SwiftData
 
 struct ProfileView: View {
     @ObservedObject private var healthStore = HealthDataManager.shared
-    @AppStorage("dailyGoalMl") private var dailyGoalMl: Double = 2170
+    private var dailyGoalMl: Double { store.dailyGoalMl }
+    // Passe par le store pour recalculer DayRecord du jour, série et widget.
+    private var dailyGoalBinding: Binding<Double> {
+        Binding(get: { store.dailyGoalMl }, set: { store.setDailyGoal($0) })
+    }
     @AppStorage("selectedBadgeID") private var selectedBadgeID: String = ""
     @AppStorage("colorSchemeRaw") private var colorSchemeRaw: String = "system"
     @AppStorage("notificationsOn") private var notificationsOn: Bool = true
@@ -233,7 +237,7 @@ struct ProfileView: View {
             }
         }
         .sheet(isPresented: $showGoalEditor) {
-            GoalEditorSheet(dailyGoalMl: $dailyGoalMl, isPresented: $showGoalEditor)
+            GoalEditorSheet(dailyGoalMl: dailyGoalBinding, isPresented: $showGoalEditor)
                 .presentationDetents([.medium, .large])
                 .presentationDragIndicator(.hidden)
                 .presentationCornerRadius(24)
@@ -243,7 +247,7 @@ struct ProfileView: View {
                 weightKg: healthStore.weightBinding,
                 heightCm: healthStore.heightBinding,
                 genderRaw: healthStore.genderBinding,
-                dailyGoalMl: $dailyGoalMl,
+                dailyGoalMl: dailyGoalBinding,
                 isPresented: $showBodyEditor
             )
             .presentationDetents([.large])

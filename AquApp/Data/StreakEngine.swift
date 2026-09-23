@@ -60,16 +60,19 @@ final class StreakEngine {
         // Eau nette, comme todayGoalReached et les DayRecord.
         let todayGoalMet = netWaterMl(on: today) >= effectiveGoalMl
 
+        // Une seule lecture : une requête par jour coûtait ~26 ms sur une série d'un an.
+        let reachedRecords = repository.allDayRecords().filter { $0.goalReached }
+        let reachedDays = Set(reachedRecords.map { calendar.startOfDay(for: $0.date) })
+
         var streakFromPast = 0
         var checkDate = calendar.date(byAdding: .day, value: -1, to: today)!
-        while checkDate >= installDate {
-            guard let record = repository.dayRecord(for: checkDate), record.goalReached else { break }
+        while checkDate >= installDate, reachedDays.contains(checkDate) {
             streakFromPast += 1
             checkDate = calendar.date(byAdding: .day, value: -1, to: checkDate)!
         }
 
         let streak = todayGoalMet ? streakFromPast + 1 : streakFromPast
-        let total = repository.allDayRecords().filter { $0.goalReached }.count
+        let total = reachedRecords.count
 
         health.setCurrentStreak(streak)
         health.setTotalGoalDays(total)

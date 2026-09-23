@@ -21,6 +21,19 @@ final class AppDataStore: ObservableObject {
     weak var xpManager: XPManager?
 
     @AppStorage("dailyGoalMl") var dailyGoalMl: Double = 2170
+
+    /// Incrémenté à chaque changement des données ou des objectifs : les vues qui
+    /// mettent un calcul coûteux en cache (grille annuelle) s'en servent pour le refaire.
+    @Published private(set) var dataVersion = 0
+
+    /// Point d'entrée des écrans : met aussi à jour le DayRecord du jour, la série et le widget.
+    /// Les DayRecords passés gardent l'objectif de leur jour.
+    func setDailyGoal(_ ml: Double) {
+        guard ml != dailyGoalMl else { return }
+        dailyGoalMl = ml
+        didChangeEntries(on: [Date()], water: false, alcohol: false)
+    }
+
     var isPremiumUser: Bool {
         get { PremiumManager.shared.isPremium }
         set { PremiumManager.shared.set(newValue) }
@@ -231,7 +244,7 @@ final class AppDataStore: ObservableObject {
             achievementManager?.onSoberStreakUpdated(streak: sober)
         }
         syncWidgetData()
-        objectWillChange.send()
+        dataVersion += 1
     }
 
     /// Recale l'XP eau d'un jour donné sur ses entrées réellement présentes.
@@ -277,18 +290,18 @@ final class AppDataStore: ObservableObject {
     // plutôt que le cache, qui a pu être écrit par un autre chemin.
 
     func recalculateGoalStreak() {
-        repository.invalidateTodayCache()
+        repository.invalidateCaches()
         streaks.upsertDayRecord(for: Date(), effectiveGoalMl: effectiveGoalMl, dailyGoalMl: dailyGoalMl)
         repository.save()
         streaks.recalculateGoalStreak(effectiveGoalMl: effectiveGoalMl)
-        objectWillChange.send()
+        dataVersion += 1
     }
 
     func recalculateSoberStreak() {
-        repository.invalidateTodayCache()
+        repository.invalidateCaches()
         let sober = streaks.recalculateSoberStreak()
         achievementManager?.onSoberStreakUpdated(streak: sober)
-        objectWillChange.send()
+        dataVersion += 1
     }
 
     func fetchDayRecord(for day: Date) -> DayRecord? {
@@ -351,13 +364,13 @@ final class AppDataStore: ObservableObject {
     // MARK: - Reset quotidien
 
     func performMidnightReset() {
-        repository.invalidateTodayCache()
+        repository.invalidateCaches()
         recalculateSoberStreak()
         recalculateGoalStreak()
         challengeManager?.performDailyReset()
         syncWidgetData()
         UserDefaults.standard.set(Calendar.current.startOfDay(for: Date()), forKey: "last_reset_date")
-        objectWillChange.send()
+        dataVersion += 1
     }
 
     // MARK: - Historique complet (Premium)
@@ -378,5 +391,6 @@ final class AppDataStore: ObservableObject {
         repository.save()
         recalculateCumulativeTotals()
         syncWidgetData()
+        dataVersion += 1
     }
 }
