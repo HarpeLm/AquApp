@@ -296,32 +296,10 @@ final class AchievementManager: ObservableObject {
 
     // MARK: - Sleep Hydration (HealthKit)
 
+    // Autorisation : voir HealthAuthorization. Sans accès, les requêtes reviennent vides.
     func checkSleepHydration() {
         guard HKHealthStore.isHealthDataAvailable() else { return }
-
-        guard let sleepType = HKObjectType.categoryType(forIdentifier: .sleepAnalysis),
-              let waterType = HKQuantityType.quantityType(forIdentifier: .dietaryWater) else { return }
-
-        let sleepAuth = healthStore.authorizationStatus(for: sleepType)
-        let waterAuth = healthStore.authorizationStatus(for: waterType)
-
-        if sleepAuth == .notDetermined || waterAuth == .notDetermined {
-            requestHealthKitAndThenCheck()
-        } else if sleepAuth == .sharingAuthorized || waterAuth == .sharingAuthorized {
-            performSleepHydrationCheck()
-        }
-    }
-
-    private func requestHealthKitAndThenCheck() {
-        guard HKHealthStore.isHealthDataAvailable() else { return }
-        guard let sleepType = HKObjectType.categoryType(forIdentifier: .sleepAnalysis),
-              let waterType = HKQuantityType.quantityType(forIdentifier: .dietaryWater),
-              let stepType = HKQuantityType.quantityType(forIdentifier: .stepCount) else { return }
-
-        healthStore.requestAuthorization(toShare: [], read: [sleepType, waterType, stepType]) { [weak self] granted, error in
-            guard let self = self, granted, error == nil else { return }
-            DispatchQueue.main.async { self.performSleepHydrationCheck() }
-        }
+        performSleepHydrationCheck()
     }
 
     private func performSleepHydrationCheck() {
@@ -330,8 +308,6 @@ final class AchievementManager: ObservableObject {
 
         let sevenDaysAgo = Calendar.current.date(byAdding: .day, value: -7, to: Date())!
         let predicate = HKQuery.predicateForSamples(withStart: sevenDaysAgo, end: Date())
-
-        guard healthStore.authorizationStatus(for: sleepType) == .sharingAuthorized else { return }
 
         let sleepQuery = HKSampleQuery(
             sampleType: sleepType,
@@ -350,7 +326,6 @@ final class AchievementManager: ObservableObject {
                 .map { $0.startDate }
 
             guard !sleepStarts.isEmpty else { return }
-            guard self.healthStore.authorizationStatus(for: waterType) == .sharingAuthorized else { return }
 
             let group = DispatchGroup()
             let countQueue = DispatchQueue(label: "aquapp.sleepHydration.count")

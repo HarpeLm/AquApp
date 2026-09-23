@@ -68,6 +68,14 @@ final class AquAppUITests: XCTestCase {
           } else {
               app.buttons.firstMatch.tap()
           }
+
+          let saveBody = app.buttons["onboarding.body.save"]
+          XCTAssertTrue(saveBody.waitForExistence(timeout: 5), "Écran profil physique introuvable")
+          saveBody.tap()
+
+          let healthLater = app.buttons["onboarding.health.later"]
+          XCTAssertTrue(healthLater.waitForExistence(timeout: 5), "Écran Apple Santé introuvable")
+          healthLater.tap()
       // → Home
             XCTAssertTrue(app.tabBars.firstMatch.waitForExistence(timeout: 10),
                           "Home absente après onboarding complet")

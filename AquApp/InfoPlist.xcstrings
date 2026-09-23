@@ -8,13 +8,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "AquApp reads your step and sleep data from the Health app to validate certain challenges (active day, hydrated nights). This data stays on your device and is never shared."
+            "value" : "AquApp reads your steps, workouts, sleep and the water logged in Health to validate certain challenges and achievements (Active Day, Recovery, Hydrated Sleep). This data stays on your iPhone and is never shared."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "AquApp lit vos données de pas et de sommeil depuis l'app Santé pour valider certains défis (journée active, nuits hydratées). Ces données restent sur votre appareil et ne sont jamais partagées."
+            "value" : "AquApp lit vos pas, vos entraînements, votre sommeil et l'eau enregistrée dans Santé pour valider certains défis et succès (Journée active, Récupération, Sommeil hydraté). Ces données restent sur votre iPhone et ne sont jamais partagées."
           }
         }
       }

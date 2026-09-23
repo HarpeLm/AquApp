@@ -7,6 +7,7 @@ struct BodyProfileView: View {
     @State private var heightCm: Double = 170
     @State private var selectedGender: Gender = .notSpecified
     @State private var keyboardHeight: CGFloat = 0
+    @State private var goToHealth = false
 
     var calculatedGoalMl: Double {
         let safeWeight = weightKg.isFinite ? min(max(weightKg, 30), 200) : 70
@@ -32,6 +33,16 @@ struct BodyProfileView: View {
     }
 
     var body: some View {
+        if goToHealth {
+            HealthPermissionView(onFinish: completeOnboarding)
+                .transition(.move(edge: .trailing).combined(with: .opacity))
+        } else {
+            profileForm
+                .transition(.move(edge: .leading).combined(with: .opacity))
+        }
+    }
+
+    private var profileForm: some View {
         ZStack {
             Color("AppBackground").ignoresSafeArea()
 
@@ -198,7 +209,17 @@ struct BodyProfileView: View {
         HealthDataManager.shared.setHeight(safeHeight)
         HealthDataManager.shared.setGender(selectedGender.rawValue)
         UserDefaults.standard.set(safeGoal, forKey: "dailyGoalMl")
-        UserDefaults.standard.set(true,     forKey: "onboardingCompleted")
+
+        guard HealthAuthorization.isAvailable else {
+            completeOnboarding()
+            return
+        }
+        withAnimation(.easeInOut(duration: 0.35)) { goToHealth = true }
+    }
+
+    // Écrit en dernier : ContentView ferme l'onboarding dès que ce flag passe à true.
+    private func completeOnboarding() {
+        UserDefaults.standard.set(true, forKey: "onboardingCompleted")
         onComplete()
     }
 }

@@ -409,9 +409,6 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = AquApp/Info.plist;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.healthcare-fitness";
-				INFOPLIST_KEY_NSHealthShareUsageDescription = "Pour suivre vos pas et votre sommeil.";
-				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "Pour enregistrer votre consommation d'eau.";
-				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "AquApp utilise votre position pour détecter les vagues de chaleur et adapter votre objectif d'hydratation.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -448,9 +445,6 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = AquApp/Info.plist;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.healthcare-fitness";
-				INFOPLIST_KEY_NSHealthShareUsageDescription = "Pour suivre vos pas et votre sommeil.";
-				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "Pour enregistrer votre consommation d'eau.";
-				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "AquApp utilise votre position pour détecter les vagues de chaleur et adapter votre objectif d'hydratation.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;

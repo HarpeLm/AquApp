@@ -19,8 +19,7 @@ import Foundation
 //     l'efface — pas de doublon, pas de dérive entre SwiftData et Health.
 //
 // Autorisation :
-//   • requestWriteAuthorizationIfNeeded() est appelé une fois au lancement
-//     depuis AquAppApp.init(), avant toute écriture.
+//   • Demandée par HealthAuthorization depuis l'écran Santé de l'onboarding.
 //   • Toutes les opérations sont silencieuses en cas de refus — l'app
 //     fonctionne normalement, Health reste simplement non synchronisé.
 //
@@ -38,18 +37,6 @@ final class HealthKitWriter {
 
     private let healthStore = HKHealthStore()
     private let waterType   = HKQuantityType.quantityType(forIdentifier: .dietaryWater)!
-
-    // MARK: - Autorisation
-
-    /// Demande la permission d'écriture pour dietaryWater.
-    /// Idempotent — sans effet si déjà accordée ou refusée.
-    /// À appeler une seule fois au lancement (AquAppApp.init).
-    func requestWriteAuthorizationIfNeeded() {
-        guard HKHealthStore.isHealthDataAvailable() else { return }
-        healthStore.requestAuthorization(toShare: [waterType], read: []) { _, _ in
-            // Résultat ignoré — les écritures vérifient le statut elles-mêmes
-        }
-    }
 
     // MARK: - Écriture
 

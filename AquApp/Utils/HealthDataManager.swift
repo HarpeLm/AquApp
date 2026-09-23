@@ -150,10 +150,6 @@ final class HealthDataManager: ObservableObject {
         }
         let stepType = HKQuantityType.quantityType(forIdentifier: .stepCount)!
         let store = HKHealthStore()
-        guard store.authorizationStatus(for: stepType) != .notDetermined else {
-            completion(d.double(forKey: "cached_steps_today"))
-            return
-        }
         let startDay = Calendar.current.startOfDay(for: Date())
         let predicate = HKQuery.predicateForSamples(withStart: startDay, end: Date(), options: .strictStartDate)
         let query = HKStatisticsQuery(quantityType: stepType, quantitySamplePredicate: predicate, options: .cumulativeSum) { _, result, _ in

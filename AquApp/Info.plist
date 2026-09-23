@@ -83,7 +83,7 @@
     <key>CFBundleIdentifier</key>
     <string>com.fabian.dargaud.AquApp</string>
     <key>NSHealthShareUsageDescription</key>
-    <string>AquApp lit vos données de pas et de sommeil depuis l&apos;app Santé pour valider certains défis (journée active, nuits hydratées). Ces données restent sur votre appareil et ne sont jamais partagées.</string>
+    <string>AquApp lit vos pas, vos entraînements, votre sommeil et l&apos;eau enregistrée dans Santé pour valider certains défis et succès (Journée active, Récupération, Sommeil hydraté). Ces données restent sur votre iPhone et ne sont jamais partagées.</string>
     <key>NSHealthUpdateUsageDescription</key>
     <string>AquApp enregistre votre consommation d&apos;eau dans Apple Santé pour centraliser vos données d&apos;hydratation.</string>
     <key>NSLocationWhenInUseUsageDescription</key>

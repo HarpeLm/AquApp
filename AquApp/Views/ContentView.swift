@@ -8,6 +8,7 @@ struct ContentView: View {
 
     @State private var showAddWaterFromWidget = false
     @State private var showDBRecoveryAlert    = false
+    @State private var showHealthPermission   = false
 
     // MARK: - Scroll-to-top
     // selectedTab   : onglet actif, lié au TabView.
@@ -95,6 +96,18 @@ struct ContentView: View {
             if dbRecoveryError != nil {
                 showDBRecoveryAlert = true
             }
+        }
+        // Utilisateurs déjà passés par l'onboarding : l'écran Santé n'est proposé qu'une fois.
+        .task {
+            guard onboardingCompleted,
+                  !UserDefaults.standard.bool(forKey: HealthAuthorization.offeredKey),
+                  await HealthAuthorization.needsRequest()
+            else { return }
+            showHealthPermission = true
+        }
+        .sheet(isPresented: $showHealthPermission) {
+            HealthPermissionView { showHealthPermission = false }
+                .interactiveDismissDisabled()
         }
     }
 }

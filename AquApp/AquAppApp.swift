@@ -43,6 +43,7 @@ struct AquAppApp: App {
             HealthDataManager.shared.resetForTests()
             if args.contains("-uiTestingReady") {
                 UserDefaults.standard.set(true, forKey: "onboardingCompleted")
+                UserDefaults.standard.set(true, forKey: HealthAuthorization.offeredKey)
                 HealthDataManager.shared.setFirstName("Test")
             }
         }
@@ -116,7 +117,6 @@ struct AquAppApp: App {
         _xpManager          = StateObject(wrappedValue: xpm)
 
         HapticManager.shared.prepare()
-        HealthKitWriter.shared.requestWriteAuthorizationIfNeeded()
 
         // Enregistre le handler BGAppRefreshTask.
         // DOIT être appelé avant la fin de application(_:didFinishLaunchingWithOptions:)

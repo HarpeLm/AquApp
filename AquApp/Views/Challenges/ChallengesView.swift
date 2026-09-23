@@ -111,7 +111,6 @@ class ChallengeManager: ObservableObject {
     init() {
         loadChallenges()
         restoreProgress()
-        requestHealthKitPermission()
     }
 
     // MARK: - Chargement des défis
@@ -192,30 +191,11 @@ class ChallengeManager: ObservableObject {
         updateProStatus()
     }
 
-    // MARK: - HealthKit
-
-    func requestHealthKitPermission() {
-        guard HKHealthStore.isHealthDataAvailable() else { return }
-        let stepType    = HKQuantityType.quantityType(forIdentifier: .stepCount)!
-        let waterType   = HKQuantityType.quantityType(forIdentifier: .dietaryWater)!
-        let workoutType = HKObjectType.workoutType()
-        healthStore.requestAuthorization(toShare: [], read: [stepType, waterType, workoutType]) { _, _ in }
-    }
+    // MARK: - HealthKit (autorisation : voir HealthAuthorization)
 
     func fetchTodaySteps(completion: @escaping (Double) -> Void) {
         guard HKHealthStore.isHealthDataAvailable() else { completion(0); return }
-        let stepType = HKQuantityType.quantityType(forIdentifier: .stepCount)!
-        switch healthStore.authorizationStatus(for: stepType) {
-        case .sharingAuthorized:
-            performStepQuery(completion: completion)
-        case .notDetermined:
-            healthStore.requestAuthorization(toShare: [], read: [stepType]) { [weak self] granted, _ in
-                guard granted else { completion(0); return }
-                self?.performStepQuery(completion: completion)
-            }
-        default:
-            completion(0)
-        }
+        performStepQuery(completion: completion)
     }
 
     private func performStepQuery(completion: @escaping (Double) -> Void) {
@@ -239,14 +219,6 @@ class ChallengeManager: ObservableObject {
             return
         }
         guard HKHealthStore.isHealthDataAvailable() else { completion(nil); return }
-        let workoutType = HKObjectType.workoutType()
-        guard healthStore.authorizationStatus(for: workoutType) == .sharingAuthorized else {
-            healthStore.requestAuthorization(toShare: [], read: [workoutType]) { [weak self] granted, _ in
-                guard granted else { completion(nil); return }
-                self?.performWorkoutQuery(completion: completion)
-            }
-            return
-        }
         performWorkoutQuery(completion: completion)
     }
 

@@ -42,6 +42,5 @@ final class HealthKitWriterTests: XCTestCase {
     func testWrite_NoCrash_WhenNotAuthorized() {
         HealthKitWriter.shared.write(amountMl: 250, date: Date(), entryID: UUID())
         HealthKitWriter.shared.delete(entryID: UUID(), date: Date())
-        HealthKitWriter.shared.requestWriteAuthorizationIfNeeded()
     }
 }

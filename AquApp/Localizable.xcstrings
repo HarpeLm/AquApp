@@ -8853,6 +8853,214 @@
           }
         }
       }
+    },
+    "health.permission.title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Connect Apple Health"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Connecter Apple Santé"
+          }
+        }
+      }
+    },
+    "health.permission.subtitle" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Optional: AquApp works without it. Here's exactly what would be used."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Facultatif : AquApp fonctionne sans. Voici exactement ce qui serait utilisé."
+          }
+        }
+      }
+    },
+    "health.permission.water.title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Save your water"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enregistrer votre eau"
+          }
+        }
+      }
+    },
+    "health.permission.water.detail" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Every glass you log in AquApp shows up in Health."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chaque verre ajouté dans AquApp apparaît dans Santé."
+          }
+        }
+      }
+    },
+    "health.permission.steps.title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Read your steps"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lire vos pas"
+          }
+        }
+      }
+    },
+    "health.permission.steps.detail" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "For the Active Day challenge and the Marathoner achievement."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pour le défi Journée active et le succès Marathonien."
+          }
+        }
+      }
+    },
+    "health.permission.workouts.title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Read your workouts"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lire vos entraînements"
+          }
+        }
+      }
+    },
+    "health.permission.workouts.detail" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "For the Recovery challenge."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pour le défi Récupération."
+          }
+        }
+      }
+    },
+    "health.permission.sleep.title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Read your sleep"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lire votre sommeil"
+          }
+        }
+      }
+    },
+    "health.permission.sleep.detail" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "For the Hydrated Sleep achievement, along with the water you drink before bed."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pour le succès Sommeil hydraté, avec l'eau bue avant le coucher."
+          }
+        }
+      }
+    },
+    "health.permission.privacy" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This data stays on your iPhone: AquApp has no account and no server. You can change your mind anytime in the Health app."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ces données restent sur votre iPhone : AquApp n'a ni compte ni serveur. Vous pourrez changer d'avis à tout moment dans l'app Santé."
+          }
+        }
+      }
+    },
+    "health.permission.connect" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Connect Apple Health"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Connecter Apple Santé"
+          }
+        }
+      }
+    },
+    "health.permission.later" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Not now"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Plus tard"
+          }
+        }
+      }
     }
   },
   "version" : "1.1"
