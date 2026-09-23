@@ -1,4 +1,3 @@
-import HealthKit
 import SwiftData
 import SwiftUI
 import Combine
@@ -201,7 +200,7 @@ final class AppDataStore: ObservableObject {
             alcoholCount: cachedAlcoholEntries().count
         )
 
-        fetchAndCacheTodaySteps { [weak self] steps in
+        HealthDataManager.shared.fetchTodaySteps { [weak self] steps in
             Task { @MainActor [weak self] in
                 guard let self else { return }
                 self.achievementManager?.onMarathonienCheck(
@@ -663,30 +662,6 @@ final class AppDataStore: ObservableObject {
         result[today] = todayProgress
 
         return result
-    }
-
-    // MARK: - Pas (HealthKit)
-
-    private func fetchAndCacheTodaySteps(completion: @escaping (Double) -> Void) {
-        guard HKHealthStore.isHealthDataAvailable() else {
-            completion(UserDefaults.standard.double(forKey: "cached_steps_today"))
-            return
-        }
-        let stepType = HKQuantityType.quantityType(forIdentifier: .stepCount)!
-        let store = HKHealthStore()
-        guard store.authorizationStatus(for: stepType) != .notDetermined else {
-            completion(UserDefaults.standard.double(forKey: "cached_steps_today"))
-            return
-        }
-        let calendar = Calendar.current
-        let startDay = calendar.startOfDay(for: Date())
-        let predicate = HKQuery.predicateForSamples(withStart: startDay, end: Date(), options: .strictStartDate)
-        let query = HKStatisticsQuery(quantityType: stepType, quantitySamplePredicate: predicate, options: .cumulativeSum) { _, result, _ in
-            let steps = result?.sumQuantity()?.doubleValue(for: HKUnit.count()) ?? 0
-            UserDefaults.standard.set(steps, forKey: "cached_steps_today")
-            DispatchQueue.main.async { completion(steps) }
-        }
-        store.execute(query)
     }
 
     // MARK: - Requêtes agrégées (bootstrap / restore uniquement)

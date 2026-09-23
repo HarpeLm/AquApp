@@ -7,6 +7,7 @@
 
 import Foundation
 import Combine
+import HealthKit
 import SwiftUI
 
 @MainActor
@@ -129,6 +130,29 @@ final class HealthDataManager: ObservableObject {
     func setChallengeCompleted(_ id: String, value: Bool) {
         challengeCompleted[id] = value
         saveJSON(dict: challengeCompleted, key: "completed_dict")
+    }
+
+    // MARK: - Pas du jour (HealthKit, repli sur le dernier cache)
+
+    func fetchTodaySteps(completion: @escaping (Double) -> Void) {
+        guard HKHealthStore.isHealthDataAvailable() else {
+            completion(d.double(forKey: "cached_steps_today"))
+            return
+        }
+        let stepType = HKQuantityType.quantityType(forIdentifier: .stepCount)!
+        let store = HKHealthStore()
+        guard store.authorizationStatus(for: stepType) != .notDetermined else {
+            completion(d.double(forKey: "cached_steps_today"))
+            return
+        }
+        let startDay = Calendar.current.startOfDay(for: Date())
+        let predicate = HKQuery.predicateForSamples(withStart: startDay, end: Date(), options: .strictStartDate)
+        let query = HKStatisticsQuery(quantityType: stepType, quantitySamplePredicate: predicate, options: .cumulativeSum) { _, result, _ in
+            let steps = result?.sumQuantity()?.doubleValue(for: HKUnit.count()) ?? 0
+            UserDefaults.standard.set(steps, forKey: "cached_steps_today")
+            DispatchQueue.main.async { completion(steps) }
+        }
+        store.execute(query)
     }
 
     func achievementProgressValue(_ id: String) -> Double { achievementProgress[id] ?? 0 }
