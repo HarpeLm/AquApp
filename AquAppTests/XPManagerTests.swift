@@ -15,13 +15,15 @@ enum TestKit {
         let f = DateFormatter(); f.dateFormat = "yyyyMMdd"
         return f.string(from: Date())
     }
-    static func resetXPDefaults() {
+    @MainActor static func resetXPDefaults() {
         let d = UserDefaults.standard
         for key in d.dictionaryRepresentation().keys where key.hasPrefix("xp_") {
             d.removeObject(forKey: key)
         }
+        HealthDataManager.shared.setXPTotal(0)
     }
-    static func setTotalXP(_ v: Int)      { UserDefaults.standard.set(v, forKey: "xp_total") }
+    // XPManager lit le total depuis le Keychain via HealthDataManager, pas UserDefaults.
+    @MainActor static func setTotalXP(_ v: Int) { HealthDataManager.shared.setXPTotal(v) }
     static func setWaterXPToday(_ v: Int) { UserDefaults.standard.set(v, forKey: "xp_water_today_\(dayKey)") }
     static let accuracy = 0.000001
 }

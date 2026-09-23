@@ -26,6 +26,7 @@ final class AchievementManagerTests: XCTestCase {
         d.dictionaryRepresentation().keys
             .filter { $0.hasPrefix("ach_progress_") || $0.hasPrefix("ach_completed_") }
             .forEach { d.removeObject(forKey: $0) }
+        HealthDataManager.shared.resetForTests()
 
         retained = []
         manager = AchievementManager()
@@ -149,16 +150,16 @@ final class AchievementManagerTests: XCTestCase {
 
     func testOnHeatwaveDay_Needs3DaysOver3000() {
         manager.onHeatwaveDay(totalMl: 2999)
-        XCTAssertEqual(UserDefaults.standard.double(forKey: "heatwave_days"), 0)
+        XCTAssertEqual(HealthDataManager.shared.heatwaveDays, 0)
         manager.onHeatwaveDay(totalMl: 3000)
-        XCTAssertEqual(UserDefaults.standard.double(forKey: "heatwave_days"), 1)
+        XCTAssertEqual(HealthDataManager.shared.heatwaveDays, 1)
         manager.onHeatwaveDay(totalMl: 3000)
-        XCTAssertEqual(UserDefaults.standard.double(forKey: "heatwave_days"), 2)
+        XCTAssertEqual(HealthDataManager.shared.heatwaveDays, 2)
         XCTAssertNotEqual(manager.ach(id: "heatwave").status, .completed)
         manager.onHeatwaveDay(totalMl: 3000)
-        XCTAssertEqual(UserDefaults.standard.double(forKey: "heatwave_days"), 3)
+        XCTAssertEqual(HealthDataManager.shared.heatwaveDays, 3)
         XCTAssertEqual(manager.ach(id: "heatwave").status, .completed,
-                       "diag: days=\(UserDefaults.standard.double(forKey: "heatwave_days"))")
+                       "diag: days=\(HealthDataManager.shared.heatwaveDays)")
     }
 
     func testRestoreHeatwaveProgress() {

@@ -195,5 +195,8 @@ final class HealthDataManager: ObservableObject {
         setHeatwaveDays(0); setSoberDaysTotal(0)
         setTotalWaterMl(0); setTotalAlcoholMl(0)
         achievementProgress = [:]; achievementCompleted = [:]; challengeCompleted = [:]
+        saveJSON(dict: achievementProgress, key: "ach_progress_dict")
+        saveJSON(dict: achievementCompleted, key: "ach_completed_dict")
+        saveJSON(dict: challengeCompleted, key: "completed_dict")
     }
 }
