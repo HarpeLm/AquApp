@@ -25,17 +25,24 @@ final class StreakEngine {
 
     // MARK: - DayRecord
 
+    /// Eau bue moins la compensation alcool, jamais négative.
+    func netWaterMl(on date: Date) -> Double {
+        let water: [WaterEntry]
+        let alcohol: [WaterAlcoholEntry]
+        if Calendar.current.isDateInToday(date) {
+            (water, alcohol) = (repository.todayWater(), repository.todayAlcohol())
+        } else {
+            let (day, dayEnd) = EntryRepository.dayRange(containing: date)
+            (water, alcohol) = (repository.water(from: day, to: dayEnd), repository.alcohol(from: day, to: dayEnd))
+        }
+        return max(0, water.reduce(0.0) { $0 + $1.amountMl } - alcohol.reduce(0.0) { $0 + $1.compensationMl })
+    }
+
     /// Crée ou met à jour le DayRecord du jour de `date`, sans sauvegarder.
     func upsertDayRecord(for date: Date, effectiveGoalMl: Double, dailyGoalMl: Double) {
-        let isToday = Calendar.current.isDateInToday(date)
-        let (day, dayEnd) = EntryRepository.dayRange(containing: date)
-
-        let water = isToday ? repository.todayWater() : repository.water(from: day, to: dayEnd)
-        let alcohol = isToday ? repository.todayAlcohol() : repository.alcohol(from: day, to: dayEnd)
-        let netMl = max(0, water.reduce(0.0) { $0 + $1.amountMl } - alcohol.reduce(0.0) { $0 + $1.compensationMl })
-
-        let goalForDay = isToday ? effectiveGoalMl : dailyGoalMl
-        let reached = netMl >= goalForDay
+        let day = Calendar.current.startOfDay(for: date)
+        let goalForDay = Calendar.current.isDateInToday(date) ? effectiveGoalMl : dailyGoalMl
+        let reached = netWaterMl(on: date) >= goalForDay
 
         if let existing = repository.dayRecord(for: day) {
             existing.goalReached = reached
@@ -52,8 +59,8 @@ final class StreakEngine {
         let installDate = calendar.startOfDay(for: firstLaunchDate)
         let today = calendar.startOfDay(for: Date())
 
-        let todayWater = repository.todayWater().reduce(0) { $0 + $1.amountMl }
-        let todayGoalMet = todayWater >= effectiveGoalMl
+        // Eau nette, comme todayGoalReached et les DayRecord.
+        let todayGoalMet = netWaterMl(on: today) >= effectiveGoalMl
 
         var streakFromPast = 0
         var checkDate = calendar.date(byAdding: .day, value: -1, to: today)!

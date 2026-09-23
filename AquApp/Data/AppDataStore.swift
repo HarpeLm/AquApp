@@ -26,7 +26,12 @@ final class AppDataStore: ObservableObject {
         set { PremiumManager.shared.set(newValue) }
     }
 
-    var heatwaveGoalMl: Double? = nil
+    var heatwaveGoalMl: Double? = nil {
+        didSet {
+            guard heatwaveGoalMl != oldValue else { return }
+            didChangeEntries(on: [Date()], water: false, alcohol: false)
+        }
+    }
     var effectiveGoalMl: Double { heatwaveGoalMl ?? dailyGoalMl }
 
     init(modelContext: ModelContext) {
@@ -35,9 +40,8 @@ final class AppDataStore: ObservableObject {
         self.stats = StatsCalculator(repository: repository)
         self.streaks = StreakEngine(repository: repository)
         bootstrapCumulativeTotals()
-        let sober = streaks.soberStreakAtLaunch()
-        achievementManager?.onSoberStreakUpdated(streak: sober)
-        recalculateGoalStreak()
+        _ = streaks.soberStreakAtLaunch()
+        streaks.recalculateGoalStreak(effectiveGoalMl: effectiveGoalMl)
     }
 
     // MARK: - Bootstrap au lancement
@@ -268,12 +272,19 @@ final class AppDataStore: ObservableObject {
     var soberDaysStreak: Int { HealthDataManager.shared.soberStreak }
     var firstLaunchDate: Date { streaks.firstLaunchDate }
 
+    // Points d'entrée externes (lancement, reset, tâche de fond) : on relit la base
+    // plutôt que le cache, qui a pu être écrit par un autre chemin.
+
     func recalculateGoalStreak() {
+        repository.invalidateTodayCache()
+        streaks.upsertDayRecord(for: Date(), effectiveGoalMl: effectiveGoalMl, dailyGoalMl: dailyGoalMl)
+        repository.save()
         streaks.recalculateGoalStreak(effectiveGoalMl: effectiveGoalMl)
         objectWillChange.send()
     }
 
     func recalculateSoberStreak() {
+        repository.invalidateTodayCache()
         guard let streak = streaks.recalculateSoberStreak() else { return }
         achievementManager?.onSoberStreakUpdated(streak: streak)
         objectWillChange.send()
