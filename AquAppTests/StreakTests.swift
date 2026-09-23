@@ -7,6 +7,8 @@ final class StreakTests: XCTestCase {
 
     private var container: ModelContainer!
     private var store: AppDataStore!
+    // Le Keychain est partagé avec l'app installée sur le simulateur.
+    private var originalFirstLaunchDate: Date!
 
     override func setUp() async throws {
         try await super.setUp()
@@ -16,11 +18,13 @@ final class StreakTests: XCTestCase {
             configurations: config
         )
         HealthDataManager.shared.resetForTests()
+        originalFirstLaunchDate = HealthDataManager.shared.firstLaunchDate
         HealthDataManager.shared.setFirstLaunchDate(daysAgo(10))
         store = AppDataStore(modelContext: container.mainContext)
     }
 
     override func tearDown() async throws {
+        HealthDataManager.shared.setFirstLaunchDate(originalFirstLaunchDate)
         store = nil
         container = nil
         try await super.tearDown()
