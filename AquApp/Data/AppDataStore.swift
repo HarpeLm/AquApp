@@ -8,6 +8,7 @@ import Foundation
 @MainActor
 final class AppDataStore: ObservableObject {
     private let repository: EntryRepository
+    private let stats: StatsCalculator
     weak var confettiManager: ConfettiManager?
     weak var achievementManager: AchievementManager?
     weak var challengeManager: ChallengeManager?
@@ -23,7 +24,9 @@ final class AppDataStore: ObservableObject {
     var effectiveGoalMl: Double { heatwaveGoalMl ?? dailyGoalMl }
 
     init(modelContext: ModelContext) {
-        self.repository = EntryRepository(context: modelContext)
+        let repository = EntryRepository(context: modelContext)
+        self.repository = repository
+        self.stats = StatsCalculator(repository: repository)
         bootstrapCumulativeTotals()
         fullScanSoberStreakAtLaunch()
         recalculateGoalStreak()
@@ -241,91 +244,25 @@ final class AppDataStore: ObservableObject {
         objectWillChange.send()
     }
 
-    // MARK: - Graphique 7 jours
+    // MARK: - Statistiques (déléguées à StatsCalculator)
 
-    var last7DaysWater: [(day: String, ml: Double)] {
-        let calendar = Calendar.current
-        let formatter = DateFormatter()
-        formatter.locale = Locale.current
-        formatter.dateFormat = "EEE"
+    var last7DaysWater: [(day: String, ml: Double)] { stats.last7DaysWater }
+    var activeDaysLast30: Int { stats.activeDaysLast30 }
+    var activeDaysTotal: Int { stats.activeDaysTotal }
+    var currentWeekStart: Date { stats.currentWeekStart }
+    var currentWeekEnd: Date { stats.currentWeekEnd }
+    var avgMlPerDay: Double { stats.avgMlPerDay }
+    var weekAlcoholLiters: Double { stats.weekAlcoholLiters }
+    var monthAlcoholLiters: Double { stats.monthAlcoholLiters }
+    func weekTotalMl(from start: Date, to end: Date) -> Double { stats.weekTotalMl(from: start, to: end) }
 
-        let weekStart = calendar.date(byAdding: .day, value: -6, to: calendar.startOfDay(for: Date()))!
-        let weekEnd = calendar.date(byAdding: .day, value: 1, to: Date())!
-        let allEntries = repository.water(from: weekStart, to: weekEnd)
-        let grouped = Dictionary(grouping: allEntries) { calendar.startOfDay(for: $0.date) }
-
-        let allAlcohol = repository.alcohol(from: weekStart, to: weekEnd)
-        let groupedAlcohol = Dictionary(grouping: allAlcohol) { calendar.startOfDay(for: $0.date) }
-
-        return (0..<7).reversed().map { offset in
-            let date = calendar.date(byAdding: .day, value: -offset, to: Date())!
-            let dayStart = calendar.startOfDay(for: date)
-            let waterMl = grouped[dayStart]?.reduce(0) { $0 + $1.amountMl } ?? 0
-            let alcoholComp = groupedAlcohol[dayStart]?.reduce(0.0) { $0 + $1.compensationMl } ?? 0.0
-            let total = max(0, waterMl - alcoholComp)
-            let label = String(formatter.string(from: date).prefix(3).capitalized)
-            return (day: label, ml: total)
-        }
+    func contributionRatios(days: Int = 365) -> [Date: Double] {
+        stats.contributionRatios(days: days, todayProgress: todayProgress,
+                                 effectiveGoalMl: effectiveGoalMl, dailyGoalMl: dailyGoalMl)
     }
 
-    // MARK: - Stats globales
-
-    var activeDaysLast30: Int {
-        let start = Calendar.current.date(byAdding: .day, value: -30, to: Date())!
-        return repository.dayRecords(since: start).filter { $0.goalReached }.count
-    }
-
-    var activeDaysTotal: Int {
-        repository.distinctWaterDayCount() ?? 0
-    }
-
-    var totalAlcoholLiters: Double {
-        HealthDataManager.shared.totalAlcoholMl / 1000.0
-    }
-
-    // MARK: - Semaine en cours
-
-    var currentWeekStart: Date {
-        let calendar = Calendar.current
-        let today = calendar.startOfDay(for: Date())
-        let weekday = calendar.component(.weekday, from: today)
-        let daysFromMonday = (weekday == 1) ? 6 : weekday - 2
-        return calendar.date(byAdding: .day, value: -daysFromMonday, to: today)!
-    }
-
-    var currentWeekEnd: Date {
-        Calendar.current.date(byAdding: .day, value: 7, to: currentWeekStart)!
-    }
-
-    var avgMlPerDay: Double {
-        let entries = repository.water(from: currentWeekStart, to: currentWeekEnd)
-        guard !entries.isEmpty else { return 0 }
-        let byDay = Dictionary(grouping: entries) { $0.day }
-        let totals = byDay.values.map { $0.reduce(0) { $0 + $1.amountMl } }
-        return totals.reduce(0, +) / Double(max(totals.count, 1))
-    }
-
-    var weekAlcoholLiters: Double {
-        repository.alcohol(from: currentWeekStart, to: currentWeekEnd)
-            .reduce(0) { $0 + $1.amountMl } / 1000.0
-    }
-
-    var monthAlcoholLiters: Double {
-        let start = Calendar.current.date(byAdding: .month, value: -1, to: Date())!
-        return repository.alcohol(from: start, to: Date()).reduce(0) { $0 + $1.amountMl } / 1000.0
-    }
-
-    var totalWaterLiters: Double {
-        HealthDataManager.shared.totalWaterMl / 1000.0
-    }
-
-    func weekTotalMl(from start: Date, to end: Date) -> Double {
-        let waterEntries = repository.water(from: start, to: end)
-        let alcoholEntries = repository.alcohol(from: start, to: end)
-        let waterTotal = waterEntries.reduce(0.0) { $0 + $1.amountMl }
-        let alcoholComp = alcoholEntries.reduce(0.0) { $0 + $1.compensationMl }
-        return max(0, waterTotal - alcoholComp)
-    }
+    var totalWaterLiters: Double { HealthDataManager.shared.totalWaterMl / 1000.0 }
+    var totalAlcoholLiters: Double { HealthDataManager.shared.totalAlcoholMl / 1000.0 }
 
     // MARK: - Goal streak
 
@@ -561,52 +498,6 @@ final class AppDataStore: ObservableObject {
         repository.dayRecord(for: day)
     }
 
-    // MARK: - Grille de contributions
-
-    func contributionRatios(days: Int = 365) -> [Date: Double] {
-        let calendar = Calendar.current
-        let today = calendar.startOfDay(for: Date())
-        let start = calendar.date(byAdding: .day, value: -(days - 1), to: today)!
-
-        let allWater = repository.allWater()
-        let allAlcohol = repository.allAlcohol()
-        let allRecords = repository.allDayRecords()
-
-        var waterByDay: [Date: Double] = [:]
-        for entry in allWater where entry.date >= start {
-            waterByDay[calendar.startOfDay(for: entry.date), default: 0] += entry.amountMl
-        }
-        var alcoholCompByDay: [Date: Double] = [:]
-        for entry in allAlcohol where entry.date >= start {
-            alcoholCompByDay[calendar.startOfDay(for: entry.date), default: 0] += entry.compensationMl
-        }
-
-        var goalByDay: [Date: Double] = [:]
-        for record in allRecords where record.date >= start {
-            goalByDay[calendar.startOfDay(for: record.date)] = record.goalMl
-        }
-
-        var result: [Date: Double] = [:]
-        var allDays = Set(waterByDay.keys)
-        allDays.formUnion(goalByDay.keys)
-        for day in allDays where day <= today {
-            let net = max(0, (waterByDay[day] ?? 0) - (alcoholCompByDay[day] ?? 0))
-            let goal = goalByDay[day] ?? (calendar.isDateInToday(day) ? effectiveGoalMl : dailyGoalMl)
-            guard goal > 0 else { continue }
-            if waterByDay[day] == nil {
-                if let reached = allRecords.first(where: { calendar.startOfDay(for: $0.date) == day })?.goalReached, reached {
-                    result[day] = 1.0
-                }
-                continue
-            }
-            result[day] = net / goal
-        }
-
-        result[today] = todayProgress
-
-        return result
-    }
-
     // MARK: - Save
 
     @discardableResult
@@ -631,40 +522,15 @@ final class AppDataStore: ObservableObject {
         defaults.set(activeDaysTotal, forKey: "widget_active_days")
         defaults.set(dailyGoalMl, forKey: "widget_daily_goal_ml")
 
-        let calendar = Calendar.current
-        let formatter = DateFormatter()
-        formatter.locale = Locale.current
-        formatter.dateFormat = "EEE"
-
-        let sevenDaysAgo = calendar.date(byAdding: .day, value: -6, to: calendar.startOfDay(for: Date()))!
-        let tomorrow = calendar.date(byAdding: .day, value: 1, to: Date())!
-
-        let allWater = repository.water(from: sevenDaysAgo, to: tomorrow)
-        let allAlcohol = repository.alcohol(from: sevenDaysAgo, to: tomorrow)
-
-        let waterByDay = Dictionary(grouping: allWater) { calendar.startOfDay(for: $0.date) }
-        let alcoholByDay = Dictionary(grouping: allAlcohol) { calendar.startOfDay(for: $0.date) }
-
+        let formatter = StatsCalculator.weekdayFormatter
         var weekData: [[String: Any]] = []
 
-        for offset in 0..<7 {
-            let date = calendar.date(byAdding: .day, value: -offset, to: Date())!
-            let dayStart = calendar.startOfDay(for: date)
-
-            let waterMl: Double
-            let alcoholComp: Double
-            let reached: Bool
-            if offset == 0 {
-                waterMl = todayWaterMlRaw
-                alcoholComp = todayAlcoholCompensationMl
-                reached = todayGoalReached
-            } else {
-                waterMl = waterByDay[dayStart]?.reduce(0) { $0 + $1.amountMl } ?? 0
-                alcoholComp = alcoholByDay[dayStart]?.reduce(0.0) { $0 + $1.compensationMl } ?? 0.0
-                reached = repository.dayRecord(for: dayStart)?.goalReached ?? false
-            }
-
-            let netMl = max(0, waterMl - alcoholComp)
+        for (offset, total) in stats.dailyTotals(lastDays: 7).enumerated() {
+            let date = total.date
+            let netMl = total.netMl
+            let reached = offset == 0
+                ? todayGoalReached
+                : repository.dayRecord(for: total.dayStart)?.goalReached ?? false
             let label = String(formatter.string(from: date).prefix(1).uppercased())
 
             weekData.append([
