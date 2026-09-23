@@ -9,6 +9,7 @@ import Foundation
 final class AppDataStore: ObservableObject {
     private let repository: EntryRepository
     private let stats: StatsCalculator
+    private let streaks: StreakEngine
     weak var confettiManager: ConfettiManager?
     weak var achievementManager: AchievementManager?
     weak var challengeManager: ChallengeManager?
@@ -27,6 +28,7 @@ final class AppDataStore: ObservableObject {
         let repository = EntryRepository(context: modelContext)
         self.repository = repository
         self.stats = StatsCalculator(repository: repository)
+        self.streaks = StreakEngine(repository: repository)
         bootstrapCumulativeTotals()
         fullScanSoberStreakAtLaunch()
         recalculateGoalStreak()
@@ -59,13 +61,7 @@ final class AppDataStore: ObservableObject {
     }
 
     private func fullScanSoberStreakAtLaunch() {
-        guard repository.todayAlcohol().isEmpty else {
-            HealthDataManager.shared.setSoberStreak(0)
-            achievementManager?.onSoberStreakUpdated(streak: 0)
-            return
-        }
-        let streak = fullScanSoberStreak()
-        HealthDataManager.shared.setSoberStreak(streak)
+        let streak = streaks.soberStreakAtLaunch()
         achievementManager?.onSoberStreakUpdated(streak: streak)
     }
 
@@ -275,31 +271,7 @@ final class AppDataStore: ObservableObject {
     }
 
     func recalculateGoalStreak() {
-        let calendar = Calendar.current
-        let installDate = calendar.startOfDay(for: firstLaunchDate)
-        let today = calendar.startOfDay(for: Date())
-
-        let todayWater = repository.todayWater().reduce(0) { $0 + $1.amountMl }
-        let todayGoalMet = todayWater >= effectiveGoalMl
-
-        var streakFromPast = 0
-        var checkDate = calendar.date(byAdding: .day, value: -1, to: today)!
-
-        while checkDate >= installDate {
-            guard let record = repository.dayRecord(for: checkDate) else { break }
-            if record.goalReached {
-                streakFromPast += 1
-                checkDate = calendar.date(byAdding: .day, value: -1, to: checkDate)!
-            } else {
-                break
-            }
-        }
-
-        let streak = todayGoalMet ? streakFromPast + 1 : streakFromPast
-        let total = repository.allDayRecords().filter { $0.goalReached }.count
-
-        HealthDataManager.shared.setCurrentStreak(streak)
-        HealthDataManager.shared.setTotalGoalDays(total)
+        streaks.recalculateGoalStreak(effectiveGoalMl: effectiveGoalMl)
         objectWillChange.send()
     }
 
@@ -310,71 +282,12 @@ final class AppDataStore: ObservableObject {
     }
 
     func recalculateSoberStreak() {
-        let calendar = Calendar.current
-
-        // Si alcool aujourd'hui → streak = 0
-        guard repository.todayAlcohol().isEmpty else {
-            HealthDataManager.shared.setSoberStreak(0)
-            achievementManager?.onSoberStreakUpdated(streak: 0)
-            objectWillChange.send()
-            return
-        }
-
-        // Vérifier si on a déjà recalculé aujourd'hui
-        let today = calendar.startOfDay(for: Date())
-        let lastRecalcDate = UserDefaults.standard.object(forKey: "last_sober_recalc") as? Date
-
-        if let lastRecalc = lastRecalcDate, calendar.isDate(lastRecalc, inSameDayAs: today) {
-            // Déjà recalculé aujourd'hui → ne pas incrémenter
-            return
-        }
-
-        // Vérifier hier
-        let yesterday = calendar.date(byAdding: .day, value: -1, to: today)!
-        let yesterdayEnd = calendar.date(byAdding: .day, value: 1, to: calendar.startOfDay(for: yesterday))!
-        let alcoholYesterday = repository.alcohol(from: calendar.startOfDay(for: yesterday), to: yesterdayEnd)
-
-        // Calculer le nouveau streak
-        let storedStreak = HealthDataManager.shared.soberStreak
-        let streak = alcoholYesterday.isEmpty ? storedStreak + 1 : 1
-
-        // Sauvegarder
-        HealthDataManager.shared.setSoberStreak(streak)
-        UserDefaults.standard.set(today, forKey: "last_sober_recalc")
+        guard let streak = streaks.recalculateSoberStreak() else { return }
         achievementManager?.onSoberStreakUpdated(streak: streak)
         objectWillChange.send()
     }
 
-    private func fullScanSoberStreak() -> Int {
-        let calendar = Calendar.current
-        let installDate = calendar.startOfDay(for: firstLaunchDate)
-        let today = calendar.startOfDay(for: Date())
-        let yesterday = calendar.date(byAdding: .day, value: -1, to: today)!
-
-        let allAlcohol = repository.alcohol(from: installDate, to: yesterday)
-        let alcoholDays = Set(allAlcohol.map { calendar.startOfDay(for: $0.date) })
-
-        var streak = 1
-        var checkDate = yesterday
-
-        while checkDate >= installDate {
-            if alcoholDays.contains(checkDate) { break }
-            streak += 1
-            checkDate = calendar.date(byAdding: .day, value: -1, to: checkDate)!
-        }
-
-        return streak
-    }
-
-    var firstLaunchDate: Date {
-        let date = HealthDataManager.shared.firstLaunchDate
-        if date == Date(timeIntervalSince1970: 0) {
-            let now = Date()
-            HealthDataManager.shared.setFirstLaunchDate(now)
-            return now
-        }
-        return date
-    }
+    var firstLaunchDate: Date { streaks.firstLaunchDate }
 
     // MARK: - Reset quotidien
 
@@ -467,30 +380,7 @@ final class AppDataStore: ObservableObject {
     // MARK: - DayRecord
 
     private func updateDayRecord(for date: Date) {
-        let day = Calendar.current.startOfDay(for: date)
-        let dayEnd = Calendar.current.date(byAdding: .day, value: 1, to: day)!
-
-        let netMl: Double
-        if Calendar.current.isDateInToday(date) {
-            let waterRaw = repository.todayWater().reduce(0.0) { $0 + $1.amountMl }
-            let alcoholComp = repository.todayAlcohol().reduce(0.0) { $0 + $1.compensationMl }
-            netMl = max(0, waterRaw - alcoholComp)
-        } else {
-            let waterRaw = repository.water(from: day, to: dayEnd).reduce(0.0) { $0 + $1.amountMl }
-            let alcoholComp = repository.alcohol(from: day, to: dayEnd).reduce(0.0) { $0 + $1.compensationMl }
-            netMl = max(0, waterRaw - alcoholComp)
-        }
-
-        let goalForDay = Calendar.current.isDateInToday(date) ? effectiveGoalMl : dailyGoalMl
-        let reached = netMl >= goalForDay
-
-        if let existing = repository.dayRecord(for: day) {
-            existing.goalReached = reached
-            existing.goalMl = goalForDay
-        } else {
-            let record = DayRecord(date: day, goalMl: goalForDay, goalReached: reached)
-            repository.insert(record)
-        }
+        streaks.upsertDayRecord(for: date, effectiveGoalMl: effectiveGoalMl, dailyGoalMl: dailyGoalMl)
         save()
     }
 
