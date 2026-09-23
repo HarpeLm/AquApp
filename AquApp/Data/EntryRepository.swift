@@ -118,6 +118,15 @@ final class EntryRepository {
         return results.reduce(0.0) { $0 + $1.amountMl }
     }
 
+    func latestAlcoholDate(before date: Date) -> Date? {
+        var descriptor = FetchDescriptor<WaterAlcoholEntry>(
+            predicate: #Predicate { $0.date < date },
+            sortBy: [SortDescriptor(\.date, order: .reverse)]
+        )
+        descriptor.fetchLimit = 1
+        return (try? context.fetch(descriptor))?.first?.date
+    }
+
     func alcoholIntentIDs() -> Set<String> {
         Set(allAlcohol().compactMap(\.siriIntentID))
     }

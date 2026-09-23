@@ -12,7 +12,6 @@ final class WidgetSyncTests: XCTestCase {
     override func setUp() async throws {
         try await super.setUp()
         HealthDataManager.shared.resetForTests()
-        UserDefaults.standard.removeObject(forKey: StreakEngine.lastSoberRecalcKey)
         container = try ModelContainer(
             for: WaterEntry.self, WaterAlcoholEntry.self, DayRecord.self,
             configurations: ModelConfiguration(isStoredInMemoryOnly: true)
@@ -23,7 +22,6 @@ final class WidgetSyncTests: XCTestCase {
     }
 
     override func tearDown() async throws {
-        UserDefaults.standard.removeObject(forKey: StreakEngine.lastSoberRecalcKey)
         store = nil
         container = nil
         try await super.tearDown()

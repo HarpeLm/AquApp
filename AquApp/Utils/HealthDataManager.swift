@@ -39,6 +39,9 @@ final class HealthDataManager: ObservableObject {
 
     @Published private(set) var firstLaunchDate: Date
 
+    /// Jour d'alcool le plus récent parmi les entrées supprimées par le nettoyage non-Premium.
+    private(set) var prunedAlcoholDate: Date?
+
     // MARK: - Progrès succès/défis (dict JSON en Keychain)
 
     @Published private(set) var achievementProgress:  [String: Double]
@@ -81,6 +84,8 @@ final class HealthDataManager: ObservableObject {
             self.firstLaunchDate = Date()
         }
 
+        self.prunedAlcoholDate = km.getDouble(forKey: "pruned_alcohol_date").map { Date(timeIntervalSince1970: $0) }
+
         self.achievementProgress  = Self.loadJSON(key: "ach_progress_dict", km: km) ?? [:]
         self.achievementCompleted = Self.loadJSON(key: "ach_completed_dict", km: km) ?? [:]
         self.challengeCompleted   = Self.loadJSON(key: "completed_dict",     km: km) ?? [:]
@@ -106,6 +111,10 @@ final class HealthDataManager: ObservableObject {
     func setFirstLaunchDate(_ v: Date) {
         km.set(String(v.timeIntervalSince1970), forKey: "aquapp_first_launch_date")
         firstLaunchDate = v
+    }
+    func setPrunedAlcoholDate(_ v: Date) {
+        km.set(v.timeIntervalSince1970, forKey: "pruned_alcohol_date")
+        prunedAlcoholDate = v
     }
 
     // MARK: - Setters totaux cumulatifs (O(1))
@@ -218,6 +227,7 @@ final class HealthDataManager: ObservableObject {
         setCurrentStreak(0); setTotalGoalDays(0); setSoberStreak(0); setXPTotal(0)
         setHeatwaveDays(0); setSoberDaysTotal(0)
         setTotalWaterMl(0); setTotalAlcoholMl(0)
+        km.delete(forKey: "pruned_alcohol_date"); prunedAlcoholDate = nil
         achievementProgress = [:]; achievementCompleted = [:]; challengeCompleted = [:]
         saveJSON(dict: achievementProgress, key: "ach_progress_dict")
         saveJSON(dict: achievementCompleted, key: "ach_completed_dict")

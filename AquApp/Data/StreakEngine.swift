@@ -7,8 +7,6 @@ final class StreakEngine {
     private let repository: EntryRepository
     private let health = HealthDataManager.shared
 
-    static let lastSoberRecalcKey = "last_sober_recalc"
-
     init(repository: EntryRepository) {
         self.repository = repository
     }
@@ -79,51 +77,38 @@ final class StreakEngine {
 
     // MARK: - Série sobre
 
-    /// Nouvelle valeur de la série, ou `nil` si rien n'a changé (déjà recalculée aujourd'hui).
-    func recalculateSoberStreak() -> Int? {
+    /// Jours consécutifs sans alcool, aujourd'hui inclus (0 si alcool aujourd'hui).
+    /// Toujours recalculée depuis les données : idempotente, et supprimer une
+    /// entrée d'alcool restaure la série.
+    @discardableResult
+    func recalculateSoberStreak() -> Int {
+        let streak = computeSoberStreak()
+        health.setSoberStreak(streak)
+        return streak
+    }
+
+    private func computeSoberStreak() -> Int {
+        guard repository.todayAlcohol().isEmpty else { return 0 }
+
         let calendar = Calendar.current
-
-        guard repository.todayAlcohol().isEmpty else {
-            health.setSoberStreak(0)
-            return 0
-        }
-
         let today = calendar.startOfDay(for: Date())
-        if let lastRecalc = UserDefaults.standard.object(forKey: Self.lastSoberRecalcKey) as? Date,
-           calendar.isDate(lastRecalc, inSameDayAs: today) {
-            return nil
-        }
+        let installDay = calendar.startOfDay(for: firstLaunchDate)
+        let daysSinceInstall = max(0, calendar.dateComponents([.day], from: installDay, to: today).day ?? 0) + 1
 
-        let yesterday = calendar.date(byAdding: .day, value: -1, to: today)!
-        let alcoholYesterday = repository.alcohol(from: yesterday, to: today)
-        let streak = alcoholYesterday.isEmpty ? health.soberStreak + 1 : 1
+        let lastAlcohol = [repository.latestAlcoholDate(before: today), health.prunedAlcoholDate]
+            .compactMap { $0 }
+            .max()
+        guard let lastAlcohol else { return daysSinceInstall }
 
-        health.setSoberStreak(streak)
-        UserDefaults.standard.set(today, forKey: Self.lastSoberRecalcKey)
-        return streak
+        let lastAlcoholDay = calendar.startOfDay(for: lastAlcohol)
+        let daysSinceAlcohol = calendar.dateComponents([.day], from: lastAlcoholDay, to: today).day ?? 0
+        return min(daysSinceAlcohol, daysSinceInstall)
     }
 
-    /// Recalcul complet depuis l'historique, utilisé au lancement.
-    func soberStreakAtLaunch() -> Int {
-        let streak = repository.todayAlcohol().isEmpty ? fullScanSoberStreak() : 0
-        health.setSoberStreak(streak)
-        return streak
-    }
-
-    private func fullScanSoberStreak() -> Int {
-        let calendar = Calendar.current
-        let installDate = calendar.startOfDay(for: firstLaunchDate)
-        let yesterday = calendar.date(byAdding: .day, value: -1, to: calendar.startOfDay(for: Date()))!
-
-        let alcoholDays = Set(repository.alcohol(from: installDate, to: yesterday).map { calendar.startOfDay(for: $0.date) })
-
-        var streak = 1
-        var checkDate = yesterday
-        while checkDate >= installDate {
-            if alcoholDays.contains(checkDate) { break }
-            streak += 1
-            checkDate = calendar.date(byAdding: .day, value: -1, to: checkDate)!
-        }
-        return streak
+    /// À appeler avant que le nettoyage non-Premium supprime des entrées d'alcool,
+    /// pour que la série ne remonte pas au-delà du dernier jour bu.
+    func rememberPrunedAlcohol(on date: Date) {
+        guard health.prunedAlcoholDate.map({ date > $0 }) ?? true else { return }
+        health.setPrunedAlcoholDate(date)
     }
 }

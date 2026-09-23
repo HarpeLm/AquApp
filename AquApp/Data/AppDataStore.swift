@@ -40,7 +40,7 @@ final class AppDataStore: ObservableObject {
         self.stats = StatsCalculator(repository: repository)
         self.streaks = StreakEngine(repository: repository)
         bootstrapCumulativeTotals()
-        _ = streaks.soberStreakAtLaunch()
+        streaks.recalculateSoberStreak()
         streaks.recalculateGoalStreak(effectiveGoalMl: effectiveGoalMl)
     }
 
@@ -226,7 +226,8 @@ final class AppDataStore: ObservableObject {
         }
         repository.save()
         streaks.recalculateGoalStreak(effectiveGoalMl: effectiveGoalMl)
-        if alcohol, let sober = streaks.recalculateSoberStreak() {
+        if alcohol {
+            let sober = streaks.recalculateSoberStreak()
             achievementManager?.onSoberStreakUpdated(streak: sober)
         }
         syncWidgetData()
@@ -285,8 +286,8 @@ final class AppDataStore: ObservableObject {
 
     func recalculateSoberStreak() {
         repository.invalidateTodayCache()
-        guard let streak = streaks.recalculateSoberStreak() else { return }
-        achievementManager?.onSoberStreakUpdated(streak: streak)
+        let sober = streaks.recalculateSoberStreak()
+        achievementManager?.onSoberStreakUpdated(streak: sober)
         objectWillChange.send()
     }
 
@@ -370,7 +371,9 @@ final class AppDataStore: ObservableObject {
         guard !isPremiumUser else { return }
         let cutoff = Calendar.current.date(byAdding: .day, value: -30, to: Date())!
         repository.water(to: cutoff).forEach { repository.delete($0) }
-        repository.alcohol(to: cutoff).forEach { repository.delete($0) }
+        let oldAlcohol = repository.alcohol(to: cutoff)
+        if let latest = oldAlcohol.first?.date { streaks.rememberPrunedAlcohol(on: latest) }
+        oldAlcohol.forEach { repository.delete($0) }
         repository.dayRecords(before: cutoff).forEach { repository.delete($0) }
         repository.save()
         recalculateCumulativeTotals()
