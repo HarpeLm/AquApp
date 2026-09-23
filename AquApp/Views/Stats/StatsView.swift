@@ -279,7 +279,6 @@ private struct ChartCard: View {
                 }
                 .background(Color(UIColor.systemGray6))
                 .cornerRadius(10)
-                .fixedSize()
             }
 
             // ── Graphique ─────────────────────────────────────────────────────
@@ -324,6 +323,8 @@ private struct PeriodTab: View {
             HStack(spacing: 3) {
                 Text(period.label)
                     .font(.system(size: 12, weight: isSelected ? .bold : .medium))
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.7)
                     .foregroundColor(
                         isSelected
                             ? .white

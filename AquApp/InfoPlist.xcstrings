@@ -1,0 +1,96 @@
+{
+  "sourceLanguage" : "fr",
+  "strings" : {
+    "NSHealthShareUsageDescription" : {
+      "comment" : "Info.plist NSHealthShareUsageDescription",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "AquApp reads your step and sleep data from the Health app to validate certain challenges (active day, hydrated nights). This data stays on your device and is never shared."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "AquApp lit vos données de pas et de sommeil depuis l'app Santé pour valider certains défis (journée active, nuits hydratées). Ces données restent sur votre appareil et ne sont jamais partagées."
+          }
+        }
+      }
+    },
+    "NSHealthUpdateUsageDescription" : {
+      "comment" : "Info.plist NSHealthUpdateUsageDescription",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "AquApp saves your water intake to Apple Health to keep all your hydration data in one place."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "AquApp enregistre votre consommation d'eau dans Apple Santé pour centraliser vos données d'hydratation."
+          }
+        }
+      }
+    },
+    "NSLocationWhenInUseUsageDescription" : {
+      "comment" : "Info.plist NSLocationWhenInUseUsageDescription",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "AquApp uses your approximate location to detect periods of high heat and automatically adjust your daily hydration goal. No location data is stored or shared."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "AquApp utilise votre position approximative pour détecter les périodes de forte chaleur et adapter automatiquement votre objectif d'hydratation journalier. Aucune donnée de localisation n'est stockée ni partagée."
+          }
+        }
+      }
+    },
+    "NSSiriUsageDescription" : {
+      "comment" : "Info.plist NSSiriUsageDescription",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "AquApp uses Siri to log your water and alcohol intake and check your progress without opening the app."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "AquApp utilise Siri pour enregistrer votre consommation d'eau et d'alcool, et consulter votre progression, sans avoir à ouvrir l'application."
+          }
+        }
+      }
+    },
+    "NSUserNotificationsUsageDescription" : {
+      "comment" : "Info.plist NSUserNotificationsUsageDescription",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "AquApp sends you personalized reminders to help you reach your daily hydration goal."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "AquApp vous envoie des rappels personnalisés pour vous aider à atteindre votre objectif d'hydratation quotidien."
+          }
+        }
+      }
+    }
+  },
+  "version" : "1.1"
+}

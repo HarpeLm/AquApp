@@ -11,10 +11,13 @@ final class AquAppUITests: XCTestCase {
 
     var app: XCUIApplication!
 
+    // Les assertions ciblent des libellés français : on fige la langue quel que soit le simulateur.
+    private let frenchLocale = ["-AppleLanguages", "(fr)", "-AppleLocale", "fr_FR"]
+
     override func setUpWithError() throws {
         continueAfterFailure = false
         app = XCUIApplication()
-        app.launchArguments = ["-uiTestingReady"]
+        app.launchArguments = ["-uiTestingReady"] + frenchLocale
     }
 
     override func tearDownWithError() throws {
@@ -41,7 +44,7 @@ final class AquAppUITests: XCTestCase {
     // MARK: - 1. Lancement frais : onboarding de bout en bout
 
     func test01_LaunchFresh_OnboardingComplet() {
-          app.launchArguments = ["-uiTestingFresh"]
+          app.launchArguments = ["-uiTestingFresh"] + frenchLocale
           app.launch()
 
           // 4 pages swipables
