@@ -5,11 +5,16 @@ import Foundation
 
 // MARK: - AppDataStore
 
+/// Façade unique exposée aux vues : orchestre les mutations et délègue
+/// le stockage (EntryRepository), les stats (StatsCalculator), les séries
+/// (StreakEngine) et le widget (WidgetBridge).
 @MainActor
 final class AppDataStore: ObservableObject {
     private let repository: EntryRepository
     private let stats: StatsCalculator
     private let streaks: StreakEngine
+    private let widget = WidgetBridge()
+
     weak var confettiManager: ConfettiManager?
     weak var achievementManager: AchievementManager?
     weak var challengeManager: ChallengeManager?
@@ -30,21 +35,9 @@ final class AppDataStore: ObservableObject {
         self.stats = StatsCalculator(repository: repository)
         self.streaks = StreakEngine(repository: repository)
         bootstrapCumulativeTotals()
-        fullScanSoberStreakAtLaunch()
+        let sober = streaks.soberStreakAtLaunch()
+        achievementManager?.onSoberStreakUpdated(streak: sober)
         recalculateGoalStreak()
-    }
-
-    /// Recale l'XP eau d'un jour donné sur ses entrées réellement présentes.
-    private func syncWaterXP(for date: Date = Date()) {
-        let day = Calendar.current.startOfDay(for: date)
-        let amounts: [Double]
-        if Calendar.current.isDateInToday(date) {
-            amounts = repository.todayWater().map(\.amountMl)
-        } else {
-            let dayEnd = Calendar.current.date(byAdding: .day, value: 1, to: day)!
-            amounts = repository.water(from: day, to: dayEnd).map(\.amountMl)
-        }
-        xpManager?.syncWaterXP(for: day, amountsMl: amounts)
     }
 
     // MARK: - Bootstrap au lancement
@@ -60,22 +53,14 @@ final class AppDataStore: ObservableObject {
         }
     }
 
-    private func fullScanSoberStreakAtLaunch() {
-        let streak = streaks.soberStreakAtLaunch()
-        achievementManager?.onSoberStreakUpdated(streak: streak)
-    }
-
     public func recalculateCumulativeTotals() {
         if let w = repository.totalWaterMl() { HealthDataManager.shared.setTotalWaterMl(w) }
         if let a = repository.totalAlcoholMl() { HealthDataManager.shared.setTotalAlcoholMl(a) }
     }
 
-    // MARK: - Recalcul des succès au démarrage
-
     func recalculateAllAchievementsFromHistory() {
         guard let am = achievementManager else { return }
-        let totalMl = HealthDataManager.shared.totalWaterMl
-        am.onWaterAdded(totalCumulatedMl: totalMl)
+        am.onWaterAdded(totalCumulatedMl: HealthDataManager.shared.totalWaterMl)
         am.onGoalReached(streak: currentStreak, totalDays: totalGoalDays)
         am.onSoberStreakUpdated(streak: soberDaysStreak)
         let heatwaveDays = HealthDataManager.shared.heatwaveDays
@@ -112,12 +97,10 @@ final class AppDataStore: ObservableObject {
 
     var todayEffectiveGoalMl: Double { effectiveGoalMl }
 
-    // MARK: - Entrées du jour (API publique)
-
     func todayWaterEntries() -> [WaterEntry] { repository.todayWater() }
     func todayAlcoholEntries() -> [WaterAlcoholEntry] { repository.todayAlcohol() }
 
-    // MARK: - Ajout eau
+    // MARK: - Eau
 
     func addWater(amountMl: Double, date: Date = Date()) {
         guard EntryValidation.isValid(amountMl: amountMl) else {
@@ -128,8 +111,7 @@ final class AppDataStore: ObservableObject {
         let wasGoalReached = todayGoalReached
         let entry = WaterEntry(amountMl: amountMl, date: date)
         repository.insert(entry)
-
-        guard save() else {
+        guard repository.save() else {
             repository.rollback()
             return
         }
@@ -137,9 +119,7 @@ final class AppDataStore: ObservableObject {
         // Seulement APRÈS succès SwiftData
         HealthDataManager.shared.addWaterMl(amountMl)
         HealthKitWriter.shared.write(amountMl: amountMl, date: date, entryID: entry.id)
-        syncWaterXP(for: date)
-        updateDayRecord(for: date)
-        recalculateGoalStreak()
+        didChangeEntries(on: [date], water: true, alcohol: false)
 
         if !wasGoalReached && todayGoalReached {
             HapticManager.shared.goalReached()
@@ -176,27 +156,22 @@ final class AppDataStore: ObservableObject {
                 )
             }
         }
-
-        objectWillChange.send()
     }
 
     func deleteWater(_ entry: WaterEntry) {
+        let (id, date, amount) = (entry.id, entry.date, entry.amountMl)
         repository.delete(entry)
-
-        guard save() else {
+        guard repository.save() else {
             repository.rollback()
             return
         }
 
-        HealthKitWriter.shared.delete(entryID: entry.id, date: entry.date)
-        HealthDataManager.shared.addWaterMl(-entry.amountMl)
-        syncWaterXP(for: entry.date)
-        updateDayRecord(for: entry.date)
-        recalculateGoalStreak()
-        objectWillChange.send()
+        HealthKitWriter.shared.delete(entryID: id, date: date)
+        HealthDataManager.shared.addWaterMl(-amount)
+        didChangeEntries(on: [date], water: true, alcohol: false)
     }
 
-    // MARK: - Ajout alcool
+    // MARK: - Alcool
 
     func addAlcohol(amountMl: Double, type: AlcoholKind, date: Date = Date()) {
         guard EntryValidation.isValid(amountMl: amountMl) else {
@@ -204,40 +179,66 @@ final class AppDataStore: ObservableObject {
             return
         }
 
-        let entry = WaterAlcoholEntry(amountMl: amountMl, alcoholType: type, date: date)
-        repository.insert(entry)
-
-        guard save() else {
+        repository.insert(WaterAlcoholEntry(amountMl: amountMl, alcoholType: type, date: date))
+        guard repository.save() else {
             repository.rollback()
             return
         }
 
         HealthDataManager.shared.addAlcoholMl(amountMl)
-        updateDayRecord(for: date)
-        recalculateSoberStreak()
-        challengeManager?.onAlcoholUpdated(
-            alcoholCount: repository.todayAlcohol().count,
-            dailyGoalReached: todayGoalReached
-        )
-        objectWillChange.send()
+        didChangeEntries(on: [date], water: false, alcohol: true)
+        notifyChallengesOfAlcohol()
     }
 
     func deleteAlcohol(_ entry: WaterAlcoholEntry) {
+        let (date, amount) = (entry.date, entry.amountMl)
         repository.delete(entry)
-
-        guard save() else {
+        guard repository.save() else {
             repository.rollback()
             return
         }
 
-        HealthDataManager.shared.addAlcoholMl(-entry.amountMl)
-        updateDayRecord(for: entry.date)
-        recalculateSoberStreak()
+        HealthDataManager.shared.addAlcoholMl(-amount)
+        didChangeEntries(on: [date], water: false, alcohol: true)
+        notifyChallengesOfAlcohol()
+    }
+
+    private func notifyChallengesOfAlcohol() {
         challengeManager?.onAlcoholUpdated(
             alcoholCount: repository.todayAlcohol().count,
             dailyGoalReached: todayGoalReached
         )
+    }
+
+    // MARK: - Pipeline commun aux mutations
+
+    /// À appeler après toute écriture d'entrées déjà sauvegardée : met à jour XP,
+    /// DayRecord et séries, puis synchronise le widget une seule fois avec des valeurs à jour.
+    private func didChangeEntries(on dates: Set<Date>, water: Bool, alcohol: Bool) {
+        let days = Set(dates.map { Calendar.current.startOfDay(for: $0) })
+        for day in days {
+            if water { syncWaterXP(for: day) }
+            streaks.upsertDayRecord(for: day, effectiveGoalMl: effectiveGoalMl, dailyGoalMl: dailyGoalMl)
+        }
+        repository.save()
+        streaks.recalculateGoalStreak(effectiveGoalMl: effectiveGoalMl)
+        if alcohol, let sober = streaks.recalculateSoberStreak() {
+            achievementManager?.onSoberStreakUpdated(streak: sober)
+        }
+        syncWidgetData()
         objectWillChange.send()
+    }
+
+    /// Recale l'XP eau d'un jour donné sur ses entrées réellement présentes.
+    private func syncWaterXP(for day: Date) {
+        let amounts: [Double]
+        if Calendar.current.isDateInToday(day) {
+            amounts = repository.todayWater().map(\.amountMl)
+        } else {
+            let (start, end) = EntryRepository.dayRange(containing: day)
+            amounts = repository.water(from: start, to: end).map(\.amountMl)
+        }
+        xpManager?.syncWaterXP(for: day, amountsMl: amounts)
     }
 
     // MARK: - Statistiques (déléguées à StatsCalculator)
@@ -260,25 +261,16 @@ final class AppDataStore: ObservableObject {
     var totalWaterLiters: Double { HealthDataManager.shared.totalWaterMl / 1000.0 }
     var totalAlcoholLiters: Double { HealthDataManager.shared.totalAlcoholMl / 1000.0 }
 
-    // MARK: - Goal streak
+    // MARK: - Séries (déléguées à StreakEngine)
 
-    var currentStreak: Int {
-        HealthDataManager.shared.currentStreak
-    }
-
-    var totalGoalDays: Int {
-        HealthDataManager.shared.totalGoalDays
-    }
+    var currentStreak: Int { HealthDataManager.shared.currentStreak }
+    var totalGoalDays: Int { HealthDataManager.shared.totalGoalDays }
+    var soberDaysStreak: Int { HealthDataManager.shared.soberStreak }
+    var firstLaunchDate: Date { streaks.firstLaunchDate }
 
     func recalculateGoalStreak() {
         streaks.recalculateGoalStreak(effectiveGoalMl: effectiveGoalMl)
         objectWillChange.send()
-    }
-
-    // MARK: - Sober streak
-
-    var soberDaysStreak: Int {
-        HealthDataManager.shared.soberStreak
     }
 
     func recalculateSoberStreak() {
@@ -287,68 +279,64 @@ final class AppDataStore: ObservableObject {
         objectWillChange.send()
     }
 
-    var firstLaunchDate: Date { streaks.firstLaunchDate }
+    func fetchDayRecord(for day: Date) -> DayRecord? {
+        repository.dayRecord(for: day)
+    }
 
-    // MARK: - Reset quotidien
+    // MARK: - Widget
 
     func flushWidgetPendingEntries() {
-        guard let defaults = UserDefaults(suiteName: "group.com.fabian.dargaud.AquApp") else { return }
-        let pending = defaults.array(forKey: "widget_pending_entries") as? [[String: Any]] ?? []
+        let pending = widget.drainPendingEntries()
         guard !pending.isEmpty else { return }
-
-        defaults.removeObject(forKey: "widget_pending_entries")
 
         let existingWaterIDs = repository.waterIntentIDs()
         let existingAlcoholIDs = repository.alcoholIntentIDs()
-
         var datesAffected: Set<Date> = []
-        var needsSoberRecalc = false
+        var alcoholAdded = false
 
         for entry in pending {
-            guard
-                let amount = entry["amountMl"] as? Double,
-                let timestamp = entry["timestamp"] as? TimeInterval
-            else { continue }
-
-            guard EntryValidation.isValid(amountMl: amount) else {
-                print("⚠️ flushWidgetPendingEntries — entrée rejetée, amountMl invalide: \(amount)")
-                continue
-            }
-            guard EntryValidation.isValid(timestamp: timestamp) else {
-                print("⚠️ flushWidgetPendingEntries — entrée rejetée, timestamp invalide: \(timestamp)")
-                continue
-            }
-
-            let date = Date(timeIntervalSince1970: timestamp)
-            let intentID = entry["siriIntentID"] as? String
-            let isAlcohol = entry["isAlcohol"] as? Bool ?? false
-
-            if isAlcohol {
-                if let id = intentID, existingAlcoholIDs.contains(id) { continue }
-                let kindRaw = entry["alcoholKindRaw"] as? String ?? AlcoholKind.other.rawValue
-                let kind = AlcoholKind.migratedAlcoholKind(from: kindRaw)
-                let alcoholEntry = WaterAlcoholEntry(amountMl: amount, alcoholType: kind, date: date, siriIntentID: intentID)
-                repository.insert(alcoholEntry)
-                HealthDataManager.shared.addAlcoholMl(amount)
-                needsSoberRecalc = true
+            if let kind = entry.alcoholKind {
+                if let id = entry.siriIntentID, existingAlcoholIDs.contains(id) { continue }
+                repository.insert(WaterAlcoholEntry(amountMl: entry.amountMl, alcoholType: kind,
+                                                     date: entry.date, siriIntentID: entry.siriIntentID))
+                HealthDataManager.shared.addAlcoholMl(entry.amountMl)
+                alcoholAdded = true
             } else {
-                if let id = intentID, existingWaterIDs.contains(id) { continue }
-                let waterEntry = WaterEntry(amountMl: amount, date: date, siriIntentID: intentID)
+                if let id = entry.siriIntentID, existingWaterIDs.contains(id) { continue }
+                let waterEntry = WaterEntry(amountMl: entry.amountMl, date: entry.date, siriIntentID: entry.siriIntentID)
                 repository.insert(waterEntry)
-                HealthDataManager.shared.addWaterMl(amount)
-                HealthKitWriter.shared.write(amountMl: amount, date: date, entryID: waterEntry.id)
+                HealthDataManager.shared.addWaterMl(entry.amountMl)
+                HealthKitWriter.shared.write(amountMl: entry.amountMl, date: entry.date, entryID: waterEntry.id)
             }
-
-            datesAffected.insert(Calendar.current.startOfDay(for: date))
+            datesAffected.insert(entry.date)
         }
 
-        save()
-        for day in datesAffected { syncWaterXP(for: day) }
-        for day in datesAffected { updateDayRecord(for: day) }
-        recalculateGoalStreak()
-        if needsSoberRecalc { recalculateSoberStreak() }
-        objectWillChange.send()
+        repository.save()
+        didChangeEntries(on: datesAffected, water: true, alcohol: alcoholAdded)
     }
+
+    func syncWidgetData() {
+        let week = stats.dailyTotals(lastDays: 7).enumerated().map { offset, total in
+            WidgetDay(
+                date: total.date,
+                netMl: total.netMl,
+                goalReached: offset == 0
+                    ? todayGoalReached
+                    : repository.dayRecord(for: total.dayStart)?.goalReached ?? false
+            )
+        }
+        widget.write(WidgetSnapshot(
+            todayMl: todayWaterMl,
+            goalMl: effectiveGoalMl,
+            dailyGoalMl: dailyGoalMl,
+            streak: currentStreak,
+            soberStreak: soberDaysStreak,
+            activeDays: activeDaysTotal,
+            week: week
+        ))
+    }
+
+    // MARK: - Reset quotidien
 
     func performMidnightReset() {
         repository.invalidateTodayCache()
@@ -373,73 +361,8 @@ final class AppDataStore: ObservableObject {
         repository.water(to: cutoff).forEach { repository.delete($0) }
         repository.alcohol(to: cutoff).forEach { repository.delete($0) }
         repository.dayRecords(before: cutoff).forEach { repository.delete($0) }
-        save()
+        repository.save()
         recalculateCumulativeTotals()
-    }
-
-    // MARK: - DayRecord
-
-    private func updateDayRecord(for date: Date) {
-        streaks.upsertDayRecord(for: date, effectiveGoalMl: effectiveGoalMl, dailyGoalMl: dailyGoalMl)
-        save()
-    }
-
-    func fetchDayRecord(for day: Date) -> DayRecord? {
-        repository.dayRecord(for: day)
-    }
-
-    // MARK: - Save
-
-    @discardableResult
-    private func save() -> Bool {
-        guard repository.save() else { return false }
         syncWidgetData()
-        return true
-    }
-
-    // MARK: - Widget Data Sync
-
-    func syncWidgetData() {
-        guard let defaults = UserDefaults(suiteName: "group.com.fabian.dargaud.AquApp") else {
-            print("syncWidgetData — App Group introuvable.")
-            return
-        }
-
-        defaults.set(todayWaterMl, forKey: "widget_today_ml")
-        defaults.set(effectiveGoalMl, forKey: "widget_goal_ml")
-        defaults.set(currentStreak, forKey: "widget_streak")
-        defaults.set(soberDaysStreak, forKey: "widget_sober_streak")
-        defaults.set(activeDaysTotal, forKey: "widget_active_days")
-        defaults.set(dailyGoalMl, forKey: "widget_daily_goal_ml")
-
-        let formatter = StatsCalculator.weekdayFormatter
-        var weekData: [[String: Any]] = []
-
-        for (offset, total) in stats.dailyTotals(lastDays: 7).enumerated() {
-            let date = total.date
-            let netMl = total.netMl
-            let reached = offset == 0
-                ? todayGoalReached
-                : repository.dayRecord(for: total.dayStart)?.goalReached ?? false
-            let label = String(formatter.string(from: date).prefix(1).uppercased())
-
-            weekData.append([
-                "label": label,
-                "ml": netMl,
-                "goalReached": reached,
-                "offset": offset
-            ])
-
-            if offset >= 1 && offset <= 3 {
-                let legacyLabel = String(formatter.string(from: date).prefix(3).capitalized)
-                defaults.set(legacyLabel, forKey: "widget_day\(offset)_label")
-                defaults.set(netMl, forKey: "widget_day\(offset)_ml")
-                defaults.set(reached, forKey: "widget_day\(offset)_goalReached")
-            }
-        }
-
-        if let data = try? JSONSerialization.data(withJSONObject: weekData) {
-            defaults.set(data, forKey: "widget_week_data")
-        }
     }
 }
