@@ -131,10 +131,10 @@ struct AddAlcoolSheet: View {
                     Text(showHistory
                          ? String(localized: "alcohol.history_title")
                          : String(localized: "alcohol.sheet.title"))
-                        .font(.system(size: 22, weight: .bold))
+                        .scaledFont(size: 22, weight: .bold)
                         .accessibilityAddTraits(.isHeader)
                     Image(systemName: showHistory ? "clock.arrow.circlepath" : "wineglass.fill")
-                        .font(.system(size: 20))
+                        .scaledFont(size: 20)
                         .foregroundColor(Color.app.alcoholLight)
                         .accessibilityHidden(true)
                 }
@@ -148,18 +148,18 @@ struct AddAlcoolSheet: View {
                 } label: {
                     HStack(spacing: 6) {
                         Image(systemName: showHistory ? "arrow.left" : "clock.arrow.circlepath")
-                            .font(.system(size: 13, weight: .semibold))
+                            .scaledFont(size: 13, weight: .semibold)
                         if !showHistory {
                             if !todayDisplayEntries.isEmpty {
                                 Text("\(todayDisplayEntries.count)")
-                                    .font(.system(size: 12, weight: .bold))
+                                    .scaledFont(size: 12, weight: .bold)
                             } else {
                                 Text(String(localized: "alcohol.history_button"))
-                                    .font(.system(size: 12, weight: .semibold))
+                                    .scaledFont(size: 12, weight: .semibold)
                             }
                         } else {
                             Text(String(localized: "alcohol.back_button"))
-                                .font(.system(size: 12, weight: .semibold))
+                                .scaledFont(size: 12, weight: .semibold)
                         }
                     }
                     .foregroundColor(showHistory ? .white : Color.app.alcoholLight)
@@ -177,7 +177,7 @@ struct AddAlcoolSheet: View {
                     ZStack {
                         Circle().fill(Color(UIColor.systemGray5)).frame(width: 32, height: 32)
                         Image(systemName: "xmark")
-                            .font(.system(size: 12, weight: .bold))
+                            .scaledFont(size: 12, weight: .bold)
                             .foregroundColor(.secondary)
                             .accessibilityHidden(true)
                     }
@@ -206,14 +206,14 @@ struct AddAlcoolSheet: View {
                         ZStack {
                             Circle().fill(Color.app.alcoholPale).frame(width: 72, height: 72)
                             Image(systemName: "wineglass")
-                                .font(.system(size: 32))
+                                .scaledFont(size: 32)
                                 .foregroundColor(Color.app.alcoholLight.opacity(0.5))
                         }
                         .accessibilityHidden(true)
                         Text(String(localized: "alcohol.no_entries"))
-                            .font(.system(size: 17, weight: .semibold))
+                            .scaledFont(size: 17, weight: .semibold)
                         Text(String(localized: "alcohol.no_entries_sub"))
-                            .font(.system(size: 14))
+                            .scaledFont(size: 14)
                             .foregroundColor(.secondary)
                     }
                     .frame(maxWidth: .infinity).padding(.vertical, 48)
@@ -221,10 +221,10 @@ struct AddAlcoolSheet: View {
                     HStack(spacing: 12) {
                         VStack(spacing: 4) {
                             Text(UnitFormatter.volume(totalVolumeTodayMl))
-                                .font(.system(size: 20, weight: .bold))
+                                .scaledFont(size: 20, weight: .bold)
                                 .foregroundColor(Color.app.alcoholLight)
                             Text(String(localized: "alcohol.total_volume"))
-                                .font(.system(size: 12)).foregroundColor(.secondary)
+                                .scaledFont(size: 12).foregroundColor(.secondary)
                         }
                         .frame(maxWidth: .infinity).padding(.vertical, 12)
                         .background(Color.app.alcoholLight.opacity(0.08)).cornerRadius(12)
@@ -232,9 +232,9 @@ struct AddAlcoolSheet: View {
 
                         VStack(spacing: 4) {
                             Text(UnitFormatter.volume(totalCompensationTodayMl))
-                                .font(.system(size: 20, weight: .bold)).foregroundColor(.orange)
+                                .scaledFont(size: 20, weight: .bold).foregroundColor(.orange)
                             Text(String(localized: "alcohol.to_compensate"))
-                                .font(.system(size: 12)).foregroundColor(.secondary)
+                                .scaledFont(size: 12).foregroundColor(.secondary)
                         }
                         .frame(maxWidth: .infinity).padding(.vertical, 12)
                         .background(Color.orange.opacity(0.08)).cornerRadius(12)
@@ -248,12 +248,12 @@ struct AddAlcoolSheet: View {
                                 ZStack {
                                     Circle().fill(Color.app.alcoholPale).frame(width: 40, height: 40)
                                     Image(systemName: entry.sfSymbol)
-                                        .font(.system(size: 16)).foregroundColor(Color.app.alcoholLight)
+                                        .scaledFont(size: 16).foregroundColor(Color.app.alcoholLight)
                                 }
                                 .accessibilityHidden(true)
                                 VStack(alignment: .leading, spacing: 2) {
-                                    Text(entry.drinkName).font(.system(size: 15, weight: .semibold))
-                                    Text(UnitFormatter.volume(entry.volumeMl)).font(.system(size: 13)).foregroundColor(.secondary)
+                                    Text(entry.drinkName).scaledFont(size: 15, weight: .semibold)
+                                    Text(UnitFormatter.volume(entry.volumeMl)).scaledFont(size: 13).foregroundColor(.secondary)
                                 }
                                 .accessibilityElement(children: .combine)
                                 Spacer()
@@ -262,7 +262,7 @@ struct AddAlcoolSheet: View {
                                     HapticManager.shared.entryDeleted()
                                 } label: {
                                     Image(systemName: "trash")
-                                        .font(.system(size: 14))
+                                        .scaledFont(size: 14)
                                         .foregroundColor(.red.opacity(0.6)).padding(10)
                                 }
                                 .accessibilityLabel(String(format: String(localized: "accessibility.delete_entry"),
@@ -289,7 +289,7 @@ struct AddAlcoolSheet: View {
                     HStack(spacing: 8) {
                         Image(systemName: "checkmark.circle.fill").foregroundColor(.green)
                             .accessibilityHidden(true)
-                        Text(feedback).font(.system(size: 13, weight: .medium)).foregroundColor(.primary)
+                        Text(feedback).scaledFont(size: 13, weight: .medium).foregroundColor(.primary)
                     }
                     .padding(12).frame(maxWidth: .infinity, alignment: .leading)
                     .background(Color.app.card).cornerRadius(12)
@@ -302,11 +302,11 @@ struct AddAlcoolSheet: View {
                 VStack(alignment: .leading, spacing: 10) {
                     HStack(spacing: 8) {
                         Image(systemName: "exclamationmark.triangle.fill")
-                            .font(.system(size: 15))
+                            .scaledFont(size: 15)
                             .foregroundColor(Color(hex: "F59E0B"))
                             .accessibilityHidden(true)
                         Text(String(localized: "alcohol.warning.title"))
-                            .font(.system(size: 14, weight: .bold))
+                            .scaledFont(size: 14, weight: .bold)
                             .foregroundColor(Color(hex: "92400E"))
                             .accessibilityAddTraits(.isHeader)
                     }
@@ -363,10 +363,10 @@ struct AddAlcoolSheet: View {
                         HStack {
                             Image(systemName: "plus.circle.fill").foregroundColor(Color.app.primary)
                             Text(String(localized: "alcohol.add_custom"))
-                                .font(.system(size: 15, weight: .semibold)).foregroundColor(.primary)
+                                .scaledFont(size: 15, weight: .semibold).foregroundColor(.primary)
                             Spacer()
                             Image(systemName: showCustomForm ? "chevron.up" : "chevron.down")
-                                .font(.system(size: 13)).foregroundColor(.secondary)
+                                .scaledFont(size: 13).foregroundColor(.secondary)
                         }
                         .padding(16).background(Color.app.card).cornerRadius(14)
                         .shadow(color: .black.opacity(0.05), radius: 6, x: 0, y: 2)
@@ -376,7 +376,7 @@ struct AddAlcoolSheet: View {
                         VStack(spacing: 14) {
                             VStack(alignment: .leading, spacing: 6) {
                                 Text(String(localized: "alcohol.custom.name_label"))
-                                    .font(.system(size: 13, weight: .semibold)).foregroundColor(.secondary)
+                                    .scaledFont(size: 13, weight: .semibold).foregroundColor(.secondary)
                                 TextField(String(localized: "alcohol.custom.name_placeholder"), text: $customName)
                                     .focused($focusedField, equals: .name)
                                     .padding(12).background(Color(UIColor.systemGray6)).cornerRadius(10)
@@ -384,7 +384,7 @@ struct AddAlcoolSheet: View {
                             }
                             VStack(alignment: .leading, spacing: 6) {
                                 Text(String(localized: "alcohol.custom.abv_label"))
-                                    .font(.system(size: 13, weight: .semibold)).foregroundColor(.secondary)
+                                    .scaledFont(size: 13, weight: .semibold).foregroundColor(.secondary)
                                 TextField(String(localized: "alcohol.custom.abv_placeholder"), text: $customAlcohol)
                                     .keyboardType(.decimalPad)
                                     .focused($focusedField, equals: .alcohol)
@@ -393,7 +393,7 @@ struct AddAlcoolSheet: View {
                             }
                             Button { saveCustomDrink() } label: {
                                 Text(String(localized: "alcohol.custom.save"))
-                                    .font(.system(size: 15, weight: .semibold)).foregroundColor(.white)
+                                    .scaledFont(size: 15, weight: .semibold).foregroundColor(.white)
                                     .frame(maxWidth: .infinity).frame(height: 46)
                                     .background(isCustomFormValid
                                                 ? AnyShapeStyle(LinearGradient(
@@ -485,17 +485,17 @@ struct DrinkRow: View {
                         RoundedRectangle(cornerRadius: 10)
                             .fill(drink.symbolColor.opacity(0.12)).frame(width: 44, height: 44)
                         Image(systemName: drink.sfSymbol)
-                            .font(.system(size: 18, weight: .medium)).foregroundColor(drink.symbolColor)
+                            .scaledFont(size: 18, weight: .medium).foregroundColor(drink.symbolColor)
                     }
                     .accessibilityHidden(true)
                     VStack(alignment: .leading, spacing: 2) {
-                        Text(drink.name).font(.system(size: 15, weight: .semibold)).foregroundColor(.primary)
+                        Text(drink.name).scaledFont(size: 15, weight: .semibold).foregroundColor(.primary)
                         Text(String(format: String(localized: "alcohol.abv_label"), Int(drink.alcoholPercent)))
-                            .font(.system(size: 12)).foregroundColor(.secondary)
+                            .scaledFont(size: 12).foregroundColor(.secondary)
                     }
                     Spacer()
                     Image(systemName: isExpanded ? "chevron.up" : "chevron.down")
-                        .font(.system(size: 13)).foregroundColor(.secondary)
+                        .scaledFont(size: 13).foregroundColor(.secondary)
                         .accessibilityHidden(true)
                 }
                 .padding(16)
@@ -514,11 +514,11 @@ struct DrinkRow: View {
                             Button { onAdd(preset.ml) } label: {
                                 VStack(spacing: 2) {
                                     Text(preset.label)
-                                        .font(.system(size: 13, weight: .semibold)).foregroundColor(.primary)
+                                        .scaledFont(size: 13, weight: .semibold).foregroundColor(.primary)
                                     Text(drink.compensationLabel(for: preset.ml))
-                                        .font(.system(size: 11, weight: .medium)).foregroundColor(.orange.opacity(0.8))
+                                        .scaledFont(size: 11, weight: .medium).foregroundColor(.orange.opacity(0.8))
                                     Text(preset.sublabel)
-                                        .font(.system(size: 10)).foregroundColor(.secondary)
+                                        .scaledFont(size: 10).foregroundColor(.secondary)
                                 }
                                 .frame(maxWidth: .infinity).padding(.vertical, 10)
                                 .background(Color(UIColor.systemGray6)).cornerRadius(10)
@@ -552,16 +552,16 @@ struct CustomQuantityRow: View {
         HStack(spacing: 10) {
             TextField(UnitFormatter.volumePlaceholder, text: $customMl)
                 .keyboardType(.numberPad).focused($isFocused)
-                .padding(10).background(Color(UIColor.systemGray6)).cornerRadius(10).font(.system(size: 14))
+                .padding(10).background(Color(UIColor.systemGray6)).cornerRadius(10).scaledFont(size: 14)
                 .withDoneButton() // ← BOUTON "TERMINÉ" AJOUTÉ
                 .accessibilityLabel(String(localized: "water.custom_quantity"))
 
             if let ml = Double(customMl), ml > 0 {
                 VStack(spacing: 1) {
                     Text(drink.compensationLabel(for: ml))
-                        .font(.system(size: 11, weight: .bold)).foregroundColor(.orange)
+                        .scaledFont(size: 11, weight: .bold).foregroundColor(.orange)
                     Text(String(localized: "alcohol.to_compensate_short"))
-                        .font(.system(size: 10)).foregroundColor(.secondary)
+                        .scaledFont(size: 10).foregroundColor(.secondary)
                 }
             }
 
@@ -580,7 +580,7 @@ struct CustomQuantityRow: View {
                                 colors: [Color.app.alcoholMid, Color.app.alcoholDark],
                                 startPoint: .topLeading, endPoint: .bottomTrailing)))
                         .frame(width: 44, height: 44)
-                    Image(systemName: "plus").font(.system(size: 18, weight: .bold)).foregroundColor(.white)
+                    Image(systemName: "plus").scaledFont(size: 18, weight: .bold).foregroundColor(.white)
                 }
             }
             .disabled(customMl.isEmpty)
@@ -598,13 +598,13 @@ private struct WarningRow: View {
     var body: some View {
         HStack(alignment: .top, spacing: 8) {
             Image(systemName: symbol)
-                .font(.system(size: 11, weight: .semibold))
+                .scaledFont(size: 11, weight: .semibold)
                 .foregroundColor(color)
                 .frame(width: 16)
                 .padding(.top, 1)
                 .accessibilityHidden(true)
             Text(text)
-                .font(.system(size: 12))
+                .scaledFont(size: 12)
                 .foregroundColor(Color(hex: "92400E"))
                 .fixedSize(horizontal: false, vertical: true)
         }

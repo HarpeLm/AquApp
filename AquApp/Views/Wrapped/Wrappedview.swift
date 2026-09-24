@@ -103,7 +103,7 @@ struct WrappedView: View {
                     isPresented = false
                 } label: {
                     Image(systemName: "xmark")
-                        .font(.system(size: 14, weight: .bold))
+                        .scaledFont(size: 14, weight: .bold)
                         .foregroundColor(.white.opacity(0.6))
                         .padding(14)
                         .background(Color.white.opacity(0.08))
@@ -134,7 +134,7 @@ struct WrappedView: View {
                         navigateTo(index)
                     } label: {
                         Text(theme.label)
-                            .font(.system(size: 10, weight: index == currentSlide ? .bold : .regular))
+                            .scaledFont(size: 10, weight: index == currentSlide ? .bold : .regular)
                             .foregroundColor(index == currentSlide ? .white : .white.opacity(0.3))
                             .padding(.horizontal, 9)
                             .padding(.vertical, 4)
@@ -379,7 +379,7 @@ struct WrappedDropletCounter: View {
             ZStack {
                 ForEach(Array(droplets.enumerated()), id: \.element.id) { index, droplet in
                     Image(systemName: "drop.fill")
-                        .font(.system(size: 14))
+                        .scaledFont(size: 14)
                         .foregroundColor(Color.app.primary)
                         .offset(y: droplet.fallen ? 30 : -30)
                         .opacity(droplet.fallen ? 0 : 1)
@@ -390,7 +390,7 @@ struct WrappedDropletCounter: View {
 
             // Compteur XP qui s'incrémente goutte par goutte
             Text("\(displayedXP.formatted()) XP")
-                .font(.system(size: 52, weight: .black, design: .rounded))
+                .scaledFont(size: 52, weight: .black, design: .rounded)
                 .foregroundColor(.white)
                 .monospacedDigit()
         }
@@ -463,28 +463,28 @@ struct WrappedIntroSlide: View {
         ) {
             VStack(spacing: 14) {
                 Image(systemName: "drop.fill")
-                    .font(.system(size: 56))
+                    .scaledFont(size: 56)
                     .foregroundColor(Color.app.primary)
 
                 Text("AQUAPP")
-                    .font(.system(size: 12, weight: .bold))
+                    .scaledFont(size: 12, weight: .bold)
                     .foregroundColor(Color.app.primary)
                     .kerning(3)
 
                 Text(String(format: String(localized: "wrapped.intro.title"), data.year))
-                    .font(.system(size: 36, weight: .black))
+                    .scaledFont(size: 36, weight: .black)
                     .foregroundColor(.white)
                     .multilineTextAlignment(.center)
                     .lineSpacing(2)
                     .padding(.top, 4)
 
                 Text(String(format: String(localized: "wrapped.intro.subtitle"), data.userName))
-                    .font(.system(size: 15))
+                    .scaledFont(size: 15)
                     .foregroundColor(.white.opacity(0.5))
                     .padding(.top, 6)
 
                 Text(String(localized: "wrapped.intro.cta"))
-                    .font(.system(size: 13, weight: .bold))
+                    .scaledFont(size: 13, weight: .bold)
                     .foregroundColor(.white)
                     .padding(.horizontal, 24)
                     .padding(.vertical, 10)
@@ -512,17 +512,17 @@ struct WrappedVolumeSlide: View {
         ) {
             VStack(spacing: 10) {
                 Text(String(localized: "wrapped.volume.eyebrow"))
-                    .font(.system(size: 12, weight: .bold))
+                    .scaledFont(size: 12, weight: .bold)
                     .foregroundColor(Color.app.primary)
                     .kerning(3)
 
                 Text(String(localized: "wrapped.volume.lead"))
-                    .font(.system(size: 13))
+                    .scaledFont(size: 13)
                     .foregroundColor(.white.opacity(0.4))
                     .padding(.bottom, 18)
 
                 Image(systemName: "drop.fill")
-                    .font(.system(size: 36))
+                    .scaledFont(size: 36)
                     .foregroundColor(Color.app.primary.opacity(0.3))
 
                 WrappedRevealText(
@@ -533,16 +533,16 @@ struct WrappedVolumeSlide: View {
                 .monospacedDigit()
 
                 Text(String(localized: "wrapped.volume.unit"))
-                    .font(.system(size: 24, weight: .bold))
+                    .scaledFont(size: 24, weight: .bold)
                     .foregroundColor(Color.app.primary)
                     .padding(.bottom, 18)
 
                 VStack(spacing: 2) {
                     Text("\(data.totalGlasses.formatted())")
-                        .font(.system(size: 22, weight: .black, design: .rounded))
+                        .scaledFont(size: 22, weight: .black, design: .rounded)
                         .foregroundColor(.white)
                     Text(String(localized: "wrapped.volume.glasses"))
-                        .font(.system(size: 12))
+                        .scaledFont(size: 12)
                         .foregroundColor(.white.opacity(0.45))
                 }
                 .padding(.vertical, 12)
@@ -555,7 +555,7 @@ struct WrappedVolumeSlide: View {
                 .clipShape(RoundedRectangle(cornerRadius: 16))
 
                 Text(String(format: String(localized: "wrapped.volume.avg"), data.avgDailyMl / 1000.0))
-                    .font(.system(size: 12))
+                    .scaledFont(size: 12)
                     .foregroundColor(.white.opacity(0.3))
                     .padding(.top, 14)
             }
@@ -578,7 +578,7 @@ struct WrappedStreakSlide: View {
         ) {
             VStack(spacing: 16) {
                 Text(String(localized: "wrapped.streak.eyebrow"))
-                    .font(.system(size: 12, weight: .bold))
+                    .scaledFont(size: 12, weight: .bold)
                     .foregroundColor(Color.app.alcoholLight)
                     .kerning(3)
 
@@ -598,10 +598,10 @@ struct WrappedStreakSlide: View {
                         .animation(.easeOut(duration: 1.0), value: active)
                     VStack(spacing: 2) {
                         Text("\(Int(pct * 100))%")
-                            .font(.system(size: 28, weight: .black))
+                            .scaledFont(size: 28, weight: .black)
                             .foregroundColor(.white)
                         Text(String(localized: "wrapped.streak.ofyear"))
-                            .font(.system(size: 9))
+                            .scaledFont(size: 9)
                             .foregroundColor(.white.opacity(0.4))
                     }
                 }
@@ -613,18 +613,18 @@ struct WrappedStreakSlide: View {
                 )
 
                 Text(String(localized: "wrapped.streak.goaldays"))
-                    .font(.system(size: 15, weight: .semibold))
+                    .scaledFont(size: 15, weight: .semibold)
                     .foregroundColor(Color.app.alcoholLight)
 
                 HStack(spacing: 10) {
                     Image(systemName: "flame.fill")
-                        .font(.system(size: 22))
+                        .scaledFont(size: 22)
                     VStack(alignment: .leading, spacing: 1) {
                         Text(String(format: String(localized: "wrapped.streak.best"), data.bestStreak))
-                            .font(.system(size: 17, weight: .bold))
+                            .scaledFont(size: 17, weight: .bold)
                             .foregroundColor(Color.app.premiumGold)
                         Text(String(localized: "wrapped.streak.best_label"))
-                            .font(.system(size: 11))
+                            .scaledFont(size: 11)
                             .foregroundColor(.white.opacity(0.4))
                     }
                 }
@@ -656,13 +656,13 @@ struct WrappedSoberSlide: View {
         ) {
             VStack(spacing: 10) {
                 Text(String(localized: "wrapped.sober.eyebrow"))
-                    .font(.system(size: 12, weight: .bold))
+                    .scaledFont(size: 12, weight: .bold)
                     .foregroundColor(Color.app.greenDark)
                     .kerning(3)
                     .padding(.bottom, 14)
 
                 Image(systemName: "leaf.fill")
-                    .font(.system(size: 56))
+                    .scaledFont(size: 56)
                     .foregroundColor(Color.app.greenDark)
 
                 WrappedCountUpText(
@@ -672,26 +672,26 @@ struct WrappedSoberSlide: View {
                 )
 
                 Text(String(localized: "wrapped.sober.days"))
-                    .font(.system(size: 18, weight: .bold))
+                    .scaledFont(size: 18, weight: .bold)
                     .foregroundColor(Color.app.greenDark)
                     .padding(.bottom, 6)
 
                 Text(String(format: String(localized: "wrapped.sober.percent"),
                             Int((Double(data.soberDays) / 365.0) * 100)))
-                    .font(.system(size: 13))
+                    .scaledFont(size: 13)
                     .foregroundColor(.white.opacity(0.4))
 
                 if data.alcoholLiters > 0 {
                     VStack(spacing: 3) {
                         Text(String(localized: "wrapped.sober.alcohol_consumed"))
-                            .font(.system(size: 11))
+                            .scaledFont(size: 11)
                             .foregroundColor(.white.opacity(0.3))
                         Text(String(format: "%.1f L", data.alcoholLiters))
-                            .font(.system(size: 17, weight: .bold))
+                            .scaledFont(size: 17, weight: .bold)
                             .foregroundColor(.white.opacity(0.55))
                         if !data.topAlcoholKind.isEmpty {
                             Text(String(format: String(localized: "wrapped.sober.top_kind"), data.topAlcoholKind))
-                                .font(.system(size: 10))
+                                .scaledFont(size: 10)
                                 .foregroundColor(.white.opacity(0.25))
                         }
                     }
@@ -723,17 +723,17 @@ struct WrappedMonthSlide: View {
         ) {
             VStack(spacing: 8) {
                 Text(String(localized: "wrapped.month.eyebrow"))
-                    .font(.system(size: 12, weight: .bold))
+                    .scaledFont(size: 12, weight: .bold)
                     .foregroundColor(Color.app.amber)
                     .kerning(3)
 
                 Text(data.bestMonthName)
-                    .font(.system(size: 36, weight: .black))
+                    .scaledFont(size: 36, weight: .black)
                     .foregroundColor(.white)
                     .padding(.top, 4)
 
                 Text(String(format: String(localized: "wrapped.month.record"), Int(data.bestMonthLiters)))
-                    .font(.system(size: 14, weight: .semibold))
+                    .scaledFont(size: 14, weight: .semibold)
                     .foregroundColor(Color.app.amber)
                     .padding(.bottom, 20)
 
@@ -759,7 +759,7 @@ struct WrappedMonthSlide: View {
                 HStack(spacing: 4) {
                     ForEach(data.monthLabels, id: \.self) { label in
                         Text(label)
-                            .font(.system(size: 8))
+                            .scaledFont(size: 8)
                             .foregroundColor(.white.opacity(0.25))
                             .frame(maxWidth: .infinity)
                     }
@@ -769,9 +769,9 @@ struct WrappedMonthSlide: View {
                 if data.heatwaveDays > 0 {
                     HStack(spacing: 6) {
                         Image(systemName: "thermometer.sun.fill")
-                            .font(.system(size: 12))
+                            .scaledFont(size: 12)
                         Text(String(format: String(localized: "wrapped.month.heatwave"), data.heatwaveDays))
-                            .font(.system(size: 12))
+                            .scaledFont(size: 12)
                     }
                     .foregroundColor(Color(hex: "FB923C"))
                     .padding(.horizontal, 14)
@@ -798,13 +798,13 @@ struct WrappedHabitsSlide: View {
         ) {
             VStack(spacing: 8) {
                 Text(String(localized: "wrapped.habits.eyebrow"))
-                    .font(.system(size: 12, weight: .bold))
+                    .scaledFont(size: 12, weight: .bold)
                     .foregroundColor(Color.app.pink)
                     .kerning(3)
                     .padding(.bottom, 14)
 
                 Image(systemName: "sunrise.fill")
-                    .font(.system(size: 48))
+                    .scaledFont(size: 48)
                     .foregroundColor(Color.app.pink)
 
                 WrappedCountUpText(
@@ -814,7 +814,7 @@ struct WrappedHabitsSlide: View {
                 )
 
                 Text(String(localized: "wrapped.habits.mornings"))
-                    .font(.system(size: 16, weight: .bold))
+                    .scaledFont(size: 16, weight: .bold)
                     .foregroundColor(Color.app.pink)
                     .padding(.bottom, 20)
 
@@ -844,13 +844,13 @@ private struct WrappedStatCard: View {
     var body: some View {
         VStack(spacing: 4) {
             Image(systemName: icon)
-                .font(.system(size: 18))
+                .scaledFont(size: 18)
                 .foregroundColor(color)
             Text(value)
-                .font(.system(size: 20, weight: .black))
+                .scaledFont(size: 20, weight: .black)
                 .foregroundColor(color)
             Text(label)
-                .font(.system(size: 10))
+                .scaledFont(size: 10)
                 .foregroundColor(.white.opacity(0.4))
                 .multilineTextAlignment(.center)
         }
@@ -875,7 +875,7 @@ struct WrappedXPSlide: View {
         ) {
             VStack(spacing: 14) {
                 Text(String(localized: "wrapped.xp.eyebrow"))
-                    .font(.system(size: 12, weight: .bold))
+                    .scaledFont(size: 12, weight: .bold)
                     .foregroundColor(Color.app.alcoholLight)
                     .kerning(3)
 
@@ -888,18 +888,18 @@ struct WrappedXPSlide: View {
                         .frame(width: 84, height: 84)
                         .shadow(color: Color.app.alcoholLight.opacity(0.5), radius: 20)
                     Image(systemName: "drop.fill")
-                        .font(.system(size: 36))
+                        .scaledFont(size: 36)
                         .foregroundColor(.white)
                 }
 
                 WrappedDropletCounter(targetXP: data.xpTotal, active: active)
 
                 Text(String(format: String(localized: "wrapped.xp.level"), data.xpLevelName))
-                    .font(.system(size: 18, weight: .bold))
+                    .scaledFont(size: 18, weight: .bold)
                     .foregroundColor(.white)
 
                 Text(String(format: String(localized: "wrapped.xp.subtitle"), data.totalGlasses))
-                    .font(.system(size: 12))
+                    .scaledFont(size: 12)
                     .foregroundColor(.white.opacity(0.4))
                     .multilineTextAlignment(.center)
                     .padding(.bottom, 8)
@@ -920,16 +920,16 @@ struct WrappedFinaleSlide: View {
         ) {
             VStack(spacing: 16) {
                 Image(systemName: "drop.fill")
-                    .font(.system(size: 44))
+                    .scaledFont(size: 44)
                     .foregroundColor(Color.app.primary)
 
                 Text(String(format: String(localized: "wrapped.finale.eyebrow"), data.year))
-                    .font(.system(size: 12, weight: .bold))
+                    .scaledFont(size: 12, weight: .bold)
                     .foregroundColor(Color.app.primary)
                     .kerning(3)
 
                 Text(String(format: String(localized: "wrapped.finale.title"), data.percentileTop))
-                    .font(.system(size: 28, weight: .black))
+                    .scaledFont(size: 28, weight: .black)
                     .foregroundColor(.white)
                     .multilineTextAlignment(.center)
                     .lineSpacing(2)
@@ -948,7 +948,7 @@ struct WrappedFinaleSlide: View {
 
                 // Message adaptatif selon le profil dominant de l'utilisateur
                 Text(data.adaptiveClosingMessage)
-                    .font(.system(size: 14))
+                    .scaledFont(size: 14)
                     .foregroundColor(.white.opacity(0.4))
                     .multilineTextAlignment(.center)
                     .padding(.top, 10)
@@ -965,11 +965,11 @@ private struct WrappedSummaryRow: View {
     var body: some View {
         HStack {
             Text(label)
-                .font(.system(size: 13))
+                .scaledFont(size: 13)
                 .foregroundColor(.white.opacity(0.5))
             Spacer()
             Text(value)
-                .font(.system(size: 15, weight: .black))
+                .scaledFont(size: 15, weight: .black)
                 .foregroundColor(color)
         }
         .padding(.horizontal, 16)
@@ -999,28 +999,28 @@ struct WrappedLegendarySlide: View {
                 Spacer()
 
                 Image(systemName: "crown.fill")
-                    .font(.system(size: 52))
+                    .scaledFont(size: 52)
                     .foregroundColor(Color.app.premiumGold)
                     .shadow(color: Color.app.amber.opacity(0.6), radius: 16)
 
                 Text(String(localized: "wrapped.legendary.eyebrow"))
-                    .font(.system(size: 12, weight: .bold))
+                    .scaledFont(size: 12, weight: .bold)
                     .foregroundColor(Color.app.premiumGold)
                     .kerning(3)
 
                 Text(String(localized: "wrapped.legendary.title"))
-                    .font(.system(size: 32, weight: .black))
+                    .scaledFont(size: 32, weight: .black)
                     .foregroundColor(.white)
                     .multilineTextAlignment(.center)
 
                 Text(data.legendaryReason)
-                    .font(.system(size: 15, weight: .semibold))
+                    .scaledFont(size: 15, weight: .semibold)
                     .foregroundColor(Color.app.premiumGold)
                     .multilineTextAlignment(.center)
                     .padding(.horizontal, 20)
 
                 Text(String(localized: "wrapped.legendary.subtitle"))
-                    .font(.system(size: 13))
+                    .scaledFont(size: 13)
                     .foregroundColor(.white.opacity(0.5))
                     .multilineTextAlignment(.center)
                     .padding(.top, 6)
@@ -1053,7 +1053,7 @@ struct WrappedShareSlide: View {
                 WrappedShareCardPreview(data: data)
 
                 Text(String(localized: "wrapped.share.title"))
-                    .font(.system(size: 13, weight: .bold))
+                    .scaledFont(size: 13, weight: .bold)
                     .foregroundColor(.white.opacity(0.5))
                     .kerning(1)
 
@@ -1079,9 +1079,9 @@ private struct WrappedShareButton: View {
         Button(action: action) {
             VStack(spacing: 6) {
                 Image(systemName: icon)
-                    .font(.system(size: 20))
+                    .scaledFont(size: 20)
                 Text(label)
-                    .font(.system(size: 12, weight: .semibold))
+                    .scaledFont(size: 12, weight: .semibold)
             }
             .foregroundColor(.white)
             .frame(maxWidth: .infinity)
@@ -1099,9 +1099,9 @@ private struct WrappedShareCardPreview: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
             HStack(spacing: 6) {
-                Image(systemName: "drop.fill").font(.system(size: 14)).foregroundColor(Color.app.primary)
+                Image(systemName: "drop.fill").scaledFont(size: 14).foregroundColor(Color.app.primary)
                 Text("AQUAPP \(String(data.year))")
-                    .font(.system(size: 11, weight: .bold))
+                    .scaledFont(size: 11, weight: .bold)
                     .foregroundColor(Color.app.primary)
                     .kerning(0.5)
             }
@@ -1130,8 +1130,8 @@ private struct WrappedMiniStat: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 2) {
-            Text(value).font(.system(size: 15, weight: .black)).foregroundColor(color)
-            Text(label).font(.system(size: 9)).foregroundColor(.white.opacity(0.4))
+            Text(value).scaledFont(size: 15, weight: .black).foregroundColor(color)
+            Text(label).scaledFont(size: 9).foregroundColor(.white.opacity(0.4))
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(8)
@@ -1161,16 +1161,16 @@ struct WrappedShareCard: View {
                 Spacer()
 
                 Image(systemName: "drop.fill")
-                    .font(.system(size: 56))
+                    .scaledFont(size: 56)
                     .foregroundColor(Color.app.primary)
 
                 Text("AQUAPP \(String(data.year))")
-                    .font(.system(size: 22, weight: .bold))
+                    .scaledFont(size: 22, weight: .bold)
                     .foregroundColor(Color.app.primary)
                     .kerning(2)
 
                 Text(String(format: String(localized: "wrapped.share.card_title"), data.userName))
-                    .font(.system(size: 38, weight: .black))
+                    .scaledFont(size: 38, weight: .black)
                     .foregroundColor(.white)
                     .multilineTextAlignment(.center)
                     .padding(.horizontal, 60)
@@ -1184,7 +1184,7 @@ struct WrappedShareCard: View {
                 .padding(.horizontal, 60)
 
                 Text(String(format: String(localized: "wrapped.share.percentile"), data.percentileTop))
-                    .font(.system(size: 20, weight: .bold))
+                    .scaledFont(size: 20, weight: .bold)
                     .foregroundColor(.white.opacity(0.7))
                     .padding(.top, 8)
 
@@ -1199,7 +1199,7 @@ struct WrappedShareCard: View {
                         .clipShape(RoundedRectangle(cornerRadius: 10))
 
                     Text(String(localized: "wrapped.share.watermark"))
-                        .font(.system(size: 13, weight: .semibold))
+                        .scaledFont(size: 13, weight: .semibold)
                         .foregroundColor(.white.opacity(0.4))
                 }
                 .padding(.bottom, format == .story ? 60 : 32)
@@ -1216,9 +1216,9 @@ private struct WrappedExportStatRow: View {
 
     var body: some View {
         HStack {
-            Text(label).font(.system(size: 20)).foregroundColor(.white.opacity(0.55))
+            Text(label).scaledFont(size: 20).foregroundColor(.white.opacity(0.55))
             Spacer()
-            Text(value).font(.system(size: 24, weight: .black)).foregroundColor(color)
+            Text(value).scaledFont(size: 24, weight: .black).foregroundColor(color)
         }
         .padding(.horizontal, 20)
         .padding(.vertical, 16)

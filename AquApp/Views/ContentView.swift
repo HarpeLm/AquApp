@@ -69,6 +69,9 @@ struct ContentView: View {
                 .environmentObject(confettiManager)
         }
         .preferredColorScheme(preferredColorScheme)
+        // Suit la taille de texte de l'utilisateur, plafonnée pour que les grands chiffres
+        // et les cartes à taille fixe ne débordent pas aux tailles d'accessibilité extrêmes.
+        .dynamicTypeSize(...DynamicTypeSize.accessibility2)
         .fullScreenCover(isPresented: Binding(
             get: { !onboardingCompleted },
             set: { isShowing in

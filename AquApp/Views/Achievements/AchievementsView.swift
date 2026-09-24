@@ -500,7 +500,7 @@ struct AchievementsView: View {
 
                         VStack(alignment: .leading, spacing: 4) {
                             Text(L10n.achievementsTitle)
-                                .font(.system(size: 32, weight: .bold))
+                                .scaledFont(size: 32, weight: .bold)
                             Text(L10n.achievementsSub)
                                 .font(.subheadline)
                                 .foregroundColor(Color.secondary)
@@ -556,20 +556,20 @@ struct AchievementsView: View {
                                             .fill(Color.orange.opacity(colorScheme == .dark ? 0.18 : 0.15))
                                             .frame(width: 44, height: 44)
                                         Image(systemName: "crown.fill")
-                                            .font(.system(size: 20))
+                                            .scaledFont(size: 20)
                                             .foregroundColor(Color.orange)
                                     }
                                     VStack(alignment: .leading, spacing: 2) {
                                         Text(String(localized: "achievements.unlock_pro_title"))
-                                            .font(.system(size: 15, weight: .bold))
+                                            .scaledFont(size: 15, weight: .bold)
                                             .foregroundColor(colorScheme == .dark ? Color.app.premiumGold : Color.app.amberText)
                                         Text(String(localized: "achievements.unlock_pro_detail"))
-                                            .font(.system(size: 13))
+                                            .scaledFont(size: 13)
                                             .foregroundColor(colorScheme == .dark ? Color.app.amber.opacity(0.75) : Color.app.amberDeep)
                                     }
                                     Spacer()
                                     Image(systemName: "chevron.right")
-                                        .font(.system(size: 13, weight: .semibold))
+                                        .scaledFont(size: 13, weight: .semibold)
                                         .foregroundColor(colorScheme == .dark ? Color.app.amber : Color.app.amberDeep)
                                 }
                                 .padding(16)
@@ -631,11 +631,11 @@ private struct AquaAddictBanner: View {
                         .fill(Color.white.opacity(0.20))
                         .frame(width: 56, height: 56)
                     Image(systemName: "drop.fill")
-                        .font(.system(size: 26, weight: .bold))
+                        .scaledFont(size: 26, weight: .bold)
                         .foregroundColor(Color.white)
                     if isCompleted {
                         Image(systemName: "checkmark.circle.fill")
-                            .font(.system(size: 18))
+                            .scaledFont(size: 18)
                             .foregroundColor(Color.white)
                             .background(Color.app.primary.clipShape(Circle()))
                             .offset(x: 20, y: 20)
@@ -644,10 +644,10 @@ private struct AquaAddictBanner: View {
                 VStack(alignment: .leading, spacing: 4) {
                     HStack(spacing: 6) {
                         Text(achievement.title)
-                            .font(.system(size: 18, weight: .bold))
+                            .scaledFont(size: 18, weight: .bold)
                             .foregroundColor(Color.white)
                         Text(String(localized: "achievement.legendary_badge"))
-                            .font(.system(size: 10, weight: .bold))
+                            .scaledFont(size: 10, weight: .bold)
                             .foregroundColor(Color.app.primary)
                             .padding(.horizontal, 7)
                             .padding(.vertical, 3)
@@ -655,7 +655,7 @@ private struct AquaAddictBanner: View {
                             .cornerRadius(6)
                     }
                     Text(achievement.description)
-                        .font(.system(size: 12))
+                        .scaledFont(size: 12)
                         .foregroundColor(Color.white.opacity(0.85))
                         .lineLimit(2)
                 }
@@ -677,7 +677,7 @@ private struct AquaAddictBanner: View {
                 Text(isCompleted
                      ? String(localized: "achievement.completed_tag")
                      : String(format: String(localized: "achievement.aqua_addict.progress"), litersProgress, "1 000 000"))
-                    .font(.system(size: 11, weight: .semibold))
+                    .scaledFont(size: 11, weight: .semibold)
                     .foregroundColor(Color.white.opacity(0.9))
             }
         }
@@ -709,10 +709,10 @@ private struct AchievementSectionTitle: View {
     var body: some View {
         HStack(spacing: 8) {
             Image(systemName: sfSymbol)
-                .font(.system(size: 14, weight: .semibold))
+                .scaledFont(size: 14, weight: .semibold)
                 .foregroundColor(color)
             Text(label)
-                .font(.system(size: 20, weight: .bold))
+                .scaledFont(size: 20, weight: .bold)
         }
     }
 }
@@ -734,11 +734,11 @@ struct SummaryCard: View {
             HStack {
                 VStack(alignment: .leading, spacing: 4) {
                     Text("\(completed) / \(total)")
-                        .font(.system(size: 32, weight: .bold))
+                        .scaledFont(size: 32, weight: .bold)
                         .minimumScaleFactor(0.7)
                         .lineLimit(1)
                     Text(L10n.achievementsUnlocked)
-                        .font(.system(size: 14))
+                        .scaledFont(size: 14)
                         .foregroundColor(Color.secondary)
                 }
                 Spacer()
@@ -760,7 +760,7 @@ struct SummaryCard: View {
                         .frame(width: 72, height: 72)
                         .animation(.easeInOut(duration: 0.6), value: ratio)
                     Text("\(Int(ratio * 100))%")
-                        .font(.system(size: 16, weight: .bold))
+                        .scaledFont(size: 16, weight: .bold)
                 }
                 .accessibilityElement(children: .ignore)
                 .accessibilityLabel(String(localized: "accessibility.achievement_progress"))
@@ -826,16 +826,16 @@ struct AchievementBadge: View {
                         .frame(width: 64, height: 64)
                     if isLocked {
                         Image(systemName: "lock.fill")
-                            .font(.system(size: 24))
+                            .scaledFont(size: 24)
                             .foregroundColor(Color(UIColor.systemGray3))
                     } else {
                         Image(systemName: achievement.sfSymbol)
-                            .font(.system(size: 28, weight: .medium))
+                            .scaledFont(size: 28, weight: .medium)
                             .foregroundColor(isCompleted ? achievement.symbolColor : Color(UIColor.systemGray3))
                     }
                     if achievement.isPro {
                         Image(systemName: "crown.fill")
-                            .font(.system(size: 11))
+                            .scaledFont(size: 11)
                             .foregroundColor(Color.white)
                             .padding(4)
                             .background(Color.orange)
@@ -844,19 +844,19 @@ struct AchievementBadge: View {
                     }
                     if isCompleted {
                         Image(systemName: "checkmark.circle.fill")
-                            .font(.system(size: 18))
+                            .scaledFont(size: 18)
                             .foregroundColor(Color.green)
                             .background(Color.white.clipShape(Circle()))
                             .offset(x: 22, y: 22)
                     }
                 }
                 Text(achievement.title)
-                    .font(.system(size: 14, weight: .semibold))
+                    .scaledFont(size: 14, weight: .semibold)
                     .foregroundColor(isLocked ? Color.secondary : Color.primary)
                     .multilineTextAlignment(.center)
                     .lineLimit(2)
                 Text(achievement.description)
-                    .font(.system(size: 11))
+                    .scaledFont(size: 11)
                     .foregroundColor(Color.secondary)
                     .multilineTextAlignment(.center)
                     .lineLimit(2)
@@ -876,23 +876,23 @@ struct AchievementBadge: View {
                         }
                         .frame(height: 4)
                         Text(achievement.progressLabel)
-                            .font(.system(size: 10))
+                            .scaledFont(size: 10)
                             .foregroundColor(Color.secondary)
                     }
                     .padding(.top, 2)
                 }
                 if isCompleted {
                     Text(String(localized: "achievement.completed_tag"))
-                        .font(.system(size: 11, weight: .semibold))
+                        .scaledFont(size: 11, weight: .semibold)
                         .foregroundColor(Color.green)
                 }
                 if isLocked {
                     HStack(spacing: 4) {
                         Image(systemName: "crown.fill")
-                            .font(.system(size: 9))
+                            .scaledFont(size: 9)
                             .foregroundColor(Color.orange)
                         Text(String(localized: "premium.label"))
-                            .font(.system(size: 11, weight: .semibold))
+                            .scaledFont(size: 11, weight: .semibold)
                             .foregroundColor(Color.orange)
                     }
                     .padding(.horizontal, 8)

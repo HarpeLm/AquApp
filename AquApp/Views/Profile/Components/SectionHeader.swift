@@ -14,11 +14,11 @@ struct SectionHeader: View {
     var body: some View {
         HStack(spacing: 6) {
             Image(systemName: sfSymbol)
-                .font(.system(size: 13, weight: .semibold))
+                .scaledFont(size: 13, weight: .semibold)
                 .foregroundColor(color)
                 .accessibilityHidden(true)
             Text(title)
-                .font(.system(size: 13, weight: .semibold))
+                .scaledFont(size: 13, weight: .semibold)
                 .foregroundColor(.secondary)
         }
         .padding(.leading, 4)

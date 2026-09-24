@@ -41,10 +41,10 @@ struct NotificationSettingsSheet: View {
             HStack {
                 HStack(spacing: 8) {
                     Text(String(localized: "notif.settings.title"))
-                        .font(.system(size: 22, weight: .bold))
+                        .scaledFont(size: 22, weight: .bold)
                     Image(systemName: "bell.fill")
                         .accessibilityHidden(true)
-                        .font(.system(size: 20))
+                        .scaledFont(size: 20)
                         .foregroundColor(.orange)
                 }
                 Spacer()
@@ -53,7 +53,7 @@ struct NotificationSettingsSheet: View {
                         Circle().fill(Color(UIColor.systemGray5)).frame(width: 32, height: 32)
                         Image(systemName: "xmark")
                             .accessibilityHidden(true)
-                            .font(.system(size: 12, weight: .bold))
+                            .scaledFont(size: 12, weight: .bold)
                             .foregroundColor(.secondary)
                     }
                 }
@@ -69,9 +69,9 @@ struct NotificationSettingsSheet: View {
                     HStack {
                         VStack(alignment: .leading, spacing: 2) {
                             Text(String(localized: "notif.settings.enable"))
-                                .font(.system(size: 15, weight: .semibold))
+                                .scaledFont(size: 15, weight: .semibold)
                             Text(String(localized: "notif.settings.enable_sub"))
-                                .font(.system(size: 12))
+                                .scaledFont(size: 12)
                                 .foregroundColor(.secondary)
                         }
                         Spacer()
@@ -90,14 +90,14 @@ struct NotificationSettingsSheet: View {
                         // Plage horaire
                         VStack(alignment: .leading, spacing: 12) {
                             Text(String(localized: "notif.settings.time_range"))
-                                .font(.system(size: 13, weight: .semibold))
+                                .scaledFont(size: 13, weight: .semibold)
                                 .foregroundColor(.secondary)
                                 .padding(.leading, 4)
 
                             HStack(spacing: 12) {
                                 VStack(spacing: 6) {
                                     Text(String(localized: "notif.settings.start"))
-                                        .font(.system(size: 12))
+                                        .scaledFont(size: 12)
                                         .foregroundColor(.secondary)
                                     HourPicker(hour: $localStart, range: 0...23, color: Color.app.primary)
                                 }
@@ -105,12 +105,12 @@ struct NotificationSettingsSheet: View {
 
                                 Image(systemName: "arrow.right")
                                     .accessibilityHidden(true)
-                                    .font(.system(size: 14))
+                                    .scaledFont(size: 14)
                                     .foregroundColor(.secondary)
 
                                 VStack(spacing: 6) {
                                     Text(String(localized: "notif.settings.end"))
-                                        .font(.system(size: 12))
+                                        .scaledFont(size: 12)
                                         .foregroundColor(.secondary)
                                     HourPicker(hour: $localEnd, range: 0...23, color: .orange)
                                 }
@@ -125,7 +125,7 @@ struct NotificationSettingsSheet: View {
                         // Fréquence
                         VStack(alignment: .leading, spacing: 12) {
                             Text(String(localized: "notif.settings.frequency"))
-                                .font(.system(size: 13, weight: .semibold))
+                                .scaledFont(size: 13, weight: .semibold)
                                 .foregroundColor(.secondary)
                                 .padding(.leading, 4)
 
@@ -136,12 +136,12 @@ struct NotificationSettingsSheet: View {
                                         .foregroundColor(Color.app.primary)
                                         .frame(width: 24)
                                     Text(String(localized: "notif.settings.every"))
-                                        .font(.system(size: 15))
+                                        .scaledFont(size: 15)
                                     Spacer()
                                     Text(localInterval == 1
                                          ? String(localized: "notif.settings.one_hour")
                                          : String(format: String(localized: "notif.settings.n_hours"), localInterval))
-                                        .font(.system(size: 15, weight: .semibold))
+                                        .scaledFont(size: 15, weight: .semibold)
                                         .foregroundColor(Color.app.primary)
                                 }
 
@@ -151,7 +151,7 @@ struct NotificationSettingsSheet: View {
                                             withAnimation(.spring()) { localInterval = value }
                                         } label: {
                                             Text(String(format: String(localized: "notif.hours_format"), value))
-                                                .font(.system(size: 14, weight: .semibold))
+                                                .scaledFont(size: 14, weight: .semibold)
                                                 .foregroundColor(localInterval == value ? .white : Color.app.primary)
                                                 .frame(maxWidth: .infinity)
                                                 .padding(.vertical, 8)
@@ -172,11 +172,11 @@ struct NotificationSettingsSheet: View {
                             VStack(alignment: .leading, spacing: 10) {
                                 HStack {
                                     Text(String(localized: "notif.settings.preview"))
-                                        .font(.system(size: 13, weight: .semibold))
+                                        .scaledFont(size: 13, weight: .semibold)
                                         .foregroundColor(.secondary)
                                     Spacer()
                                     Text(String(localized: "notif.settings.count \(previewTimes.count)"))
-                                        .font(.system(size: 12, weight: .semibold))
+                                        .scaledFont(size: 12, weight: .semibold)
                                         .foregroundColor(Color.app.primary)
                                         .padding(.horizontal, 8)
                                         .padding(.vertical, 4)
@@ -191,10 +191,10 @@ struct NotificationSettingsSheet: View {
                                             HStack(spacing: 4) {
                                                 Image(systemName: "bell.fill")
                                                     .accessibilityHidden(true)
-                                                    .font(.system(size: 10))
+                                                    .scaledFont(size: 10)
                                                     .foregroundColor(.orange)
                                                 Text(time)
-                                                    .font(.system(size: 12, weight: .medium))
+                                                    .scaledFont(size: 12, weight: .medium)
                                                     .foregroundColor(.primary)
                                             }
                                             .padding(.horizontal, 10)
@@ -216,9 +216,9 @@ struct NotificationSettingsSheet: View {
                         HStack(spacing: 8) {
                             Image(systemName: "checkmark.circle.fill")
                                 .accessibilityHidden(true)
-                                .font(.system(size: 18))
+                                .scaledFont(size: 18)
                             Text(String(localized: "notif.settings.save"))
-                                .font(.system(size: 17, weight: .semibold))
+                                .scaledFont(size: 17, weight: .semibold)
                         }
                         .foregroundColor(.white)
                         .frame(maxWidth: .infinity)
@@ -295,7 +295,7 @@ private struct HourPicker: View {
             } label: {
                 Image(systemName: "minus.circle.fill")
                     .accessibilityHidden(true)
-                    .font(.system(size: 24))
+                    .scaledFont(size: 24)
                     .foregroundColor(hour > range.lowerBound ? color : Color(UIColor.systemGray4))
             }
             .accessibilityLabel(String(localized: "notif.hour_picker.decrease"))
@@ -304,7 +304,7 @@ private struct HourPicker: View {
             .disabled(hour <= range.lowerBound)
 
             Text(String(format: "%02dh00", hour))
-                .font(.system(size: 16, weight: .bold, design: .rounded))
+                .scaledFont(size: 16, weight: .bold, design: .rounded)
                 .foregroundColor(color)
                 .frame(width: 60)
                 .accessibilityHidden(true)
@@ -314,7 +314,7 @@ private struct HourPicker: View {
             } label: {
                 Image(systemName: "plus.circle.fill")
                     .accessibilityHidden(true)
-                    .font(.system(size: 24))
+                    .scaledFont(size: 24)
                     .foregroundColor(hour < range.upperBound ? color : Color(UIColor.systemGray4))
             }
             .accessibilityLabel(String(localized: "notif.hour_picker.increase"))

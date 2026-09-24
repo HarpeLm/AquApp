@@ -44,9 +44,9 @@ struct AddWaterSheet: View {
             HStack {
                 HStack(spacing: 8) {
                     Text(String(localized: "water.sheet.title"))
-                        .font(.system(size: 22, weight: .bold))
+                        .scaledFont(size: 22, weight: .bold)
                     Image(systemName: "drop.fill")
-                        .font(.system(size: 20, weight: .medium))
+                        .scaledFont(size: 20, weight: .medium)
                         .foregroundColor(Color.app.primary)
                         .frame(width: 24, height: 24)
                 }
@@ -57,7 +57,7 @@ struct AddWaterSheet: View {
                             .fill(Color(UIColor.systemGray5))
                             .frame(width: 32, height: 32)
                         Image(systemName: "xmark")
-                            .font(.system(size: 12, weight: .bold))
+                            .scaledFont(size: 12, weight: .bold)
                             .foregroundColor(.secondary)
                             .accessibilityHidden(true)
                     }
@@ -97,11 +97,11 @@ struct AddWaterSheet: View {
                                 Image(systemName: "slider.horizontal.3")
                                     .foregroundColor(Color.app.primary)
                                 Text(String(localized: "water.custom_quantity"))
-                                    .font(.system(size: 15, weight: .semibold))
+                                    .scaledFont(size: 15, weight: .semibold)
                                     .foregroundColor(.primary)
                                 Spacer()
                                 Image(systemName: showSlider ? "chevron.up" : "chevron.down")
-                                    .font(.system(size: 13))
+                                    .scaledFont(size: 13)
                                     .foregroundColor(.secondary)
                             }
                             .padding(16)
@@ -114,11 +114,11 @@ struct AddWaterSheet: View {
                             VStack(spacing: 16) {
                                 HStack {
                                     Text(String(localized: "water.quantity_label"))
-                                        .font(.system(size: 14))
+                                        .scaledFont(size: 14)
                                         .foregroundColor(.secondary)
                                     Spacer()
                                     Text(UnitFormatter.volume(sliderValue))
-                                        .font(.system(size: 20, weight: .bold))
+                                        .scaledFont(size: 20, weight: .bold)
                                         .foregroundColor(Color.app.primaryDark)
                                 }
                                 VStack(spacing: 6) {
@@ -143,18 +143,18 @@ struct AddWaterSheet: View {
                                         }
                                     HStack {
                                         Text(UnitFormatter.volumeSliderBound(50))
-                                            .font(.system(size: 11)).foregroundColor(.secondary)
+                                            .scaledFont(size: 11).foregroundColor(.secondary)
                                         Spacer()
                                         Text(UnitFormatter.volumeSliderBound(2000))
-                                            .font(.system(size: 11)).foregroundColor(.secondary)
+                                            .scaledFont(size: 11).foregroundColor(.secondary)
                                     }
                                 }
                                 Button { addWater(ml: sliderValue) } label: {
                                     HStack(spacing: 8) {
                                         Image(systemName: "plus")
-                                            .font(.system(size: 16, weight: .bold))
+                                            .scaledFont(size: 16, weight: .bold)
                                         Text(String(format: String(localized: "water.add_ml"), UnitFormatter.volume(sliderValue)))
-                                            .font(.system(size: 16, weight: .semibold))
+                                            .scaledFont(size: 16, weight: .semibold)
                                     }
                                     .foregroundColor(.white)
                                     .frame(maxWidth: .infinity)
@@ -187,11 +187,11 @@ struct AddWaterSheet: View {
                                 Image(systemName: "minus.circle.fill")
                                     .foregroundColor(.red.opacity(0.7))
                                 Text(String(localized: "water.remove_water"))
-                                    .font(.system(size: 15, weight: .semibold))
+                                    .scaledFont(size: 15, weight: .semibold)
                                     .foregroundColor(.primary)
                                 Spacer()
                                 Image(systemName: showRemove ? "chevron.up" : "chevron.down")
-                                    .font(.system(size: 13))
+                                    .scaledFont(size: 13)
                                     .foregroundColor(.secondary)
                             }
                             .padding(16)
@@ -209,7 +209,7 @@ struct AddWaterSheet: View {
                                         .padding(14)
                                         .background(Color(UIColor.systemGray6))
                                         .cornerRadius(12)
-                                        .font(.system(size: 15))
+                                        .scaledFont(size: 15)
                                         .withDoneButton() // ← BOUTON "TERMINÉ" AJOUTÉ
 
                                     Button {
@@ -226,7 +226,7 @@ struct AddWaterSheet: View {
                                                       : AnyShapeStyle(Color.red.opacity(0.8)))
                                                 .frame(width: 52, height: 52)
                                             Image(systemName: "minus")
-                                                .font(.system(size: 20, weight: .bold))
+                                                .scaledFont(size: 20, weight: .bold)
                                                 .foregroundColor(.white)
                                         }
                                     }
@@ -234,10 +234,10 @@ struct AddWaterSheet: View {
                                 }
                                 HStack(spacing: 6) {
                                     Image(systemName: "info.circle")
-                                        .font(.system(size: 12))
+                                        .scaledFont(size: 12)
                                         .foregroundColor(.secondary)
                                     Text(String(format: String(localized: "water.current_intake"), UnitFormatter.volume(store.todayWaterMl), UnitFormatter.volume(store.dailyGoalMl)))
-                                        .font(.system(size: 12))
+                                        .scaledFont(size: 12)
                                         .foregroundColor(.secondary)
                                 }
                                 .frame(maxWidth: .infinity, alignment: .leading)
@@ -259,7 +259,7 @@ struct AddWaterSheet: View {
                             .padding(14)
                             .background(Color(UIColor.systemGray6))
                             .cornerRadius(12)
-                            .font(.system(size: 15))
+                            .scaledFont(size: 15)
                             .withDoneButton() // ← BOUTON "TERMINÉ" AJOUTÉ
 
                         Button {
@@ -279,7 +279,7 @@ struct AddWaterSheet: View {
                                           )))
                                     .frame(width: 52, height: 52)
                                 Image(systemName: "plus")
-                                    .font(.system(size: 20, weight: .bold))
+                                    .scaledFont(size: 20, weight: .bold)
                                     .foregroundColor(.white)
                             }
                         }
@@ -338,17 +338,17 @@ struct PresetButton: View {
         Button(action: action) {
             VStack(spacing: 6) {
                 Image(systemName: "drop.fill")
-                    .font(.system(size: dropSize * 0.6, weight: .medium))
+                    .scaledFont(size: dropSize * 0.6, weight: .medium)
                     .foregroundColor(Color.app.primary)
                     .frame(width: dropSize, height: dropSize)
                     .accessibilityHidden(true)
                 Text(label)
-                    .font(.system(size: 14, weight: .semibold))
+                    .scaledFont(size: 14, weight: .semibold)
                     .foregroundColor(.primary)
                     .minimumScaleFactor(0.8)
                     .lineLimit(1)
                 Text(sublabel)
-                    .font(.system(size: 11))
+                    .scaledFont(size: 11)
                     .foregroundColor(.secondary)
                     .multilineTextAlignment(.center)
                     .minimumScaleFactor(0.8)

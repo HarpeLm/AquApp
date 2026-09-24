@@ -510,7 +510,7 @@ struct ChallengesView: View {
 
                         VStack(alignment: .leading, spacing: 4) {
                             Text(L10n.challengesTitle)
-                                .font(.system(size: 32, weight: .bold))
+                                .scaledFont(size: 32, weight: .bold)
                             Text(L10n.challengesSub)
                                 .font(.subheadline)
                                 .foregroundColor(.secondary)
@@ -523,7 +523,7 @@ struct ChallengesView: View {
 
                         VStack(alignment: .leading, spacing: 0) {
                             Text(L10n.challengesDayTitle)
-                                .font(.system(size: 20, weight: .bold))
+                                .scaledFont(size: 20, weight: .bold)
                                 .padding(.horizontal)
                                 .padding(.bottom, 12)
 
@@ -571,14 +571,14 @@ struct ActiveChallengeCard: View {
         VStack(alignment: .leading, spacing: 12) {
             HStack(spacing: 6) {
                 Image(systemName: "trophy.fill")
-                    .font(.system(size: 14))
+                    .scaledFont(size: 14)
                     .foregroundColor(.white.opacity(0.9))
                 Text(String(localized: "challenge.card.ongoing"))
-                    .font(.system(size: 14, weight: .semibold))
+                    .scaledFont(size: 14, weight: .semibold)
                     .foregroundColor(.white.opacity(0.9))
             }
             Text(String(localized: "challenge.card.title"))
-                .font(.system(size: 26, weight: .bold))
+                .scaledFont(size: 26, weight: .bold)
                 .foregroundColor(.white)
             Text(String(format: String(localized: "challenge.card.subtitle"), Int(goal)))
                 .font(.subheadline)
@@ -595,7 +595,7 @@ struct ActiveChallengeCard: View {
                 }
                 .frame(height: 8)
                 Text("\(UnitFormatter.volumeNumber(current)) / \(UnitFormatter.volume(goal))")
-                    .font(.system(size: 13, weight: .medium))
+                    .scaledFont(size: 13, weight: .medium)
                     .foregroundColor(.white.opacity(0.9))
             }
         }
@@ -626,11 +626,11 @@ struct ChallengeRow: View {
             ZStack {
                 Circle().fill(iconBackground).frame(width: 48, height: 48)
                 if challenge.status == .completed {
-                    Image(systemName: "checkmark").font(.system(size: 18, weight: .bold)).foregroundColor(.green)
+                    Image(systemName: "checkmark").scaledFont(size: 18, weight: .bold).foregroundColor(.green)
                 } else if challenge.status == .locked {
-                    Image(systemName: "lock.fill").font(.system(size: 18)).foregroundColor(.gray)
+                    Image(systemName: "lock.fill").scaledFont(size: 18).foregroundColor(.gray)
                 } else {
-                    Image(systemName: challenge.sfSymbol).font(.system(size: 20, weight: .medium)).foregroundColor(challenge.symbolColor)
+                    Image(systemName: challenge.sfSymbol).scaledFont(size: 20, weight: .medium).foregroundColor(challenge.symbolColor)
                 }
             }
             .accessibilityHidden(true)
@@ -638,19 +638,19 @@ struct ChallengeRow: View {
             VStack(alignment: .leading, spacing: 4) {
                 HStack(spacing: 6) {
                     Text(challenge.title)
-                        .font(.system(size: 16, weight: .semibold))
+                        .scaledFont(size: 16, weight: .semibold)
                         .foregroundColor(challenge.status == .locked ? .secondary : .primary)
                         .minimumScaleFactor(0.85).lineLimit(1)
                     if challenge.status != .locked {
                         Image(systemName: challenge.badgeSFSymbol)
-                            .font(.system(size: 12, weight: .bold))
+                            .scaledFont(size: 12, weight: .bold)
                             .foregroundColor(challenge.symbolColor)
                             .padding(4).background(challenge.symbolColor.opacity(0.12)).clipShape(Circle())
                     }
                     if challenge.isPro { PremiumBadge() }
                 }
                 Text(challenge.description)
-                    .font(.system(size: 13)).foregroundColor(.secondary)
+                    .scaledFont(size: 13).foregroundColor(.secondary)
                     .minimumScaleFactor(0.8).lineLimit(2)
 
                 if challenge.status == .inProgress && !challenge.progressLabel.isEmpty {
@@ -658,11 +658,11 @@ struct ChallengeRow: View {
                     VStack(alignment: .leading, spacing: 6) {
                         HStack {
                             Text(challenge.progressLabel)
-                                .font(.system(size: 11, weight: .medium))
+                                .scaledFont(size: 11, weight: .medium)
                                 .foregroundColor(.secondary)
                             Spacer()
                             Text("\(Int(ratio * 100))%")
-                                .font(.system(size: 11, weight: .bold))
+                                .scaledFont(size: 11, weight: .bold)
                                 .foregroundColor(challenge.symbolColor)
                                 .monospacedDigit()
                         }
@@ -688,7 +688,7 @@ struct ChallengeRow: View {
 
             if challenge.status == .locked {
                 Image(systemName: "chevron.right")
-                    .font(.system(size: 13, weight: .semibold))
+                    .scaledFont(size: 13, weight: .semibold)
                     .foregroundColor(Color(UIColor.systemGray3))
                     .accessibilityHidden(true)
             }
@@ -715,8 +715,8 @@ struct ChallengeRow: View {
 struct PremiumBadge: View {
     var body: some View {
         HStack(spacing: 4) {
-            Image(systemName: "crown.fill").font(.system(size: 9, weight: .bold)).foregroundColor(.white)
-            Text(String(localized: "premium.badge")).font(.system(size: 10, weight: .bold)).foregroundColor(.white)
+            Image(systemName: "crown.fill").scaledFont(size: 9, weight: .bold).foregroundColor(.white)
+            Text(String(localized: "premium.badge")).scaledFont(size: 10, weight: .bold).foregroundColor(.white)
         }
         .padding(.horizontal, 8).padding(.vertical, 3).background(Color.orange).cornerRadius(6)
     }

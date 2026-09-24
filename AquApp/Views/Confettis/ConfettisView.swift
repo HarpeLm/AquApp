@@ -179,22 +179,22 @@ struct CompletionBanner: View {
                         .fill(color.opacity(0.15))
                         .frame(width: 48, height: 48)
                     Image(systemName: sfSymbol)
-                        .font(.system(size: 22, weight: .medium))
+                        .scaledFont(size: 22, weight: .medium)
                         .foregroundColor(color)
                 }
 
                 VStack(alignment: .leading, spacing: 2) {
                     Text(String(localized: "confetti.challenge_completed"))
-                        .font(.system(size: 13, weight: .semibold))
+                        .scaledFont(size: 13, weight: .semibold)
                         .foregroundColor(.secondary)
                     Text(title)
-                        .font(.system(size: 17, weight: .bold))
+                        .scaledFont(size: 17, weight: .bold)
                 }
 
                 Spacer()
 
                 Image(systemName: "checkmark.circle.fill")
-                    .font(.system(size: 24))
+                    .scaledFont(size: 24)
                     .foregroundColor(.green)
             }
             .padding(16)

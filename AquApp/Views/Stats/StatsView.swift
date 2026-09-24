@@ -72,9 +72,9 @@ struct StatsView: View {
                     VStack(alignment: .leading, spacing: 4) {
                         HStack(alignment: .center, spacing: 8) {
                             Text(L10n.statsTitle)
-                                .font(.system(size: 32, weight: .bold))
+                                .scaledFont(size: 32, weight: .bold)
                             Image(systemName: "chart.bar.fill")
-                                .font(.system(size: 26, weight: .medium))
+                                .scaledFont(size: 26, weight: .medium)
                                 .foregroundColor(Color.app.primary)
                                 .frame(width: 32, height: 32)
                         }
@@ -254,31 +254,44 @@ private struct ChartCard: View {
         }
     }
 
+    private var chartTitleText: some View {
+        Text(chartTitle)
+            .scaledFont(size: 17, weight: .bold)
+            .lineLimit(1)
+            .minimumScaleFactor(0.8)
+    }
+
+    private var periodSelector: some View {
+        HStack(spacing: 0) {
+            ForEach(ChartPeriod.allCases, id: \.self) { p in
+                PeriodTab(
+                    period:        p,
+                    isSelected:    period == p,
+                    isPremiumUser: isPremiumUser,
+                    onTap:         { onSelectPeriod(p) }
+                )
+            }
+        }
+        .background(Color(UIColor.systemGray6))
+        .cornerRadius(10)
+    }
+
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
 
             // ── Header carte ──────────────────────────────────────────────────
-            HStack(alignment: .center, spacing: 8) {
-                Text(chartTitle)
-                    .font(.system(size: 17, weight: .bold))
-                    .lineLimit(1)
-                    .layoutPriority(1)
-
-                Spacer(minLength: 4)
-
-                // Sélecteur de période
-                HStack(spacing: 0) {
-                    ForEach(ChartPeriod.allCases, id: \.self) { p in
-                        PeriodTab(
-                            period:        p,
-                            isSelected:    period == p,
-                            isPremiumUser: isPremiumUser,
-                            onTap:         { onSelectPeriod(p) }
-                        )
-                    }
+            // Titre et sélecteur sur une ligne s'ils tiennent (texte normal),
+            // sinon le sélecteur passe dessous (grandes tailles de texte).
+            ViewThatFits(in: .horizontal) {
+                HStack(alignment: .center, spacing: 8) {
+                    chartTitleText
+                    Spacer(minLength: 4)
+                    periodSelector.fixedSize()
                 }
-                .background(Color(UIColor.systemGray6))
-                .cornerRadius(10)
+                VStack(alignment: .leading, spacing: 10) {
+                    chartTitleText
+                    periodSelector
+                }
             }
 
             // ── Graphique ─────────────────────────────────────────────────────
@@ -296,7 +309,7 @@ private struct ChartCard: View {
                     .fill(Color.app.primaryDark)
                     .frame(width: 16, height: 3)
                 Text(goalLegend)
-                    .font(.system(size: 12))
+                    .scaledFont(size: 12)
                     .foregroundColor(.secondary)
             }
         }
@@ -322,7 +335,7 @@ private struct PeriodTab: View {
         Button(action: onTap) {
             HStack(spacing: 3) {
                 Text(period.label)
-                    .font(.system(size: 12, weight: isSelected ? .bold : .medium))
+                    .scaledFont(size: 12, weight: isSelected ? .bold : .medium)
                     .lineLimit(1)
                     .minimumScaleFactor(0.7)
                     .foregroundColor(
@@ -333,7 +346,7 @@ private struct PeriodTab: View {
 
                 if isLocked {
                     Image(systemName: "crown.fill")
-                        .font(.system(size: 8, weight: .bold))
+                        .scaledFont(size: 8, weight: .bold)
                         .foregroundColor(.orange)
                 }
             }
@@ -442,7 +455,7 @@ private struct BarColumn: View {
             .frame(height: 100)
 
             Text(bar.label)
-                .font(.system(size: period == .all ? 9 : 11))
+                .scaledFont(size: period == .all ? 9 : 11)
                 .foregroundColor(bar.isToday ? Color.app.primaryDark : .secondary)
                 .fontWeight(bar.isToday ? .bold : .regular)
                 .multilineTextAlignment(.center)
@@ -473,7 +486,7 @@ struct WeeklyChartCard: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
             Text(L10n.statsWeekly)
-                .font(.system(size: 17, weight: .bold))
+                .scaledFont(size: 17, weight: .bold)
 
             HStack(alignment: .bottom, spacing: 8) {
                 ForEach(data, id: \.day) { item in
@@ -502,7 +515,7 @@ struct WeeklyChartCard: View {
                         .clipped()
 
                         Text(item.day)
-                            .font(.system(size: 12))
+                            .scaledFont(size: 12)
                             .foregroundColor(
                                 item.day == currentDayAbbr()
                                 ? Color.app.primaryDark : .secondary
@@ -517,7 +530,7 @@ struct WeeklyChartCard: View {
                     .fill(Color.app.primaryDark)
                     .frame(width: 16, height: 3)
                 Text(insertValue("\(Int(goal))", into: "stats.goal_label"))
-                    .font(.system(size: 12))
+                    .scaledFont(size: 12)
                     .foregroundColor(.secondary)
             }
         }
@@ -561,14 +574,14 @@ struct AlcoolAnalysisCard: View {
         VStack(alignment: .leading, spacing: 0) {
             HStack {
                 Text(L10n.statsAlcohol)
-                    .font(.system(size: 17, weight: .bold))
+                    .scaledFont(size: 17, weight: .bold)
                 Spacer()
                 HStack(spacing: 4) {
                     Image(systemName: "crown.fill")
-                        .font(.system(size: 9, weight: .bold))
+                        .scaledFont(size: 9, weight: .bold)
                         .foregroundColor(.white)
                     Text(String(localized: "premium.badge"))
-                        .font(.system(size: 10, weight: .bold))
+                        .scaledFont(size: 10, weight: .bold)
                         .foregroundColor(.white)
                 }
                 .padding(.horizontal, 8)
@@ -596,11 +609,11 @@ struct AlcoolAnalysisCard: View {
                     }
                     VStack(alignment: .leading, spacing: 6) {
                         Text(String(localized: "stats.trend"))
-                            .font(.system(size: 13, weight: .semibold))
+                            .scaledFont(size: 13, weight: .semibold)
                             .foregroundColor(.secondary)
                         HStack(spacing: 6) {
                             Circle().fill(tendanceColor).frame(width: 8, height: 8)
-                            Text(tendanceText).font(.system(size: 14)).foregroundColor(.primary)
+                            Text(tendanceText).scaledFont(size: 14).foregroundColor(.primary)
                         }
                     }
                 }
@@ -609,16 +622,16 @@ struct AlcoolAnalysisCard: View {
                 VStack(spacing: 16) {
                     ZStack {
                         Circle().fill(Color(UIColor.systemGray5)).frame(width: 64, height: 64)
-                        Image(systemName: "lock.fill").font(.system(size: 26)).foregroundColor(.gray)
+                        Image(systemName: "lock.fill").scaledFont(size: 26).foregroundColor(.gray)
                     }
                     Text(String(localized: "stats.alcohol_locked"))
-                        .font(.system(size: 14))
+                        .scaledFont(size: 14)
                         .foregroundColor(.secondary)
                         .multilineTextAlignment(.center)
                     Button(action: onUnlock) {
                         HStack(spacing: 8) {
-                            Image(systemName: "crown.fill").font(.system(size: 16)).foregroundColor(.white)
-                            Text(L10n.premiumCTA).font(.system(size: 16, weight: .semibold)).foregroundColor(.white)
+                            Image(systemName: "crown.fill").scaledFont(size: 16).foregroundColor(.white)
+                            Text(L10n.premiumCTA).scaledFont(size: 16, weight: .semibold).foregroundColor(.white)
                         }
                         .frame(maxWidth: .infinity).frame(height: 50)
                         .background(LinearGradient(
@@ -646,8 +659,8 @@ private struct StatPill: View {
 
     var body: some View {
         VStack(spacing: 4) {
-            Text(value).font(.system(size: 20, weight: .bold)).foregroundColor(color)
-            Text(label).font(.system(size: 12)).foregroundColor(.secondary)
+            Text(value).scaledFont(size: 20, weight: .bold).foregroundColor(color)
+            Text(label).scaledFont(size: 12).foregroundColor(.secondary)
         }
         .frame(maxWidth: .infinity).padding(.vertical, 12)
         .background(color.opacity(0.08)).cornerRadius(12)
@@ -668,19 +681,19 @@ struct MetricCard: View {
             ZStack {
                 Circle().fill(symbolColor.opacity(0.12)).frame(width: 40, height: 40)
                 Image(systemName: sfSymbol)
-                    .font(.system(size: 17, weight: .medium))
+                    .scaledFont(size: 17, weight: .medium)
                     .foregroundColor(symbolColor)
                     .accessibilityHidden(true)
             }
             HStack(alignment: .lastTextBaseline, spacing: 2) {
                 Text(value)
-                    .font(.system(size: 24, weight: .bold))
+                    .scaledFont(size: 24, weight: .bold)
                     .minimumScaleFactor(0.7).lineLimit(1)
                 Text(unit)
-                    .font(.system(size: 12)).foregroundColor(.secondary).minimumScaleFactor(0.8)
+                    .scaledFont(size: 12).foregroundColor(.secondary).minimumScaleFactor(0.8)
             }
             Text(label)
-                .font(.system(size: 12)).foregroundColor(.secondary)
+                .scaledFont(size: 12).foregroundColor(.secondary)
                 .multilineTextAlignment(.center).minimumScaleFactor(0.8).lineLimit(2)
         }
         .frame(maxWidth: .infinity)

@@ -57,7 +57,7 @@ struct PremiumSheet: View {
                     ZStack {
                         Circle().fill(Color(UIColor.systemGray5)).frame(width: 32, height: 32)
                         Image(systemName: "xmark")
-                            .font(.system(size: 12, weight: .bold))
+                            .scaledFont(size: 12, weight: .bold)
                             .foregroundColor(.secondary)
                             .accessibilityHidden(true)
                     }
@@ -75,14 +75,14 @@ struct PremiumSheet: View {
                         ZStack {
                             Circle().fill(Color.orange.opacity(0.15)).frame(width: 80, height: 80)
                             Image(systemName: "crown.fill")
-                                .font(.system(size: 36))
+                                .scaledFont(size: 36)
                                 .foregroundColor(.orange)
                                 .accessibilityHidden(true)
                         }
                         Text(String(localized: "premium.title"))
-                            .font(.system(size: 26, weight: .bold))
+                            .scaledFont(size: 26, weight: .bold)
                         Text(String(localized: "premium.subtitle"))
-                            .font(.system(size: 15))
+                            .scaledFont(size: 15)
                             .foregroundColor(.secondary)
                             .multilineTextAlignment(.center)
                     }
@@ -116,7 +116,7 @@ struct PremiumSheet: View {
                     // MARK: Aperçu icônes Premium
                     VStack(alignment: .leading, spacing: 12) {
                         Text(String(localized: "premium.icons_preview_title"))
-                            .font(.system(size: 13, weight: .semibold))
+                            .scaledFont(size: 13, weight: .semibold)
                             .foregroundColor(.secondary)
                             .padding(.leading, 4)
 
@@ -151,7 +151,7 @@ struct PremiumSheet: View {
                                         )
                                         .accessibilityLabel(icon.localizedName)
                                         Text(icon.localizedName)
-                                            .font(.system(size: 10, weight: .medium))
+                                            .scaledFont(size: 10, weight: .medium)
                                             .foregroundColor(.secondary)
                                             .lineLimit(1)
                                     }
@@ -206,16 +206,16 @@ private struct LaunchCTASection: View {
                             .fill(Color.app.primary.opacity(0.12))
                             .frame(width: 44, height: 44)
                         Image(systemName: "sparkles")
-                            .font(.system(size: 20))
+                            .scaledFont(size: 20)
                             .foregroundColor(Color.app.primary)
                             .accessibilityHidden(true)
                     }
                     VStack(alignment: .leading, spacing: 3) {
                         HStack(spacing: 6) {
                             Text(String(localized: "premium.launch.free_title"))
-                                .font(.system(size: 15, weight: .bold))
+                                .scaledFont(size: 15, weight: .bold)
                             Text(String(localized: "premium.launch.beta_badge"))
-                                .font(.system(size: 10, weight: .bold))
+                                .scaledFont(size: 10, weight: .bold)
                                 .foregroundColor(.white)
                                 .padding(.horizontal, 6)
                                 .padding(.vertical, 2)
@@ -224,7 +224,7 @@ private struct LaunchCTASection: View {
                                 .accessibilityHidden(true)
                         }
                         Text(String(localized: "premium.launch.coming_soon"))
-                            .font(.system(size: 13))
+                            .scaledFont(size: 13)
                             .foregroundColor(.secondary)
                     }
                     Spacer()
@@ -235,7 +235,7 @@ private struct LaunchCTASection: View {
 
                 // Message
                 Text(String(localized: "premium.launch.message"))
-                    .font(.system(size: 13))
+                    .scaledFont(size: 13)
                     .foregroundColor(.secondary)
                     .multilineTextAlignment(.leading)
                     .lineSpacing(3)
@@ -248,27 +248,27 @@ private struct LaunchCTASection: View {
                         case .loading:
                             ProgressView().tint(.white)
                             Text(String(localized: "premium.launch.notify_loading"))
-                                .font(.system(size: 15, weight: .semibold))
+                                .scaledFont(size: 15, weight: .semibold)
                         case .registered:
-                            Image(systemName: "checkmark.circle.fill").font(.system(size: 16))
+                            Image(systemName: "checkmark.circle.fill").scaledFont(size: 16)
                                 .accessibilityHidden(true)
                             Text(String(localized: "premium.launch.notify_registered"))
-                                .font(.system(size: 15, weight: .semibold))
+                                .scaledFont(size: 15, weight: .semibold)
                         case .denied:
-                            Image(systemName: "bell.slash.fill").font(.system(size: 16))
+                            Image(systemName: "bell.slash.fill").scaledFont(size: 16)
                                 .accessibilityHidden(true)
                             Text(String(localized: "premium.launch.notify_denied"))
-                                .font(.system(size: 15, weight: .semibold))
+                                .scaledFont(size: 15, weight: .semibold)
                         case .idle:
                             Image(systemName: alreadyRegistered
                                   ? "checkmark.circle.fill"
                                   : "bell.fill")
-                                .font(.system(size: 16))
+                                .scaledFont(size: 16)
                                 .accessibilityHidden(true)
                             Text(alreadyRegistered
                                  ? String(localized: "premium.launch.notify_already")
                                  : String(localized: "premium.launch.notify_cta"))
-                                .font(.system(size: 15, weight: .semibold))
+                                .scaledFont(size: 15, weight: .semibold)
                         }
                     }
                     .foregroundColor(.white)
@@ -326,7 +326,7 @@ private struct LaunchCTASection: View {
             // Fermer
             Button { isPresented = false } label: {
                 Text(String(localized: "premium.launch.dismiss"))
-                    .font(.system(size: 13))
+                    .scaledFont(size: 13)
                     .foregroundColor(.secondary)
             }
             .accessibilityLabel(String(localized: "premium.launch.dismiss"))
@@ -412,18 +412,18 @@ private struct FeatureRow: View {
                     .fill(color.opacity(0.12))
                     .frame(width: 40, height: 40)
                 Image(systemName: sfSymbol)
-                    .font(.system(size: 16, weight: .medium))
+                    .scaledFont(size: 16, weight: .medium)
                     .foregroundColor(color)
                     .accessibilityHidden(true)
             }
             VStack(alignment: .leading, spacing: 2) {
-                Text(title).font(.system(size: 14, weight: .semibold))
-                Text(subtitle).font(.system(size: 12)).foregroundColor(.secondary)
+                Text(title).scaledFont(size: 14, weight: .semibold)
+                Text(subtitle).scaledFont(size: 12).foregroundColor(.secondary)
             }
             Spacer()
             Image(systemName: "checkmark.circle.fill")
                 .foregroundColor(Color.app.greenDark)
-                .font(.system(size: 18))
+                .scaledFont(size: 18)
                 .accessibilityHidden(true)
         }
         .padding(.horizontal, 16)

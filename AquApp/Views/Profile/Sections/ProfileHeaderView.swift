@@ -56,7 +56,7 @@ struct ProfileHeaderView: View {
                 VStack(alignment: .leading, spacing: 6) {
                     HStack(spacing: 8) {
                         Text(userName)
-                            .font(.system(size: 20, weight: .bold))
+                            .scaledFont(size: 20, weight: .bold)
                             .minimumScaleFactor(0.8)
                             .lineLimit(1)
                         if let badge = selectedBadge {
@@ -65,7 +65,7 @@ struct ProfileHeaderView: View {
                                     .fill(badge.color.opacity(0.15))
                                     .frame(width: 30, height: 30)
                                 Image(systemName: badge.sfSymbol)
-                                    .font(.system(size: 13, weight: .medium))
+                                    .scaledFont(size: 13, weight: .medium)
                                     .foregroundColor(badge.color)
                             }
                             .accessibilityLabel(String(format: String(localized: "profile.badge_label"), badge.title))
@@ -77,12 +77,12 @@ struct ProfileHeaderView: View {
                     } label: {
                         HStack(spacing: 4) {
                             Image(systemName: "medal.fill")
-                                .font(.system(size: 11))
+                                .scaledFont(size: 11)
                                 .accessibilityHidden(true)
                             Text(selectedBadge == nil
                                  ? String(localized: "profile.choose_badge")
                                  : String(localized: "profile.change_badge"))
-                                .font(.system(size: 12, weight: .semibold))
+                                .scaledFont(size: 12, weight: .semibold)
                         }
                         .foregroundColor(Color.app.primary)
                         .padding(.horizontal, 10)
@@ -102,11 +102,11 @@ struct ProfileHeaderView: View {
                 if isPremiumUser {
                     VStack(spacing: 2) {
                         Image(systemName: "crown.fill")
-                            .font(.system(size: 16))
+                            .scaledFont(size: 16)
                             .foregroundColor(.orange)
                             .accessibilityHidden(true)
                         Text(String(localized: "profile.pro_label"))
-                            .font(.system(size: 10, weight: .bold))
+                            .scaledFont(size: 10, weight: .bold)
                             .foregroundColor(.orange)
                     }
                     .accessibilityLabel(String(localized: "profile.premium_active_label"))
@@ -171,12 +171,12 @@ struct ProfileStatCell: View {
     var body: some View {
         VStack(spacing: 4) {
             Text(value)
-                .font(.system(size: 20, weight: .bold))
+                .scaledFont(size: 20, weight: .bold)
                 .foregroundColor(color)
                 .minimumScaleFactor(0.7)
                 .lineLimit(1)
             Text(label)
-                .font(.system(size: 11))
+                .scaledFont(size: 11)
                 .foregroundColor(.secondary)
                 .minimumScaleFactor(0.8)
                 .lineLimit(2)
@@ -217,10 +217,10 @@ private struct XPProgressBlock: View {
 
                     VStack(alignment: .leading, spacing: 1) {
                         Text(String(localized: "xp.level.label") + " \(xp.currentLevel.rawValue)")
-                            .font(.system(size: 11, weight: .semibold))
+                            .scaledFont(size: 11, weight: .semibold)
                             .foregroundColor(.secondary)
                         Text(xp.currentLevel.localizedName)
-                            .font(.system(size: 14, weight: .bold))
+                            .scaledFont(size: 14, weight: .bold)
                             .foregroundColor(xp.currentLevel.displayColor)
                     }
                 }
@@ -230,12 +230,12 @@ private struct XPProgressBlock: View {
                 // XP dans le niveau courant
                 if isMaxLevel {
                     Text(String(localized: "xp.max_level"))
-                        .font(.system(size: 12, weight: .semibold))
+                        .scaledFont(size: 12, weight: .semibold)
                         .foregroundColor(xp.currentLevel.displayColor)
                 } else {
                     VStack(alignment: .trailing, spacing: 1) {
                         Text("\(xp.xpInCurrentLevel) / \(xp.currentLevelRange) XP")
-                            .font(.system(size: 12, weight: .semibold))
+                            .scaledFont(size: 12, weight: .semibold)
                             .foregroundColor(.secondary)
                             .monospacedDigit()
                     }
@@ -256,11 +256,11 @@ private struct XPProgressBlock: View {
                 // Total cumulé
                 HStack(spacing: 4) {
                     Image(systemName: "drop.fill")
-                        .font(.system(size: 9, weight: .semibold))
+                        .scaledFont(size: 9, weight: .semibold)
                         .foregroundColor(xp.currentLevel.displayColor)
                         .accessibilityHidden(true)
                     Text(String(format: String(localized: "xp.total_cumulated"), xp.totalXP))
-                        .font(.system(size: 11))
+                        .scaledFont(size: 11)
                         .foregroundColor(.secondary)
                 }
 
@@ -270,7 +270,7 @@ private struct XPProgressBlock: View {
                 if let remaining = xp.xpUntilNextLevel,
                    let nextLevel = xp.currentLevel.next {
                     Text(String(format: String(localized: "xp.until_next_level"), remaining, nextLevel.localizedName))
-                        .font(.system(size: 11))
+                        .scaledFont(size: 11)
                         .foregroundColor(.secondary)
                 }
             }

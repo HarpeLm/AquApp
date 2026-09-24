@@ -32,14 +32,14 @@ struct HomeView: View {
                         // MARK: Header
                         VStack(alignment: .leading, spacing: 4) {
                             Text(L10n.homeGoodMorning)
-                                .font(.system(size: 18))
+                                .scaledFont(size: 18)
                                 .foregroundColor(.secondary)
                             HStack(spacing: 8) {
                                 Text(userName)
-                                    .font(.system(size: 32, weight: .bold))
+                                    .scaledFont(size: 32, weight: .bold)
                                 Image(systemName: "hand.wave.fill")
                                     .accessibilityHidden(true)
-                                    .font(.system(size: 28))
+                                    .scaledFont(size: 28)
                                     .foregroundColor(.orange)
                             }
                         }
@@ -99,6 +99,7 @@ struct HomeView: View {
                                 unit: L10n.homeDays(store.soberDaysStreak)
                             )
                         }
+                        .fixedSize(horizontal: false, vertical: true)
                         .padding(.horizontal)
 
                         // MARK: Activité récente
@@ -168,21 +169,21 @@ struct HeatwaveBanner: View {
                     .fill(Color.orange.opacity(0.15))
                     .frame(width: 44, height: 44)
                 Image(systemName: "thermometer.sun.fill")
-                    .font(.system(size: 20))
+                    .scaledFont(size: 20)
                     .foregroundColor(.orange)
                     .accessibilityHidden(true)
             }
             VStack(alignment: .leading, spacing: 2) {
                 Text(L10n.heatwaveBannerTitle)
-                    .font(.system(size: 14, weight: .bold))
+                    .scaledFont(size: 14, weight: .bold)
                     .foregroundColor(.primary)
                 Text(String(format: L10n.heatwaveBannerBody, UnitFormatter.volume(adaptedMl)))
-                    .font(.system(size: 12))
+                    .scaledFont(size: 12)
                     .foregroundColor(.secondary)
             }
             Spacer()
             Text(String(format: String(localized: "heatwave.temp_label"), Int(tempC)))
-                .font(.system(size: 16, weight: .black, design: .rounded))
+                .scaledFont(size: 16, weight: .black, design: .rounded)
                 .foregroundColor(.orange)
         }
         .padding(14)
@@ -228,13 +229,17 @@ struct ProgressCard: View {
                     .rotationEffect(.degrees(-90))
                     .frame(width: 160, height: 160)
                     .animation(.easeInOut(duration: 0.6), value: progress)
+                // Anneau de taille fixe : le texte se réduit plutôt que de passer sous le trait.
                 VStack(spacing: 4) {
                     Text("\(percent)%")
-                        .font(.system(size: 36, weight: .bold))
+                        .scaledFont(size: 36, weight: .bold)
                     Text("\(UnitFormatter.volumeNumber(current)) / \(UnitFormatter.volume(goal))")
-                        .font(.system(size: 13))
+                        .scaledFont(size: 13)
                         .foregroundColor(.secondary)
                 }
+                .lineLimit(1)
+                .minimumScaleFactor(0.5)
+                .frame(width: 120)
             }
             .frame(maxWidth: .infinity)
             .accessibilityElement(children: .ignore)
@@ -261,17 +266,17 @@ struct ProgressCard: View {
                 .accessibilityHidden(true)
 
                 Text(String(format: String(localized: "progress.goal_label"), Int(goal)))
-                    .font(.system(size: 12))
+                    .scaledFont(size: 12)
                     .foregroundColor(.secondary)
 
                 if compensation > 0 {
                     HStack(spacing: 4) {
                         Image(systemName: "wineglass.fill")
-                            .font(.system(size: 10))
+                            .scaledFont(size: 10)
                             .foregroundColor(.orange)
                             .accessibilityHidden(true)
                         Text(String(format: String(localized: "progress.alcohol_compensation"), Int(compensation)))
-                            .font(.system(size: 11, weight: .medium))
+                            .scaledFont(size: 11, weight: .medium)
                             .foregroundColor(.orange)
                     }
                     .transition(.opacity.combined(with: .move(edge: .bottom)))
@@ -298,12 +303,12 @@ struct ActionButton: View {
         Button(action: action) {
             HStack(spacing: 10) {
                 Image(systemName: sfSymbol)
-                    .font(.system(size: 22, weight: .medium))
+                    .scaledFont(size: 22, weight: .medium)
                     .foregroundColor(.white)
                     .frame(width: 26, height: 26)
                     .accessibilityHidden(true)
                 Text(label)
-                    .font(.system(size: 18, weight: .semibold))
+                    .scaledFont(size: 18, weight: .semibold)
                     .foregroundColor(.white)
                     .minimumScaleFactor(0.8)
                     .lineLimit(1)
@@ -338,28 +343,28 @@ struct StatCard: View {
                     .fill(symbolColor.opacity(0.12))
                     .frame(width: 40, height: 40)
                 Image(systemName: sfSymbol)
-                    .font(.system(size: 18, weight: .medium))
+                    .scaledFont(size: 18, weight: .medium)
                     .foregroundColor(symbolColor)
                     .accessibilityHidden(true)
             }
             HStack(alignment: .lastTextBaseline, spacing: 4) {
                 Text(value)
-                    .font(.system(size: 32, weight: .bold))
+                    .scaledFont(size: 32, weight: .bold)
                     .minimumScaleFactor(0.7)
                     .lineLimit(1)
                 Text(unit)
-                    .font(.system(size: 14))
+                    .scaledFont(size: 14)
                     .foregroundColor(.secondary)
                     .minimumScaleFactor(0.8)
             }
             Text(label)
-                .font(.system(size: 14))
+                .scaledFont(size: 14)
                 .foregroundColor(.secondary)
                 .minimumScaleFactor(0.8)
                 .lineLimit(2)
         }
         .padding(16)
-        .frame(maxWidth: .infinity, alignment: .leading)
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
         .background(Color.app.card)
         .cornerRadius(16)
         .shadow(color: .black.opacity(0.05), radius: 8, x: 0, y: 2)
@@ -389,7 +394,7 @@ struct SwipeToDeleteView<Content: View>: View {
                 .frame(height: 50)
                 .overlay(
                     Image(systemName: "trash.fill")
-                        .font(.system(size: 18, weight: .bold))
+                        .scaledFont(size: 18, weight: .bold)
                         .foregroundColor(.red)
                         .padding(.leading, 24)
                         .opacity(offset < -40 ? 1 : 0)
@@ -475,7 +480,7 @@ struct RecentActivitySection: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             Text(L10n.homeRecentActivity)
-                .font(.system(size: 20, weight: .bold))
+                .scaledFont(size: 20, weight: .bold)
 
             if items.isEmpty {
                 VStack(spacing: 12) {
@@ -485,13 +490,13 @@ struct RecentActivitySection: View {
                             .frame(width: 56, height: 56)
                         Image(systemName: "drop")
                             .accessibilityHidden(true)
-                            .font(.system(size: 24))
+                            .scaledFont(size: 24)
                             .foregroundColor(Color.app.primary)
                     }
                     Text(L10n.homeNoActivity)
-                        .font(.system(size: 15, weight: .semibold))
+                        .scaledFont(size: 15, weight: .semibold)
                     Text(L10n.homeNoActivitySub)
-                        .font(.system(size: 13))
+                        .scaledFont(size: 13)
                         .foregroundColor(.secondary)
                 }
                 .frame(maxWidth: .infinity)
@@ -510,14 +515,14 @@ struct RecentActivitySection: View {
                                         .frame(width: 40, height: 40)
                                     Image(systemName: item.isWater ? "drop.fill" : "wineglass.fill")
                                         .accessibilityHidden(true)
-                                        .font(.system(size: 16, weight: .medium))
+                                        .scaledFont(size: 16, weight: .medium)
                                         .foregroundColor(item.isWater ? Color.app.primary : Color.app.alcoholLight)
                                 }
                                 VStack(alignment: .leading, spacing: 2) {
                                     Text(item.label)
-                                        .font(.system(size: 15, weight: .semibold))
+                                        .scaledFont(size: 15, weight: .semibold)
                                     Text(item.time)
-                                        .font(.system(size: 13))
+                                        .scaledFont(size: 13)
                                         .foregroundColor(.secondary)
                                 }
                                 Spacer()
@@ -528,7 +533,7 @@ struct RecentActivitySection: View {
                                     }
                                 } label: {
                                     Image(systemName: "trash")
-                                        .font(.system(size: 13))
+                                        .scaledFont(size: 13)
                                         .foregroundColor(.red.opacity(0.6))
                                         .padding(8)
                                 }

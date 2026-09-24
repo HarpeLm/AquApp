@@ -22,7 +22,7 @@ struct KeyboardToolbarModifier: ViewModifier {
                             for: nil
                         )
                     }
-                    .font(.system(size: 16, weight: .semibold))
+                    .scaledFont(size: 16, weight: .semibold)
                     .foregroundColor(Color.app.primary)
                 }
             }

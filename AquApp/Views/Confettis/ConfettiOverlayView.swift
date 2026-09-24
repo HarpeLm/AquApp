@@ -57,7 +57,7 @@ private struct EventCard: View {
                     .fill(Color.white.opacity(0.25))
                     .frame(width: 44, height: 44)
                 Image(systemName: event.sfSymbol)
-                    .font(.system(size: 20, weight: .medium))
+                    .scaledFont(size: 20, weight: .medium)
                     .foregroundColor(.white)
                     .accessibilityHidden(true)
             }
@@ -66,17 +66,17 @@ private struct EventCard: View {
                 // Subtitle avec SF Symbol
                 HStack(spacing: 4) {
                     Image(systemName: event.subtitleSymbol)
-                        .font(.system(size: 11, weight: .semibold))
+                        .scaledFont(size: 11, weight: .semibold)
                         .foregroundColor(.white.opacity(0.85))
                         .accessibilityHidden(true)
                     Text(event.subtitle)
-                        .font(.system(size: 12, weight: .semibold))
+                        .scaledFont(size: 12, weight: .semibold)
                         .foregroundColor(.white.opacity(0.85))
                 }
 
                 // Titre principal
                 Text(event.title)
-                    .font(.system(size: 15, weight: .bold))
+                    .scaledFont(size: 15, weight: .bold)
                     .foregroundColor(.white)
                     .lineLimit(1)
                     .minimumScaleFactor(0.8)
@@ -85,7 +85,7 @@ private struct EventCard: View {
             Spacer()
 
             Image(systemName: "checkmark.circle.fill")
-                .font(.system(size: 22))
+                .scaledFont(size: 22)
                 .foregroundColor(.white)
                 .accessibilityHidden(true)
         }

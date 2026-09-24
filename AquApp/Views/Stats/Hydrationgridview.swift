@@ -61,12 +61,12 @@ struct HydrationGridView: View {
         VStack(alignment: .leading, spacing: 12) {
             HStack(spacing: 8) {
                 Text(String(localized: "stats.grid.title"))
-                    .font(.system(size: 15, weight: .bold))
+                    .scaledFont(size: 15, weight: .bold)
                     .foregroundColor(.white)
                     .lineLimit(1)
 
                 Text("\(reachedTotal)")
-                    .font(.system(size: 12, weight: .semibold))
+                    .scaledFont(size: 12, weight: .semibold)
                     .foregroundColor(.white.opacity(0.6))
 
                 Spacer()
@@ -102,7 +102,7 @@ struct HydrationGridView: View {
     private func monthBlock(_ month: Date, columns: [[Date?]]) -> some View {
         VStack(alignment: .leading, spacing: 6) {
             Text(month.formatted(.dateTime.month(.abbreviated).year(.twoDigits)))
-                .font(.system(size: 9, weight: .bold))
+                .scaledFont(size: 9, weight: .bold)
                 .foregroundColor(.white.opacity(0.75))
                 .padding(.bottom, 1)
 
@@ -153,7 +153,7 @@ struct HydrationGridView: View {
             }
             Text(String(localized: "stats.grid.more"))
         }
-        .font(.system(size: 10, weight: .medium))
+        .scaledFont(size: 10, weight: .medium)
         .foregroundColor(.white.opacity(0.6))
     }
 

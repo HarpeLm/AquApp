@@ -91,14 +91,14 @@ struct OnboardingView: View {
                             if currentPage < pages.count - 1 {
                                 HStack(spacing: 8) {
                                     Text(String(localized: "onboarding.next"))
-                                        .font(.system(size: 18, weight: .bold))
+                                        .scaledFont(size: 18, weight: .bold)
                                     Image(systemName: "arrow.right")
-                                        .font(.system(size: 16, weight: .bold))
+                                        .scaledFont(size: 16, weight: .bold)
                                         .accessibilityHidden(true)
                                 }
                             } else {
                                 Image(systemName: "arrow.right")
-                                    .font(.system(size: 18, weight: .bold))
+                                    .scaledFont(size: 18, weight: .bold)
                             }
                         }
                         .foregroundColor(.white)
@@ -124,7 +124,7 @@ struct OnboardingView: View {
                                 }
                             } label: {
                                 Text(String(localized: "onboarding.skip"))
-                                    .font(.system(size: 14))
+                                    .scaledFont(size: 14)
                                     .foregroundColor(.secondary)
                             }
                         } else {
@@ -180,18 +180,18 @@ struct OnboardingPageView: View {
                         .frame(width: 110, height: 110)
                         .shadow(color: page.color.opacity(0.4), radius: 20, x: 0, y: 8)
                     Image(systemName: page.sfSymbol)
-                        .font(.system(size: 48, weight: .medium))
+                        .scaledFont(size: 48, weight: .medium)
                         .foregroundColor(.white)
                 }
             }
 
             VStack(spacing: 16) {
                 Text(page.title)
-                    .font(.system(size: 28, weight: .bold))
+                    .scaledFont(size: 28, weight: .bold)
                     .multilineTextAlignment(.center)
 
                 Text(page.description)
-                    .font(.system(size: 16))
+                    .scaledFont(size: 16)
                     .foregroundColor(.secondary)
                     .multilineTextAlignment(.center)
                     .lineSpacing(4)

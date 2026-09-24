@@ -29,15 +29,15 @@ struct ProfileNotificationView: View {
                         .accessibilityHidden(true)
                     VStack(alignment: .leading, spacing: 2) {
                         Text(L10n.profileNotifications)
-                            .font(.system(size: 15))
+                            .scaledFont(size: 15)
                             .foregroundColor(.primary)
                         Text(subtitle)
-                            .font(.system(size: 12))
+                            .scaledFont(size: 12)
                             .foregroundColor(.secondary)
                     }
                     Spacer()
                     Image(systemName: "chevron.right")
-                        .font(.system(size: 12))
+                        .scaledFont(size: 12)
                         .foregroundColor(Color(UIColor.systemGray3))
                         .accessibilityHidden(true)
                 }

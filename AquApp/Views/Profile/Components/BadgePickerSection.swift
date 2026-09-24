@@ -17,13 +17,13 @@ struct BadgePickerSection: View {
         VStack(alignment: .leading, spacing: 12) {
             HStack {
                 Text(String(localized: "profile.choose_badge"))
-                    .font(.system(size: 15, weight: .semibold))
+                    .scaledFont(size: 15, weight: .semibold)
                 Spacer()
                 Button(action: onClose) {
                     Image(systemName: "xmark.circle.fill")
                         .accessibilityHidden(true)
                         .foregroundColor(Color(UIColor.systemGray3))
-                        .font(.system(size: 20))
+                        .scaledFont(size: 20)
                 }
             }
 
@@ -54,14 +54,14 @@ struct BadgePickerSection: View {
                                     )
 
                                 Image(systemName: badge.sfSymbol)
-                                    .font(.system(size: 20, weight: .medium))
+                                    .scaledFont(size: 20, weight: .medium)
                                     .foregroundColor(isLocked ? Color(UIColor.systemGray3) : badge.color)
                                     .accessibilityHidden(true)
 
                                 if isLocked {
                                     Image(systemName: "lock.fill")
                                         .accessibilityHidden(true)
-                                        .font(.system(size: 10))
+                                        .scaledFont(size: 10)
                                         .foregroundColor(.white)
                                         .padding(3)
                                         .background(Color(UIColor.systemGray3))
@@ -72,7 +72,7 @@ struct BadgePickerSection: View {
                             }
 
                             Text(badge.title)
-                                .font(.system(size: 10, weight: .medium))
+                                .scaledFont(size: 10, weight: .medium)
                                 .foregroundColor(isLocked ? Color(UIColor.systemGray3) : .primary)
                                 .lineLimit(1)
                                 .minimumScaleFactor(0.7)

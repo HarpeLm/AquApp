@@ -122,7 +122,7 @@ struct ProfileAvatarView: View {
                     .clipShape(Circle())
             } else {
                 Text(initials)
-                    .font(.system(size: size * 0.4, weight: .bold))
+                    .scaledFont(size: size * 0.4, weight: .bold)
                     .foregroundColor(.white)
             }
 
@@ -145,7 +145,7 @@ struct ProfileAvatarView: View {
                 .fill(Color.app.card)
                 .frame(width: 24, height: 24)
             Image(systemName: photoManager.image == nil ? "camera.fill" : "arrow.triangle.2.circlepath")
-                .font(.system(size: 10, weight: .bold))
+                .scaledFont(size: 10, weight: .bold)
                 .foregroundColor(Color.app.primary)
         }
         .shadow(color: .black.opacity(0.15), radius: 3, y: 1)

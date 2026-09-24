@@ -122,7 +122,7 @@ struct ProfileView: View {
 
                         VStack(alignment: .leading, spacing: 4) {
                             Text("profile.title")          // → "Profil"
-                                .font(.system(size: 32, weight: .bold))
+                                .scaledFont(size: 32, weight: .bold)
                                 .accessibilityAddTraits(.isHeader)
                             Text("profile.subtitle")       // → "Gérez vos préférences"
                                 .font(.subheadline)
@@ -189,17 +189,17 @@ struct ProfileView: View {
                         } label: {
                             HStack(spacing: 10) {
                                 Image(systemName: isPremiumUser ? "checkmark.seal.fill" : "crown.fill")
-                                    .font(.system(size: 16, weight: .bold))
+                                    .scaledFont(size: 16, weight: .bold)
                                 VStack(alignment: .leading, spacing: 2) {
                                     Text(isPremiumUser ? "Premium Actif ✓" : "Activer Premium (Debug)")
-                                        .font(.system(size: 14, weight: .semibold))
+                                        .scaledFont(size: 14, weight: .semibold)
                                     Text(isPremiumUser ? "Tap to disable" : "Tap to enable")
-                                        .font(.system(size: 11))
+                                        .scaledFont(size: 11)
                                         .foregroundColor(.secondary)
                                 }
                                 Spacer()
                                 Image(systemName: "arrow.triangle.2.circlepath")
-                                    .font(.system(size: 14))
+                                    .scaledFont(size: 14)
                             }
                             .foregroundColor(isPremiumUser ? .green : .orange)
                             .padding(14)
@@ -269,10 +269,10 @@ struct ProfileView: View {
     private var appInfoSection: some View {
         VStack(spacing: 4) {
             Text("AquApp")
-                .font(.system(size: 13, weight: .semibold))
+                .scaledFont(size: 13, weight: .semibold)
                 .foregroundColor(.secondary)
             Text("Version \(appVersion)")
-                .font(.system(size: 12))
+                .scaledFont(size: 12)
                 .foregroundColor(Color(UIColor.systemGray3))
         }
     }

@@ -155,7 +155,7 @@ struct AppIconPickerView: View {
             )
             VStack(alignment: .leading, spacing: 0) {
                 Text(String(localized: "profile.app_icon.subtitle"))
-                    .font(.system(size: 13))
+                    .scaledFont(size: 13)
                     .foregroundColor(.secondary)
                     .padding(.horizontal, 16)
                     .padding(.top, 14)
@@ -183,9 +183,9 @@ struct AppIconPickerView: View {
                     HStack(spacing: 8) {
                         Image(systemName: "checkmark.circle.fill")
                             .foregroundColor(.green)
-                            .font(.system(size: 14))
+                            .scaledFont(size: 14)
                         Text(toast)
-                            .font(.system(size: 13, weight: .medium))
+                            .scaledFont(size: 13, weight: .medium)
                             .foregroundColor(.primary)
                     }
                     .padding(.horizontal, 16)
@@ -239,7 +239,7 @@ struct AppIconCell: View {
                         ZStack {
                             Circle().fill(Color.orange).frame(width: 18, height: 18)
                             Image(systemName: "crown.fill")
-                                .font(.system(size: 9, weight: .bold))
+                                .scaledFont(size: 9, weight: .bold)
                                 .foregroundColor(.white)
                         }
                         .offset(x: 4, y: -4)
@@ -247,7 +247,7 @@ struct AppIconCell: View {
                         ZStack {
                             Circle().fill(Color.app.primary).frame(width: 18, height: 18)
                             Image(systemName: "checkmark")
-                                .font(.system(size: 9, weight: .bold))
+                                .scaledFont(size: 9, weight: .bold)
                                 .foregroundColor(.white)
                         }
                         .offset(x: 4, y: -4)
@@ -256,7 +256,7 @@ struct AppIconCell: View {
                 .frame(width: 62, height: 62)
 
                 Text(icon.localizedName)
-                    .font(.system(size: 10, weight: .medium))
+                    .scaledFont(size: 10, weight: .medium)
                     .foregroundColor(isSelected ? Color.app.primary : .secondary)
                     .lineLimit(1)
                     .minimumScaleFactor(0.7)
@@ -265,7 +265,7 @@ struct AppIconCell: View {
                     if isSelected {
                         Text(String(localized: "profile.app_icon.active_badge"))
                             .foregroundColor(.white)
-                            .font(.system(size: 9, weight: .bold))
+                            .scaledFont(size: 9, weight: .bold)
                             .padding(.horizontal, 6)
                             .padding(.vertical, 3)
                             .background(Color.app.primary)
@@ -273,7 +273,7 @@ struct AppIconCell: View {
                     } else if !icon.isPremium {
                         Text(String(localized: "profile.app_icon.free_label"))
                             .foregroundColor(Color.app.primaryDark)
-                            .font(.system(size: 9, weight: .bold))
+                            .scaledFont(size: 9, weight: .bold)
                             .padding(.horizontal, 6)
                             .padding(.vertical, 3)
                             .background(Color.app.primaryLight)
@@ -281,7 +281,7 @@ struct AppIconCell: View {
                     } else {
                         Text(String(localized: "profile.app_icon.premium_label"))
                             .foregroundColor(isUnlocked ? .orange : Color(UIColor.systemGray3))
-                            .font(.system(size: 9, weight: .bold))
+                            .scaledFont(size: 9, weight: .bold)
                             .padding(.horizontal, 6)
                             .padding(.vertical, 3)
                             .background(isUnlocked ? Color.orange.opacity(0.12) : Color(UIColor.systemGray6))

@@ -71,7 +71,7 @@ struct BodyProfileView: View {
                                 .frame(width: 90, height: 90)
                                 .shadow(color: Color.app.alcoholMid.opacity(0.4), radius: 15, x: 0, y: 6)
                             Image(systemName: "person.fill")
-                                .font(.system(size: 40, weight: .medium))
+                                .scaledFont(size: 40, weight: .medium)
                                 .foregroundColor(.white)
                         }
                     }
@@ -79,10 +79,10 @@ struct BodyProfileView: View {
 
                     VStack(spacing: 12) {
                         Text(String(localized: "onboarding.body.title"))
-                            .font(.system(size: 28, weight: .bold))
+                            .scaledFont(size: 28, weight: .bold)
                             .multilineTextAlignment(.center)
                         Text(String(localized: "onboarding.body.sub"))
-                            .font(.system(size: 16))
+                            .scaledFont(size: 16)
                             .foregroundColor(.secondary)
                             .multilineTextAlignment(.center)
                     }
@@ -93,7 +93,7 @@ struct BodyProfileView: View {
                         // Sexe
                         VStack(alignment: .leading, spacing: 10) {
                             Text(String(localized: "body.gender"))
-                                .font(.system(size: 15, weight: .bold)).padding(.horizontal, 4)
+                                .scaledFont(size: 15, weight: .bold).padding(.horizontal, 4)
                             VStack(spacing: 10) {
                                 ForEach(Gender.allCases, id: \.self) { gender in
                                     GenderButton(
@@ -109,14 +109,14 @@ struct BodyProfileView: View {
                         // Taille
                         VStack(alignment: .leading, spacing: 12) {
                             Text(String(localized: "body.height"))
-                                .font(.system(size: 15, weight: .bold)).padding(.horizontal, 4)
+                                .scaledFont(size: 15, weight: .bold).padding(.horizontal, 4)
                             VStack(spacing: 8) {
                                 HStack(alignment: .lastTextBaseline, spacing: 6) {
                                     Text("\(Int(UnitFormatter.heightValue(heightCm)))")
-                                        .font(.system(size: 48, weight: .bold))
+                                        .scaledFont(size: 48, weight: .bold)
                                         .foregroundColor(Color.app.primary)
                                     Text(UnitFormatter.heightUnitSymbol)
-                                        .font(.system(size: 18, weight: .medium))
+                                        .scaledFont(size: 18, weight: .medium)
                                         .foregroundColor(.secondary)
                                 }
                                 .frame(maxWidth: .infinity, alignment: .center)
@@ -126,10 +126,10 @@ struct BodyProfileView: View {
                                     .accessibilityValue(UnitFormatter.height(heightCm))
                                 HStack {
                                     Text(UnitFormatter.heightSliderBound(140))
-                                        .font(.system(size: 11)).foregroundColor(.secondary)
+                                        .scaledFont(size: 11).foregroundColor(.secondary)
                                     Spacer()
                                     Text(UnitFormatter.heightSliderBound(220))
-                                        .font(.system(size: 11)).foregroundColor(.secondary)
+                                        .scaledFont(size: 11).foregroundColor(.secondary)
                                 }
                                 .padding(.horizontal, 8)
                             }
@@ -138,14 +138,14 @@ struct BodyProfileView: View {
                         // Poids
                         VStack(alignment: .leading, spacing: 12) {
                             Text(String(localized: "body.weight"))
-                                .font(.system(size: 15, weight: .bold)).padding(.horizontal, 4)
+                                .scaledFont(size: 15, weight: .bold).padding(.horizontal, 4)
                             VStack(spacing: 8) {
                                 HStack(alignment: .lastTextBaseline, spacing: 6) {
                                     Text("\(Int(UnitFormatter.weightValue(weightKg)))")
-                                        .font(.system(size: 48, weight: .bold))
+                                        .scaledFont(size: 48, weight: .bold)
                                         .foregroundColor(Color.app.greenDark)
                                     Text(UnitFormatter.weightUnitSymbol)
-                                        .font(.system(size: 18, weight: .medium))
+                                        .scaledFont(size: 18, weight: .medium)
                                         .foregroundColor(.secondary)
                                 }
                                 .frame(maxWidth: .infinity, alignment: .center)
@@ -155,10 +155,10 @@ struct BodyProfileView: View {
                                     .accessibilityValue(UnitFormatter.weight(weightKg))
                                 HStack {
                                     Text(UnitFormatter.weightSliderBound(30))
-                                        .font(.system(size: 11)).foregroundColor(.secondary)
+                                        .scaledFont(size: 11).foregroundColor(.secondary)
                                     Spacer()
                                     Text(UnitFormatter.weightSliderBound(200))
-                                        .font(.system(size: 11)).foregroundColor(.secondary)
+                                        .scaledFont(size: 11).foregroundColor(.secondary)
                                 }
                                 .padding(.horizontal, 8)
                             }
@@ -166,12 +166,12 @@ struct BodyProfileView: View {
 
                         // Aperçu objectif
                         HStack(spacing: 12) {
-                            Image(systemName: "drop.fill").font(.system(size: 20)).foregroundColor(goalColor)
+                            Image(systemName: "drop.fill").scaledFont(size: 20).foregroundColor(goalColor)
                             VStack(alignment: .leading, spacing: 2) {
                                 Text(String(localized: "body.new_calculated_goal"))
-                                    .font(.system(size: 13)).foregroundColor(.secondary)
+                                    .scaledFont(size: 13).foregroundColor(.secondary)
                                 Text(String(format: String(localized: "body.goal_ml_per_day"), Int(calculatedGoalMl)))
-                                    .font(.system(size: 20, weight: .bold)).foregroundColor(goalColor)
+                                    .scaledFont(size: 20, weight: .bold).foregroundColor(goalColor)
                             }
                             Spacer()
                         }
@@ -183,8 +183,8 @@ struct BodyProfileView: View {
                         Button { saveAndContinue() } label: {
                             HStack(spacing: 8) {
                                 Text(String(localized: "body.save_and_continue"))
-                                    .font(.system(size: 16, weight: .semibold))
-                                Image(systemName: "arrow.right").font(.system(size: 16, weight: .bold))
+                                    .scaledFont(size: 16, weight: .semibold)
+                                Image(systemName: "arrow.right").scaledFont(size: 16, weight: .bold)
                             }
                             .foregroundColor(.white).frame(maxWidth: .infinity).frame(height: 56)
                             .background(LinearGradient(

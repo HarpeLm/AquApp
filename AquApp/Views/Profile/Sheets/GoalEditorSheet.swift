@@ -35,9 +35,9 @@ struct GoalEditorSheet: View {
             HStack {
                 HStack(spacing: 8) {
                     Text(String(localized: "goal.editor.title"))
-                        .font(.system(size: 22, weight: .bold))
+                        .scaledFont(size: 22, weight: .bold)
                     Image(systemName: "drop.fill")
-                        .font(.system(size: 18))
+                        .scaledFont(size: 18)
                         .foregroundColor(Color.app.primary)
                 }
                 Spacer()
@@ -45,7 +45,7 @@ struct GoalEditorSheet: View {
                     ZStack {
                         Circle().fill(Color(UIColor.systemGray5)).frame(width: 32, height: 32)
                         Image(systemName: "xmark")
-                            .font(.system(size: 12, weight: .bold))
+                            .scaledFont(size: 12, weight: .bold)
                             .foregroundColor(.secondary)
                     }
                 }
@@ -61,14 +61,14 @@ struct GoalEditorSheet: View {
                     VStack(spacing: 6) {
                         HStack(alignment: .lastTextBaseline, spacing: 6) {
                             Text("\(Int(localGoal))")
-                                .font(.system(size: 52, weight: .bold))
+                                .scaledFont(size: 52, weight: .bold)
                                 .foregroundColor(goalColor)
                             Text("ml")
-                                .font(.system(size: 20, weight: .medium))
+                                .scaledFont(size: 20, weight: .medium)
                                 .foregroundColor(.secondary)
                         }
                         Text(String(localized: "goal.editor.subtitle"))
-                            .font(.system(size: 13))
+                            .scaledFont(size: 13)
                             .foregroundColor(.secondary)
                             .multilineTextAlignment(.center)
                     }
@@ -84,10 +84,10 @@ struct GoalEditorSheet: View {
                             .accessibilityValue("\(Int(localGoal)) ml")
                         HStack {
                             Text("500 ml")
-                                .font(.system(size: 11)).foregroundColor(.secondary)
+                                .scaledFont(size: 11).foregroundColor(.secondary)
                             Spacer()
                             Text("5000 ml")
-                                .font(.system(size: 11)).foregroundColor(.secondary)
+                                .scaledFont(size: 11).foregroundColor(.secondary)
                         }
                         .padding(.horizontal, 24)
                     }
@@ -95,7 +95,7 @@ struct GoalEditorSheet: View {
                     // Presets rapides
                     VStack(alignment: .leading, spacing: 10) {
                         Text(String(localized: "goal.editor.presets"))
-                            .font(.system(size: 15, weight: .bold))
+                            .scaledFont(size: 15, weight: .bold)
                             .padding(.horizontal, 20)
                         HStack(spacing: 10) {
                             ForEach(presets, id: \.self) { value in
@@ -103,7 +103,7 @@ struct GoalEditorSheet: View {
                                     withAnimation(.easeInOut(duration: 0.2)) { localGoal = value }
                                 } label: {
                                     Text("\(Int(value))")
-                                        .font(.system(size: 14, weight: .semibold))
+                                        .scaledFont(size: 14, weight: .semibold)
                                         .foregroundColor(localGoal == value ? .white : goalColor)
                                         .frame(maxWidth: .infinity)
                                         .frame(height: 40)
@@ -124,15 +124,15 @@ struct GoalEditorSheet: View {
                     if let heatwaveGoalMl {
                         HStack(spacing: 12) {
                             Image(systemName: "thermometer.sun.fill")
-                                .font(.system(size: 18))
+                                .scaledFont(size: 18)
                                 .foregroundColor(.red)
                                 .accessibilityHidden(true)
                             VStack(alignment: .leading, spacing: 2) {
                                 Text(String(localized: "goal.editor.heatwave_note"))
-                                    .font(.system(size: 12, weight: .semibold))
+                                    .scaledFont(size: 12, weight: .semibold)
                                 Text(String(format: String(localized: "heatwave.banner_body"),
                                             UnitFormatter.volume(heatwaveGoalMl)))
-                                    .font(.system(size: 12))
+                                    .scaledFont(size: 12)
                                     .foregroundColor(.secondary)
                             }
                             .multilineTextAlignment(.leading)
@@ -155,9 +155,9 @@ struct GoalEditorSheet: View {
                         isPresented = false
                     } label: {
                         HStack(spacing: 8) {
-                            Image(systemName: "checkmark.circle.fill").font(.system(size: 18))
+                            Image(systemName: "checkmark.circle.fill").scaledFont(size: 18)
                             Text(String(localized: "body.save_and_update"))
-                                .font(.system(size: 16, weight: .semibold))
+                                .scaledFont(size: 16, weight: .semibold)
                         }
                         .foregroundColor(.white)
                         .frame(maxWidth: .infinity)

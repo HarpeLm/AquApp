@@ -52,11 +52,11 @@ struct GenderButton: View {
                         .fill(isSelected ? accentColor.opacity(0.15) : Color(UIColor.systemGray6))
                         .frame(width: 44, height: 44)
                     Text(gender.icon)
-                        .font(.system(size: 20))
+                        .scaledFont(size: 20)
                 }
 
                 Text(gender.label)
-                    .font(.system(size: 16, weight: .semibold))
+                    .scaledFont(size: 16, weight: .semibold)
                     .foregroundColor(isSelected ? accentColor : .primary)
 
                 Spacer()
@@ -108,11 +108,11 @@ struct ProfileRecapCell: View {
     var body: some View {
         VStack(spacing: 6) {
             Image(systemName: icon)
-                .font(.system(size: 16, weight: .medium))
+                .scaledFont(size: 16, weight: .medium)
                 .foregroundColor(color)
                 .accessibilityHidden(true)
             Text(value)
-                .font(.system(size: 14, weight: .semibold))
+                .scaledFont(size: 14, weight: .semibold)
                 .foregroundColor(.primary)
         }
         .frame(maxWidth: .infinity)

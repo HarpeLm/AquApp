@@ -27,7 +27,7 @@ struct ProfileAppearanceView: View {
                         .frame(width: 24)
                         .accessibilityHidden(true)
                     Text(String(localized: "profile.theme"))
-                        .font(.system(size: 15))
+                        .scaledFont(size: 15)
                     Spacer()
                     Picker(String(localized: "profile.theme"), selection: $colorSchemeRaw) {
                         Text(String(localized: "profile.system")).tag("system")

@@ -39,7 +39,7 @@ struct NameEntryView: View {
                                     .frame(width: 90, height: 90)
                                     .shadow(color: Color.app.primary.opacity(0.4), radius: 15, x: 0, y: 6)
                                 Image(systemName: "person.fill")
-                                    .font(.system(size: 40, weight: .medium))
+                                    .scaledFont(size: 40, weight: .medium)
                                     .foregroundColor(.white)
                             }
                         }
@@ -47,10 +47,10 @@ struct NameEntryView: View {
 
                         VStack(spacing: 12) {
                             Text(String(localized: "onboarding.name"))
-                                .font(.system(size: 28, weight: .bold))
+                                .scaledFont(size: 28, weight: .bold)
                                 .multilineTextAlignment(.center)
                             Text(String(localized: "onboarding.name_sub"))
-                                .font(.system(size: 16))
+                                .scaledFont(size: 16)
                                 .foregroundColor(.secondary)
                                 .multilineTextAlignment(.center)
                         }
@@ -63,7 +63,7 @@ struct NameEntryView: View {
                                 .autocorrectionDisabled()
                                 .submitLabel(.done)
                                 .focused($isFocused)
-                                .font(.system(size: 17))
+                                .scaledFont(size: 17)
                                 .padding(16)
                                 .background(Color.app.card)
                                 .cornerRadius(14)
@@ -82,7 +82,7 @@ struct NameEntryView: View {
 
                             Button { saveName() } label: {
                                 Image(systemName: "arrow.right")
-                                    .font(.system(size: 18, weight: .bold))
+                                    .scaledFont(size: 18, weight: .bold)
                                     .foregroundColor(.white)
                                     .frame(maxWidth: .infinity)
                                     .frame(height: 56)

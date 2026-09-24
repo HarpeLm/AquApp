@@ -71,19 +71,19 @@ private struct ProfileBodyRow: View {
                     .fill(color.opacity(0.12))
                     .frame(width: 32, height: 32)
                 Image(systemName: sfSymbol)
-                    .font(.system(size: 14, weight: .medium))
+                    .scaledFont(size: 14, weight: .medium)
                     .foregroundColor(color)
             }
             Text(label)
-                .font(.system(size: 15))
+                .scaledFont(size: 15)
                 .foregroundColor(.primary)
             Spacer()
             Text(value)
-                .font(.system(size: 15, weight: .semibold))
+                .scaledFont(size: 15, weight: .semibold)
                 .foregroundColor(.secondary)
             if showChevron {
                 Image(systemName: "chevron.right")
-                    .font(.system(size: 12))
+                    .scaledFont(size: 12)
                     .foregroundColor(Color(UIColor.systemGray3))
             }
         }
@@ -137,9 +137,9 @@ struct BodyEditSheet: View {
             HStack {
                 HStack(spacing: 8) {
                     Text(String(localized: "profile.section.body"))
-                        .font(.system(size: 22, weight: .bold))
+                        .scaledFont(size: 22, weight: .bold)
                     Image(systemName: "person.fill")
-                        .font(.system(size: 20))
+                        .scaledFont(size: 20)
                         .foregroundColor(Color.app.alcoholMid)
                 }
                 Spacer()
@@ -147,7 +147,7 @@ struct BodyEditSheet: View {
                     ZStack {
                         Circle().fill(Color(UIColor.systemGray5)).frame(width: 32, height: 32)
                         Image(systemName: "xmark")
-                            .font(.system(size: 12, weight: .bold)).foregroundColor(.secondary)
+                            .scaledFont(size: 12, weight: .bold).foregroundColor(.secondary)
                     }
                 }
                 .accessibilityLabel(String(localized: "goal.editor.close"))
@@ -158,7 +158,7 @@ struct BodyEditSheet: View {
                 VStack(spacing: 24) {
                     VStack(alignment: .leading, spacing: 10) {
                         Text(String(localized: "body.gender"))
-                            .font(.system(size: 15, weight: .bold)).padding(.horizontal, 20)
+                            .scaledFont(size: 15, weight: .bold).padding(.horizontal, 20)
                         VStack(spacing: 10) {
                             ForEach(Gender.allCases, id: \.self) { gender in
                                 GenderButton(
@@ -174,14 +174,14 @@ struct BodyEditSheet: View {
 
                     VStack(alignment: .leading, spacing: 12) {
                         Text(String(localized: "body.height"))
-                            .font(.system(size: 15, weight: .bold)).padding(.horizontal, 20)
+                            .scaledFont(size: 15, weight: .bold).padding(.horizontal, 20)
                         VStack(spacing: 8) {
                             HStack(alignment: .lastTextBaseline, spacing: 6) {
                                 Text("\(Int(UnitFormatter.heightValue(localHeight)))")
-                                    .font(.system(size: 48, weight: .bold))
+                                    .scaledFont(size: 48, weight: .bold)
                                     .foregroundColor(Color.app.primary)
                                 Text(UnitFormatter.heightUnitSymbol)
-                                    .font(.system(size: 18, weight: .medium))
+                                    .scaledFont(size: 18, weight: .medium)
                                     .foregroundColor(.secondary)
                             }
                             .frame(maxWidth: .infinity, alignment: .center)
@@ -191,10 +191,10 @@ struct BodyEditSheet: View {
                                 .accessibilityValue(UnitFormatter.height(localHeight))
                             HStack {
                                 Text(UnitFormatter.heightSliderBound(140))
-                                    .font(.system(size: 11)).foregroundColor(.secondary)
+                                    .scaledFont(size: 11).foregroundColor(.secondary)
                                 Spacer()
                                 Text(UnitFormatter.heightSliderBound(220))
-                                    .font(.system(size: 11)).foregroundColor(.secondary)
+                                    .scaledFont(size: 11).foregroundColor(.secondary)
                             }
                             .padding(.horizontal, 24)
                         }
@@ -202,14 +202,14 @@ struct BodyEditSheet: View {
 
                     VStack(alignment: .leading, spacing: 12) {
                         Text(String(localized: "body.weight"))
-                            .font(.system(size: 15, weight: .bold)).padding(.horizontal, 20)
+                            .scaledFont(size: 15, weight: .bold).padding(.horizontal, 20)
                         VStack(spacing: 8) {
                             HStack(alignment: .lastTextBaseline, spacing: 6) {
                                 Text("\(Int(UnitFormatter.weightValue(localWeight)))")
-                                    .font(.system(size: 48, weight: .bold))
+                                    .scaledFont(size: 48, weight: .bold)
                                     .foregroundColor(Color.app.greenDark)
                                 Text(UnitFormatter.weightUnitSymbol)
-                                    .font(.system(size: 18, weight: .medium))
+                                    .scaledFont(size: 18, weight: .medium)
                                     .foregroundColor(.secondary)
                             }
                             .frame(maxWidth: .infinity, alignment: .center)
@@ -219,22 +219,22 @@ struct BodyEditSheet: View {
                                 .accessibilityValue(UnitFormatter.weight(localWeight))
                             HStack {
                                 Text(UnitFormatter.weightSliderBound(30))
-                                    .font(.system(size: 11)).foregroundColor(.secondary)
+                                    .scaledFont(size: 11).foregroundColor(.secondary)
                                 Spacer()
                                 Text(UnitFormatter.weightSliderBound(200))
-                                    .font(.system(size: 11)).foregroundColor(.secondary)
+                                    .scaledFont(size: 11).foregroundColor(.secondary)
                             }
                             .padding(.horizontal, 24)
                         }
                     }
 
                     HStack(spacing: 12) {
-                        Image(systemName: "drop.fill").font(.system(size: 20)).foregroundColor(goalColor)
+                        Image(systemName: "drop.fill").scaledFont(size: 20).foregroundColor(goalColor)
                         VStack(alignment: .leading, spacing: 2) {
                             Text(String(localized: "body.new_calculated_goal"))
-                                .font(.system(size: 13)).foregroundColor(.secondary)
+                                .scaledFont(size: 13).foregroundColor(.secondary)
                             Text(String(format: String(localized: "body.goal_ml_per_day"), Int(calculatedGoal)))
-                                .font(.system(size: 20, weight: .bold)).foregroundColor(goalColor)
+                                .scaledFont(size: 20, weight: .bold).foregroundColor(goalColor)
                         }
                         Spacer()
                     }
@@ -245,9 +245,9 @@ struct BodyEditSheet: View {
 
                     Button { save() } label: {
                         HStack(spacing: 8) {
-                            Image(systemName: "checkmark.circle.fill").font(.system(size: 18))
+                            Image(systemName: "checkmark.circle.fill").scaledFont(size: 18)
                             Text(String(localized: "body.save_and_update"))
-                                .font(.system(size: 16, weight: .semibold))
+                                .scaledFont(size: 16, weight: .semibold)
                         }
                         .foregroundColor(.white).frame(maxWidth: .infinity).frame(height: 54)
                         .background(LinearGradient(

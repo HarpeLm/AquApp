@@ -44,7 +44,7 @@ struct PermissionPromptView: View {
                             .frame(width: 90, height: 90)
                             .shadow(color: gradient[0].opacity(0.4), radius: 15, x: 0, y: 6)
                         Image(systemName: sfSymbol)
-                            .font(.system(size: 40, weight: .medium))
+                            .scaledFont(size: 40, weight: .medium)
                             .foregroundColor(.white)
                     }
                     .accessibilityHidden(true)
@@ -65,7 +65,7 @@ struct PermissionPromptView: View {
                         ForEach(rows) { row in
                             HStack(alignment: .top, spacing: 14) {
                                 Image(systemName: row.sfSymbol)
-                                    .font(.system(size: 18, weight: .semibold))
+                                    .scaledFont(size: 18, weight: .semibold)
                                     .foregroundColor(row.color)
                                     .frame(width: 36, height: 36)
                                     .background(row.color.opacity(0.12))
