@@ -12,7 +12,8 @@ struct ProfileView: View {
     }
     @AppStorage("selectedBadgeID") private var selectedBadgeID: String = ""
     @AppStorage("colorSchemeRaw") private var colorSchemeRaw: String = "system"
-    @AppStorage("notificationsOn") private var notificationsOn: Bool = true
+    // false tant que l'utilisateur n'a pas activé (et autorisé) les rappels.
+    @AppStorage("notificationsOn") private var notificationsOn: Bool = false
     @ObservedObject private var premiumStore = PremiumManager.shared
 
     private var isPremiumUser: Bool {

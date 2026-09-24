@@ -257,48 +257,26 @@ struct NotificationSettingsSheet: View {
     }
 
     private func saveAndSchedule() {
-        startHour       = localStart
-        endHour         = localEnd
-        intervalHour    = localInterval
-        notificationsOn = localOn
+        startHour    = localStart
+        endHour      = localEnd
+        intervalHour = localInterval
 
-        UNUserNotificationCenter.current().removeAllPendingNotificationRequests()
-
-        guard localOn else { isPresented = false; return }
-
-        UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound, .badge]) { granted, _ in
-            DispatchQueue.main.async {
-                guard granted else {
-                    showPermissionAlert = true
-                    notificationsOn = false
-                    return
-                }
-                scheduleNotifications()
-                isPresented = false
-            }
+        guard localOn else {
+            notificationsOn = false
+            Task { await ReminderScheduler.cancelAll() }
+            isPresented = false
+            return
         }
-    }
 
-    private func scheduleNotifications() {
-        let messages = L10n.notifReminderMessages
-        var hour = localStart
-        var index = 0
-        while hour <= localEnd {
-            var components    = DateComponents()
-            components.hour   = hour
-            components.minute = 0
-            let content       = UNMutableNotificationContent()
-            content.title     = String(localized: "notif.reminder_title")
-            content.body      = messages[index % messages.count]
-            content.sound     = .default
-            let trigger = UNCalendarNotificationTrigger(dateMatching: components, repeats: true)
-            let request = UNNotificationRequest(
-                identifier: "aquapp_reminder_\(hour)",
-                content: content, trigger: trigger
-            )
-            UNUserNotificationCenter.current().add(request)
-            hour  += localInterval
-            index += 1
+        Task { @MainActor in
+            guard await ReminderScheduler.requestAuthorization() else {
+                notificationsOn = false
+                showPermissionAlert = true
+                return
+            }
+            notificationsOn = true
+            await ReminderScheduler.schedule(start: localStart, end: localEnd, interval: localInterval)
+            isPresented = false
         }
     }
 }

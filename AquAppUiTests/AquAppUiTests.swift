@@ -76,6 +76,10 @@ final class AquAppUITests: XCTestCase {
           let healthLater = app.buttons["onboarding.health.later"]
           XCTAssertTrue(healthLater.waitForExistence(timeout: 5), "Écran Apple Santé introuvable")
           healthLater.tap()
+
+          let remindersLater = app.buttons["onboarding.reminders.later"]
+          XCTAssertTrue(remindersLater.waitForExistence(timeout: 5), "Écran rappels introuvable")
+          remindersLater.tap()
       // → Home
             XCTAssertTrue(app.tabBars.firstMatch.waitForExistence(timeout: 10),
                           "Home absente après onboarding complet")
