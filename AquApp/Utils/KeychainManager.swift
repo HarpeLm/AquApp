@@ -15,7 +15,8 @@ final class KeychainManager {
     static let shared = KeychainManager()
     private init() {}
 
-    private let service = "com.fabian.dargaud.AquApp"
+    static let service = "com.fabian.dargaud.AquApp"
+    private var service: String { Self.service }
 
     // MARK: - Écriture
 
