@@ -237,7 +237,8 @@ struct ProfileView: View {
             }
         }
         .sheet(isPresented: $showGoalEditor) {
-            GoalEditorSheet(dailyGoalMl: dailyGoalBinding, isPresented: $showGoalEditor)
+            GoalEditorSheet(dailyGoalMl: dailyGoalBinding, isPresented: $showGoalEditor,
+                            heatwaveGoalMl: store.heatwaveGoalMl)
                 .presentationDetents([.medium, .large])
                 .presentationDragIndicator(.hidden)
                 .presentationCornerRadius(24)

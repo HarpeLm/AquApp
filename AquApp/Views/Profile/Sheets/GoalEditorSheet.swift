@@ -5,6 +5,8 @@ import SwiftUI
 struct GoalEditorSheet: View {
     @Binding var dailyGoalMl: Double
     @Binding var isPresented: Bool
+    /// Objectif du jour relevé par la météo ; `nil` hors canicule.
+    var heatwaveGoalMl: Double? = nil
 
     @State private var localGoal: Double = 2170
 
@@ -118,25 +120,34 @@ struct GoalEditorSheet: View {
                         .padding(.horizontal, 20)
                     }
 
-                    // Note canicule
-                    HStack(spacing: 12) {
-                        Image(systemName: "thermometer.sun.fill")
-                            .font(.system(size: 18))
-                            .foregroundColor(.red)
-                        Text(String(localized: "goal.editor.heatwave_note"))
-                            .font(.system(size: 12))
-                            .foregroundColor(.secondary)
+                    // Note canicule : uniquement quand la météo a relevé l'objectif du jour
+                    if let heatwaveGoalMl {
+                        HStack(spacing: 12) {
+                            Image(systemName: "thermometer.sun.fill")
+                                .font(.system(size: 18))
+                                .foregroundColor(.red)
+                                .accessibilityHidden(true)
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text(String(localized: "goal.editor.heatwave_note"))
+                                    .font(.system(size: 12, weight: .semibold))
+                                Text(String(format: String(localized: "heatwave.banner_body"),
+                                            UnitFormatter.volume(heatwaveGoalMl)))
+                                    .font(.system(size: 12))
+                                    .foregroundColor(.secondary)
+                            }
                             .multilineTextAlignment(.leading)
-                        Spacer()
+                            .accessibilityElement(children: .combine)
+                            Spacer()
+                        }
+                        .padding(16)
+                        .background(Color.red.opacity(0.06))
+                        .cornerRadius(14)
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 14)
+                                .stroke(Color.red.opacity(0.15), lineWidth: 1)
+                        )
+                        .padding(.horizontal, 20)
                     }
-                    .padding(16)
-                    .background(Color.red.opacity(0.06))
-                    .cornerRadius(14)
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 14)
-                            .stroke(Color.red.opacity(0.15), lineWidth: 1)
-                    )
-                    .padding(.horizontal, 20)
 
                     // Bouton enregistrer
                     Button {
@@ -176,4 +187,8 @@ struct GoalEditorSheet: View {
 
 #Preview {
     GoalEditorSheet(dailyGoalMl: .constant(2170), isPresented: .constant(true))
+}
+
+#Preview("Canicule") {
+    GoalEditorSheet(dailyGoalMl: .constant(2170), isPresented: .constant(true), heatwaveGoalMl: 2700)
 }
