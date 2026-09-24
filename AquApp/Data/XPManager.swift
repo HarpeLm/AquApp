@@ -41,14 +41,14 @@ enum XPLevel: Int, CaseIterable {
 
     var color: Color {
         switch self {
-        case .goutte:     return Color(hex: "4DA8F5")
-        case .ruisseau:   return Color(hex: "4DA8F5")
-        case .source:     return Color(hex: "2B87E8")
-        case .riviere:    return Color(hex: "2B87E8")
-        case .lac:        return Color(hex: "185FA5")
-        case .fleuve:     return Color(hex: "7F77DD")
-        case .ocean:      return Color(hex: "534AB7")
-        case .aquaLegend: return Color(hex: "3C3489")
+        case .goutte:     return Color.app.primary
+        case .ruisseau:   return Color.app.primary
+        case .source:     return Color.app.primaryDark
+        case .riviere:    return Color.app.primaryDark
+        case .lac:        return Color.app.primaryDeep
+        case .fleuve:     return Color.app.xpLavender
+        case .ocean:      return Color.app.xpIndigo
+        case .aquaLegend: return Color.app.xpIndigoDark
         }
     }
 

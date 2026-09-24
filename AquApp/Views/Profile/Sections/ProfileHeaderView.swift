@@ -27,8 +27,8 @@ struct ProfileHeaderView: View {
 
     var avatarColor: Color {
         let colors: [Color] = [
-            Color(hex: "4DA8F5"), Color(hex: "9B59B6"),
-            Color(hex: "10B981"), Color(hex: "F59E0B")
+            Color.app.primary, Color.app.alcoholMid,
+            Color.app.greenDark, Color.app.amber
         ]
         return colors[abs(userName.hashValue) % colors.count]
     }
@@ -84,10 +84,10 @@ struct ProfileHeaderView: View {
                                  : String(localized: "profile.change_badge"))
                                 .font(.system(size: 12, weight: .semibold))
                         }
-                        .foregroundColor(Color(hex: "4DA8F5"))
+                        .foregroundColor(Color.app.primary)
                         .padding(.horizontal, 10)
                         .padding(.vertical, 4)
-                        .background(Color(hex: "EEF4FF"))
+                        .background(Color.app.primaryLight)
                         .cornerRadius(8)
                     }
                     .accessibilityLabel(selectedBadge == nil
@@ -131,14 +131,14 @@ struct ProfileHeaderView: View {
                 ProfileStatCell(
                     value:  "\(unlockedBadgesCount)",
                     label:  String(localized: "profile.stats.achievements"),
-                    color:  Color(hex: "4DA8F5"),
+                    color:  Color.app.primary,
                     symbol: "star.fill"
                 )
                 Divider().frame(height: 36)
                 ProfileStatCell(
                     value:  String(format: "%.1f L", totalWaterLiters),
                     label:  String(localized: "profile.stats.total_water"),
-                    color:  Color(hex: "10B981"),
+                    color:  Color.app.greenDark,
                     symbol: "drop.fill"
                 )
             }
@@ -153,7 +153,7 @@ struct ProfileHeaderView: View {
                 .padding(.top, 14)
                 .padding(.bottom, 18)
         }
-        .background(Color("AppCardBackground"))
+        .background(Color.app.card)
         .cornerRadius(20)
         .shadow(color: .black.opacity(0.06), radius: 12, x: 0, y: 3)
         .padding(.horizontal)
@@ -206,7 +206,7 @@ private struct XPProgressBlock: View {
                 HStack(spacing: 7) {
                     ZStack {
                         Circle()
-                            .fill(Color(hex: "4DA8F5").opacity(0.13))
+                            .fill(Color.app.primary.opacity(0.13))
                             .frame(width: 22, height: 22)
                         Circle()
                             .fill(xp.currentLevel.displayColor)
@@ -311,8 +311,8 @@ private struct XPProgressBlock: View {
         userName: "Fabian",
         isPremiumUser: true,
         allBadges: [
-            (id: "drop",  sfSymbol: "drop.fill",  color: Color(hex: "4DA8F5"), title: "Drop",  isPro: false),
-            (id: "wave",  sfSymbol: "waveform.path.ecg", color: Color(hex: "10B981"), title: "Wave", isPro: false),
+            (id: "drop",  sfSymbol: "drop.fill",  color: Color.app.primary, title: "Drop",  isPro: false),
+            (id: "wave",  sfSymbol: "waveform.path.ecg", color: Color.app.greenDark, title: "Wave", isPro: false),
             (id: "crown", sfSymbol: "crown.fill", color: .purple,              title: "Crown", isPro: true)
         ],
         unlockedBadgeIDs: ["drop", "wave"],
@@ -324,5 +324,5 @@ private struct XPProgressBlock: View {
     )
     .environmentObject(xp)
     .padding(.vertical)
-    .background(Color("AppBackground"))
+    .background(Color.app.background)
 }

@@ -71,13 +71,13 @@ struct HomeView: View {
                             ActionButton(
                                 label: L10n.homeAddWater,
                                 sfSymbol: "drop.fill",
-                                gradient: [Color(hex: "4DA8F5"), Color(hex: "2B87E8")]
+                                gradient: [Color.app.primary, Color.app.primaryDark]
                             ) { showAddWater = true }
 
                             ActionButton(
                                 label: L10n.homeAddAlcohol,
                                 sfSymbol: "wineglass.fill",
-                                gradient: [Color(hex: "9B59B6"), Color(hex: "6C3483")]
+                                gradient: [Color.app.alcoholMid, Color.app.alcoholDark]
                             ) { showAddAlcool = true }
                         }
                         .padding(.horizontal)
@@ -114,7 +114,7 @@ struct HomeView: View {
                     }
                     .padding(.bottom, 32)
                 }
-                .background(Color("AppBackground"))
+                .background(Color.app.background)
                 .navigationBarHidden(true)
                 .onChange(of: scrollToTopID) { _, _ in
                     withAnimation(.easeOut(duration: 0.3)) { proxy.scrollTo("top") }
@@ -213,13 +213,13 @@ struct ProgressCard: View {
         VStack(spacing: 20) {
             ZStack {
                 Circle()
-                    .stroke(Color(hex: "E3EFFC"), lineWidth: 14)
+                    .stroke(Color.app.primaryPale, lineWidth: 14)
                     .frame(width: 160, height: 160)
                 Circle()
                     .trim(from: 0, to: progress)
                     .stroke(
                         LinearGradient(
-                            colors: [Color(hex: "4DA8F5"), Color(hex: "2B87E8")],
+                            colors: [Color.app.primary, Color.app.primaryDark],
                             startPoint: .topLeading,
                             endPoint: .bottomTrailing
                         ),
@@ -245,11 +245,11 @@ struct ProgressCard: View {
                 GeometryReader { geo in
                     ZStack(alignment: .leading) {
                         RoundedRectangle(cornerRadius: 6)
-                            .fill(Color(hex: "E3EFFC"))
+                            .fill(Color.app.primaryPale)
                             .frame(height: 8)
                         RoundedRectangle(cornerRadius: 6)
                             .fill(LinearGradient(
-                                colors: [Color(hex: "4DA8F5"), Color(hex: "2B87E8")],
+                                colors: [Color.app.primary, Color.app.primaryDark],
                                 startPoint: .leading,
                                 endPoint: .trailing
                             ))
@@ -279,7 +279,7 @@ struct ProgressCard: View {
             }
         }
         .padding(24)
-        .background(Color("AppCardBackground"))
+        .background(Color.app.card)
         .cornerRadius(20)
         .shadow(color: .black.opacity(0.05), radius: 8, x: 0, y: 2)
         .animation(.easeInOut(duration: 0.3), value: compensation)
@@ -360,7 +360,7 @@ struct StatCard: View {
         }
         .padding(16)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(Color("AppCardBackground"))
+        .background(Color.app.card)
         .cornerRadius(16)
         .shadow(color: .black.opacity(0.05), radius: 8, x: 0, y: 2)
         .accessibilityElement(children: .ignore)
@@ -385,7 +385,7 @@ struct SwipeToDeleteView<Content: View>: View {
         ZStack(alignment: .leading) {
             // Fond neutre révélé par le swipe (icône poubelle rouge conservée)
             Rectangle()
-                .fill(Color("AppCardBackground"))
+                .fill(Color.app.card)
                 .frame(height: 50)
                 .overlay(
                     Image(systemName: "trash.fill")
@@ -481,12 +481,12 @@ struct RecentActivitySection: View {
                 VStack(spacing: 12) {
                     ZStack {
                         Circle()
-                            .fill(Color(hex: "EEF4FF"))
+                            .fill(Color.app.primaryLight)
                             .frame(width: 56, height: 56)
                         Image(systemName: "drop")
                             .accessibilityHidden(true)
                             .font(.system(size: 24))
-                            .foregroundColor(Color(hex: "4DA8F5"))
+                            .foregroundColor(Color.app.primary)
                     }
                     Text(L10n.homeNoActivity)
                         .font(.system(size: 15, weight: .semibold))
@@ -496,7 +496,7 @@ struct RecentActivitySection: View {
                 }
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 32)
-                .background(Color("AppCardBackground"))
+                .background(Color.app.card)
                 .cornerRadius(16)
                 .shadow(color: .black.opacity(0.05), radius: 8, x: 0, y: 2)
             } else {
@@ -506,12 +506,12 @@ struct RecentActivitySection: View {
                             HStack(spacing: 16) {
                                 ZStack {
                                     Circle()
-                                        .fill(item.isWater ? Color(hex: "EEF4FF") : Color(hex: "F3E5F5"))
+                                        .fill(item.isWater ? Color.app.primaryLight : Color.app.alcoholPale)
                                         .frame(width: 40, height: 40)
                                     Image(systemName: item.isWater ? "drop.fill" : "wineglass.fill")
                                         .accessibilityHidden(true)
                                         .font(.system(size: 16, weight: .medium))
-                                        .foregroundColor(item.isWater ? Color(hex: "4DA8F5") : Color(hex: "8B5CF6"))
+                                        .foregroundColor(item.isWater ? Color.app.primary : Color.app.alcoholLight)
                                 }
                                 VStack(alignment: .leading, spacing: 2) {
                                     Text(item.label)
@@ -550,7 +550,7 @@ struct RecentActivitySection: View {
                         }
                     }
                 }
-                .background(Color("AppCardBackground"))
+                .background(Color.app.card)
                 .cornerRadius(16)
                 .shadow(color: .black.opacity(0.05), radius: 8, x: 0, y: 2)
             }

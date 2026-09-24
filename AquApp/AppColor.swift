@@ -71,6 +71,34 @@ extension Color {
         let creamPale      = Color(hex: "FFFDE7")
         let pinkPale       = Color(hex: "FCE4EC")
 
+        // MARK: - Fonds adaptatifs (assets clair/sombre)
+        /// Fond d'écran — s'adapte au mode sombre
+        let background     = Color("AppBackground")
+        /// Fond de carte — s'adapte au mode sombre
+        let card           = Color("AppCardBackground")
+
+        // MARK: - Compléments (couleurs d'interface récurrentes)
+        /// Or Premium — couronnes, bannière Premium
+        let premiumGold    = Color(hex: "FCD34D")
+        /// Fonds sombres de la bannière Premium
+        let premiumDark    = Color(hex: "2D1F00")
+        let premiumDarker  = Color(hex: "1C1400")
+        /// Bruns ambrés — texte sur fond chaud
+        let amberText      = Color(hex: "92400E")
+        let amberDeep      = Color(hex: "B45309")
+        let amberBurnt     = Color(hex: "D97706")
+        let orangeBright   = Color(hex: "F97316")
+        /// Bleus profonds — grille annuelle, barre d'XP
+        let primaryDeep    = Color(hex: "185FA5")
+        let primaryNavy    = Color(hex: "1A5FBB")
+        let primarySoft    = Color(hex: "85B7EB")
+        /// Vert profond — fin de dégradé
+        let greenDeep      = Color(hex: "059669")
+        /// Niveaux d'XP (violets)
+        let xpLavender     = Color(hex: "7F77DD")
+        let xpIndigo       = Color(hex: "534AB7")
+        let xpIndigoDark   = Color(hex: "3C3489")
+
         // MARK: - Neutres
         let slate          = Color(hex: "94A3B8")
         let red            = Color(hex: "EF4444")

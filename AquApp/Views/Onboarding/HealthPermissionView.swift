@@ -31,7 +31,7 @@ struct PermissionPromptView: View {
 
     var body: some View {
         ZStack {
-            Color("AppBackground").ignoresSafeArea()
+            Color.app.background.ignoresSafeArea()
 
             ScrollView {
                 VStack(spacing: 28) {
@@ -87,7 +87,7 @@ struct PermissionPromptView: View {
                     }
                     .padding(.horizontal, 16)
                     .padding(.vertical, 4)
-                    .background(Color("AppCardBackground"))
+                    .background(Color.app.card)
                     .cornerRadius(16)
 
                     HStack(alignment: .top, spacing: 10) {

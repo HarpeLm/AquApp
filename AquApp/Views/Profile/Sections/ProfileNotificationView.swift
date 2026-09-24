@@ -42,7 +42,7 @@ struct ProfileNotificationView: View {
                         .accessibilityHidden(true)
                 }
                 .padding(16)
-                .background(Color("AppCardBackground"))
+                .background(Color.app.card)
                 .cornerRadius(16)
                 .shadow(color: .black.opacity(0.05), radius: 8, x: 0, y: 2)
             }
@@ -66,5 +66,5 @@ struct ProfileNotificationView: View {
 #Preview {
     ProfileNotificationView(notificationsOn: .constant(true))
         .padding(.vertical)
-        .background(Color("AppBackground"))
+        .background(Color.app.background)
 }

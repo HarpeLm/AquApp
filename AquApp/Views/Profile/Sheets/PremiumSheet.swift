@@ -30,13 +30,13 @@ struct PremiumSheet: View {
     private func colorForSymbol(_ symbol: String) -> Color {
         switch symbol {
         case "medal.fill":              return .yellow
-        case "chart.bar.fill":          return Color(hex: "4DA8F5")
-        case "clock.fill":              return Color(hex: "10B981")
+        case "chart.bar.fill":          return Color.app.primary
+        case "clock.fill":              return Color.app.greenDark
         case "paintbrush.fill":         return .purple
         case "bell.badge.fill":         return .orange
         case "widget.small.badge.plus": return .indigo
-        case "app.badge":               return Color(hex: "4DA8F5")
-        default:                        return Color(hex: "4DA8F5")
+        case "app.badge":               return Color.app.primary
+        default:                        return Color.app.primary
         }
     }
 
@@ -104,12 +104,12 @@ struct PremiumSheet: View {
                         Divider().padding(.leading, 70)
                         FeatureRow(
                             sfSymbol: "app.badge",
-                            color:    Color(hex: "4DA8F5"),
+                            color:    Color.app.primary,
                             title:    String(localized: "premium.feature_icon.title"),
                             subtitle: String(localized: "premium.feature_icon.subtitle")
                         )
                     }
-                    .background(Color("AppCardBackground"))
+                    .background(Color.app.card)
                     .cornerRadius(16)
                     .shadow(color: .black.opacity(0.05), radius: 8, x: 0, y: 2)
 
@@ -172,7 +172,7 @@ struct PremiumSheet: View {
                 .padding(.bottom, 32)
             }
         }
-        .background(Color("AppBackground"))
+        .background(Color.app.background)
         .ignoresSafeArea(edges: .bottom)
     }
 }
@@ -203,11 +203,11 @@ private struct LaunchCTASection: View {
                 HStack(spacing: 12) {
                     ZStack {
                         Circle()
-                            .fill(Color(hex: "4DA8F5").opacity(0.12))
+                            .fill(Color.app.primary.opacity(0.12))
                             .frame(width: 44, height: 44)
                         Image(systemName: "sparkles")
                             .font(.system(size: 20))
-                            .foregroundColor(Color(hex: "4DA8F5"))
+                            .foregroundColor(Color.app.primary)
                             .accessibilityHidden(true)
                     }
                     VStack(alignment: .leading, spacing: 3) {
@@ -219,7 +219,7 @@ private struct LaunchCTASection: View {
                                 .foregroundColor(.white)
                                 .padding(.horizontal, 6)
                                 .padding(.vertical, 2)
-                                .background(Color(hex: "4DA8F5"))
+                                .background(Color.app.primary)
                                 .cornerRadius(5)
                                 .accessibilityHidden(true)
                         }
@@ -277,11 +277,11 @@ private struct LaunchCTASection: View {
                     .background(
                         Group {
                             if notifyState == .registered || alreadyRegistered {
-                                Color(hex: "10B981")
+                                Color.app.greenDark
                             } else if notifyState == .denied {
                                 Color.secondary
                             } else {
-                                Color(hex: "4DA8F5")
+                                Color.app.primary
                             }
                         }
                     )
@@ -315,13 +315,13 @@ private struct LaunchCTASection: View {
                 )
             }
             .padding(18)
-            .background(Color("AppCardBackground"))
+            .background(Color.app.card)
             .cornerRadius(18)
             .overlay(
                 RoundedRectangle(cornerRadius: 18)
-                    .stroke(Color(hex: "4DA8F5").opacity(0.2), lineWidth: 1.5)
+                    .stroke(Color.app.primary.opacity(0.2), lineWidth: 1.5)
             )
-            .shadow(color: Color(hex: "4DA8F5").opacity(0.07), radius: 12, x: 0, y: 4)
+            .shadow(color: Color.app.primary.opacity(0.07), radius: 12, x: 0, y: 4)
 
             // Fermer
             Button { isPresented = false } label: {
@@ -422,7 +422,7 @@ private struct FeatureRow: View {
             }
             Spacer()
             Image(systemName: "checkmark.circle.fill")
-                .foregroundColor(Color(hex: "10B981"))
+                .foregroundColor(Color.app.greenDark)
                 .font(.system(size: 18))
                 .accessibilityHidden(true)
         }

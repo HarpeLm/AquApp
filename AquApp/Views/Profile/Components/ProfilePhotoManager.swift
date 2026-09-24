@@ -142,11 +142,11 @@ struct ProfileAvatarView: View {
     private var cameraBadge: some View {
         ZStack {
             Circle()
-                .fill(Color("AppCardBackground"))
+                .fill(Color.app.card)
                 .frame(width: 24, height: 24)
             Image(systemName: photoManager.image == nil ? "camera.fill" : "arrow.triangle.2.circlepath")
                 .font(.system(size: 10, weight: .bold))
-                .foregroundColor(Color(hex: "4DA8F5"))
+                .foregroundColor(Color.app.primary)
         }
         .shadow(color: .black.opacity(0.15), radius: 3, y: 1)
     }

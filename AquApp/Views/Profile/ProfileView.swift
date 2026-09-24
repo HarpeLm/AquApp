@@ -71,14 +71,14 @@ struct ProfileView: View {
 
     private var allBadges: [(id: String, sfSymbol: String, color: Color, title: String, isPro: Bool)] {
         var list: [(id: String, sfSymbol: String, color: Color, title: String, isPro: Bool)] = [
-            (id: "drop",  sfSymbol: "drop.fill",         color: Color(hex: "4DA8F5"), title: "Drop",  isPro: false),
-            (id: "wave",  sfSymbol: "waveform.path.ecg", color: Color(hex: "10B981"), title: "Wave",  isPro: false),
+            (id: "drop",  sfSymbol: "drop.fill",         color: Color.app.primary, title: "Drop",  isPro: false),
+            (id: "wave",  sfSymbol: "waveform.path.ecg", color: Color.app.greenDark, title: "Wave",  isPro: false),
             (id: "flame", sfSymbol: "flame.fill",        color: .orange,              title: "Flame", isPro: false),
             (id: "leaf",  sfSymbol: "leaf.fill",         color: .green,               title: "Leaf",  isPro: false),
             (id: "star",  sfSymbol: "star.fill",         color: .yellow,              title: "Star",  isPro: false),
-            (id: "bolt",  sfSymbol: "bolt.fill",         color: Color(hex: "F59E0B"), title: "Bolt",  isPro: false),
+            (id: "bolt",  sfSymbol: "bolt.fill",         color: Color.app.amber, title: "Bolt",  isPro: false),
             (id: "sun",   sfSymbol: "sun.max.fill",      color: .orange,              title: "Sun",   isPro: false),
-            (id: "cloud", sfSymbol: "cloud.sun.fill",    color: Color(hex: "4DA8F5"), title: "Cloud", isPro: false),
+            (id: "cloud", sfSymbol: "cloud.sun.fill",    color: Color.app.primary, title: "Cloud", isPro: false),
             (id: "crown",   sfSymbol: "crown.fill",      color: .purple,              title: "Crown",   isPro: true),
             (id: "diamond", sfSymbol: "diamond.fill",    color: .cyan,                title: "Diamond", isPro: true),
             (id: "heart",   sfSymbol: "heart.fill",      color: .red,                 title: "Heart",   isPro: true),
@@ -224,7 +224,7 @@ struct ProfileView: View {
                     }
                     .padding(.bottom, 32)
                 }
-                .background(Color("AppBackground"))
+                .background(Color.app.background)
                 .navigationBarHidden(true)
                 .onChange(of: scrollToTopID) { _, _ in
                     withAnimation(.easeOut(duration: 0.3)) {

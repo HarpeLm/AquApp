@@ -95,12 +95,12 @@ private struct EventCard: View {
             RoundedRectangle(cornerRadius: 20)
                 .fill(
                     LinearGradient(
-                        colors: [Color(hex: "FFE878"), Color(hex: "FFAB5E")],
+                        colors: [Color.app.confettiYellow, Color.app.confettiOrange],
                         startPoint: .topLeading,
                         endPoint: .bottomTrailing
                     )
                 )
-                .shadow(color: Color(hex: "FFAB5E").opacity(0.3), radius: 16, x: 0, y: 6)
+                .shadow(color: Color.app.confettiOrange.opacity(0.3), radius: 16, x: 0, y: 6)
         )
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(event.subtitle)

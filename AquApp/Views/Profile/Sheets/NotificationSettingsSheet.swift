@@ -76,12 +76,12 @@ struct NotificationSettingsSheet: View {
                         }
                         Spacer()
                         Toggle("", isOn: $localOn)
-                            .tint(Color(hex: "4DA8F5"))
+                            .tint(Color.app.primary)
                             .accessibilityLabel(String(localized: "notif.settings.enable"))
                             .accessibilityHint(String(localized: "notif.settings.enable_sub"))
                     }
                     .padding(16)
-                    .background(Color("AppCardBackground"))
+                    .background(Color.app.card)
                     .cornerRadius(14)
                     .shadow(color: .black.opacity(0.04), radius: 6, x: 0, y: 2)
 
@@ -99,7 +99,7 @@ struct NotificationSettingsSheet: View {
                                     Text(String(localized: "notif.settings.start"))
                                         .font(.system(size: 12))
                                         .foregroundColor(.secondary)
-                                    HourPicker(hour: $localStart, range: 0...23, color: Color(hex: "4DA8F5"))
+                                    HourPicker(hour: $localStart, range: 0...23, color: Color.app.primary)
                                 }
                                 .frame(maxWidth: .infinity)
 
@@ -117,7 +117,7 @@ struct NotificationSettingsSheet: View {
                                 .frame(maxWidth: .infinity)
                             }
                             .padding(16)
-                            .background(Color("AppCardBackground"))
+                            .background(Color.app.card)
                             .cornerRadius(14)
                             .shadow(color: .black.opacity(0.04), radius: 6, x: 0, y: 2)
                         }
@@ -133,7 +133,7 @@ struct NotificationSettingsSheet: View {
                                 HStack {
                                     Image(systemName: "clock.arrow.circlepath")
                                         .accessibilityHidden(true)
-                                        .foregroundColor(Color(hex: "4DA8F5"))
+                                        .foregroundColor(Color.app.primary)
                                         .frame(width: 24)
                                     Text(String(localized: "notif.settings.every"))
                                         .font(.system(size: 15))
@@ -142,7 +142,7 @@ struct NotificationSettingsSheet: View {
                                          ? String(localized: "notif.settings.one_hour")
                                          : String(format: String(localized: "notif.settings.n_hours"), localInterval))
                                         .font(.system(size: 15, weight: .semibold))
-                                        .foregroundColor(Color(hex: "4DA8F5"))
+                                        .foregroundColor(Color.app.primary)
                                 }
 
                                 HStack(spacing: 8) {
@@ -152,17 +152,17 @@ struct NotificationSettingsSheet: View {
                                         } label: {
                                             Text(String(format: String(localized: "notif.hours_format"), value))
                                                 .font(.system(size: 14, weight: .semibold))
-                                                .foregroundColor(localInterval == value ? .white : Color(hex: "4DA8F5"))
+                                                .foregroundColor(localInterval == value ? .white : Color.app.primary)
                                                 .frame(maxWidth: .infinity)
                                                 .padding(.vertical, 8)
-                                                .background(localInterval == value ? Color(hex: "4DA8F5") : Color(hex: "EEF4FF"))
+                                                .background(localInterval == value ? Color.app.primary : Color.app.primaryLight)
                                                 .cornerRadius(10)
                                         }
                                     }
                                 }
                             }
                             .padding(16)
-                            .background(Color("AppCardBackground"))
+                            .background(Color.app.card)
                             .cornerRadius(14)
                             .shadow(color: .black.opacity(0.04), radius: 6, x: 0, y: 2)
                         }
@@ -177,10 +177,10 @@ struct NotificationSettingsSheet: View {
                                     Spacer()
                                     Text(String(localized: "notif.settings.count \(previewTimes.count)"))
                                         .font(.system(size: 12, weight: .semibold))
-                                        .foregroundColor(Color(hex: "4DA8F5"))
+                                        .foregroundColor(Color.app.primary)
                                         .padding(.horizontal, 8)
                                         .padding(.vertical, 4)
-                                        .background(Color(hex: "EEF4FF"))
+                                        .background(Color.app.primaryLight)
                                         .cornerRadius(8)
                                 }
                                 .padding(.leading, 4)
@@ -199,7 +199,7 @@ struct NotificationSettingsSheet: View {
                                             }
                                             .padding(.horizontal, 10)
                                             .padding(.vertical, 6)
-                                            .background(Color("AppCardBackground"))
+                                            .background(Color.app.card)
                                             .cornerRadius(8)
                                             .shadow(color: .black.opacity(0.04), radius: 4, x: 0, y: 1)
                                         }
@@ -224,7 +224,7 @@ struct NotificationSettingsSheet: View {
                         .frame(maxWidth: .infinity)
                         .frame(height: 54)
                         .background(LinearGradient(
-                            colors: [Color(hex: "4DA8F5"), Color(hex: "2B87E8")],
+                            colors: [Color.app.primary, Color.app.primaryDark],
                             startPoint: .leading, endPoint: .trailing
                         ))
                         .cornerRadius(16)
@@ -234,7 +234,7 @@ struct NotificationSettingsSheet: View {
                 .padding(.horizontal, 20)
             }
         }
-        .background(Color("AppBackground"))
+        .background(Color.app.background)
         .ignoresSafeArea(edges: .bottom)
         .onAppear {
             localOn       = notificationsOn

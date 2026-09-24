@@ -123,13 +123,13 @@ final class AchievementManager: ObservableObject {
                 isPro: false, targetProgress: 7
             ),
             Achievement(
-                id: "marathonien", sfSymbol: "figure.run", symbolColor: Color(hex: "10B981"),
+                id: "marathonien", sfSymbol: "figure.run", symbolColor: Color.app.greenDark,
                 title: String(localized: "achievement.marathonien.title"),
                 description: String(localized: "achievement.marathonien.desc"),
                 isPro: false, targetProgress: 3
             ),
             Achievement(
-                id: "indestructible", sfSymbol: "bolt.shield.fill", symbolColor: Color(hex: "2B87E8"),
+                id: "indestructible", sfSymbol: "bolt.shield.fill", symbolColor: Color.app.primaryDark,
                 title: String(localized: "achievement.indestructible.title"),
                 description: String(localized: "achievement.indestructible.desc"),
                 isPro: false, targetProgress: 60
@@ -141,13 +141,13 @@ final class AchievementManager: ObservableObject {
                 isPro: false, targetProgress: 100
             ),
             Achievement(
-                id: "legende", sfSymbol: "crown.fill", symbolColor: Color(hex: "F59E0B"),
+                id: "legende", sfSymbol: "crown.fill", symbolColor: Color.app.amber,
                 title: String(localized: "achievement.legende.title"),
                 description: String(localized: "achievement.legende.desc"),
                 isPro: false, targetProgress: 1_000_000
             ),
             Achievement(
-                id: "aqua_addict", sfSymbol: "drop.fill", symbolColor: Color(hex: "4DA8F5"),
+                id: "aqua_addict", sfSymbol: "drop.fill", symbolColor: Color.app.primary,
                 title: String(localized: "achievement.aqua_addict.title"),
                 description: String(localized: "achievement.aqua_addict.desc"),
                 isPro: false, targetProgress: 1_000_000_000
@@ -172,25 +172,25 @@ final class AchievementManager: ObservableObject {
     func loadMonthlyAchievements() {
         let list: [Achievement] = [
             Achievement(
-                id: "dry_january", sfSymbol: "snowflake", symbolColor: Color(hex: "4DA8F5"),
+                id: "dry_january", sfSymbol: "snowflake", symbolColor: Color.app.primary,
                 title: String(localized: "achievement.dry_january.title"),
                 description: String(localized: "achievement.dry_january.desc"),
                 isPro: false, targetProgress: 31
             ),
             Achievement(
-                id: "sober_october", sfSymbol: "leaf.fill", symbolColor: Color(hex: "F97316"),
+                id: "sober_october", sfSymbol: "leaf.fill", symbolColor: Color.app.orangeBright,
                 title: String(localized: "achievement.sober_october.title"),
                 description: String(localized: "achievement.sober_october.desc"),
                 isPro: false, targetProgress: 31
             ),
             Achievement(
-                id: "no_alcohol_november", sfSymbol: "nosign", symbolColor: Color(hex: "8B5CF6"),
+                id: "no_alcohol_november", sfSymbol: "nosign", symbolColor: Color.app.alcoholLight,
                 title: String(localized: "achievement.no_alcohol_november.title"),
                 description: String(localized: "achievement.no_alcohol_november.desc"),
                 isPro: false, targetProgress: 30
             ),
             Achievement(
-                id: "summer_hydration", sfSymbol: "sun.max.fill", symbolColor: Color(hex: "F59E0B"),
+                id: "summer_hydration", sfSymbol: "sun.max.fill", symbolColor: Color.app.amber,
                 title: String(localized: "achievement.summer_hydration.title"),
                 description: String(localized: "achievement.summer_hydration.desc"),
                 isPro: false, targetProgress: 7
@@ -514,7 +514,7 @@ struct AchievementsView: View {
                         VStack(alignment: .leading, spacing: 12) {
                             AchievementSectionTitle(
                                 sfSymbol: "calendar.badge.clock",
-                                color: Color(hex: "4DA8F5"),
+                                color: Color.app.primary,
                                 label: String(localized: "achievements.monthly_section")
                             )
                             .padding(.horizontal)
@@ -530,7 +530,7 @@ struct AchievementsView: View {
                         VStack(alignment: .leading, spacing: 12) {
                             AchievementSectionTitle(
                                 sfSymbol: "rosette",
-                                color: Color(hex: "2B87E8"),
+                                color: Color.app.primaryDark,
                                 label: String(localized: "achievements.all_title")
                             )
                             .padding(.horizontal)
@@ -562,18 +562,18 @@ struct AchievementsView: View {
                                     VStack(alignment: .leading, spacing: 2) {
                                         Text(String(localized: "achievements.unlock_pro_title"))
                                             .font(.system(size: 15, weight: .bold))
-                                            .foregroundColor(colorScheme == .dark ? Color(hex: "FCD34D") : Color(hex: "92400E"))
+                                            .foregroundColor(colorScheme == .dark ? Color.app.premiumGold : Color.app.amberText)
                                         Text(String(localized: "achievements.unlock_pro_detail"))
                                             .font(.system(size: 13))
-                                            .foregroundColor(colorScheme == .dark ? Color(hex: "F59E0B").opacity(0.75) : Color(hex: "B45309"))
+                                            .foregroundColor(colorScheme == .dark ? Color.app.amber.opacity(0.75) : Color.app.amberDeep)
                                     }
                                     Spacer()
                                     Image(systemName: "chevron.right")
                                         .font(.system(size: 13, weight: .semibold))
-                                        .foregroundColor(colorScheme == .dark ? Color(hex: "F59E0B") : Color(hex: "B45309"))
+                                        .foregroundColor(colorScheme == .dark ? Color.app.amber : Color.app.amberDeep)
                                 }
                                 .padding(16)
-                                .background(colorScheme == .dark ? Color(hex: "2D1F00") : Color(hex: "FFF7ED"))
+                                .background(colorScheme == .dark ? Color.app.premiumDark : Color.app.warmWhite)
                                 .cornerRadius(16)
                                 .overlay(
                                     RoundedRectangle(cornerRadius: 16)
@@ -585,7 +585,7 @@ struct AchievementsView: View {
                     }
                     .padding(.bottom, 32)
                 }
-                .background(Color("AppBackground"))
+                .background(Color.app.background)
                 .navigationBarHidden(true)
                 .onChange(of: scrollToTopID) { _, _ in
                     withAnimation(.easeOut(duration: 0.3)) {
@@ -637,7 +637,7 @@ private struct AquaAddictBanner: View {
                         Image(systemName: "checkmark.circle.fill")
                             .font(.system(size: 18))
                             .foregroundColor(Color.white)
-                            .background(Color(hex: "4DA8F5").clipShape(Circle()))
+                            .background(Color.app.primary.clipShape(Circle()))
                             .offset(x: 20, y: 20)
                     }
                 }
@@ -648,7 +648,7 @@ private struct AquaAddictBanner: View {
                             .foregroundColor(Color.white)
                         Text(String(localized: "achievement.legendary_badge"))
                             .font(.system(size: 10, weight: .bold))
-                            .foregroundColor(Color(hex: "4DA8F5"))
+                            .foregroundColor(Color.app.primary)
                             .padding(.horizontal, 7)
                             .padding(.vertical, 3)
                             .background(Color.white)
@@ -684,13 +684,13 @@ private struct AquaAddictBanner: View {
         .padding(18)
         .background(
             LinearGradient(
-                colors: [Color(hex: "4DA8F5"), Color(hex: "1A5FBB")],
+                colors: [Color.app.primary, Color.app.primaryNavy],
                 startPoint: .topLeading,
                 endPoint: .bottomTrailing
             )
         )
         .cornerRadius(20)
-        .shadow(color: Color(hex: "4DA8F5").opacity(0.4), radius: 12, x: 0, y: 6)
+        .shadow(color: Color.app.primary.opacity(0.4), radius: 12, x: 0, y: 6)
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(achievement.title)
         .accessibilityValue(isCompleted
@@ -744,13 +744,13 @@ struct SummaryCard: View {
                 Spacer()
                 ZStack {
                     Circle()
-                        .stroke(Color(hex: "E3EFFC"), lineWidth: 10)
+                        .stroke(Color.app.primaryPale, lineWidth: 10)
                         .frame(width: 72, height: 72)
                     Circle()
                         .trim(from: 0, to: ratio)
                         .stroke(
                             LinearGradient(
-                                colors: [Color(hex: "4DA8F5"), Color(hex: "2B87E8")],
+                                colors: [Color.app.primary, Color.app.primaryDark],
                                 startPoint: .topLeading,
                                 endPoint: .bottomTrailing
                             ),
@@ -769,12 +769,12 @@ struct SummaryCard: View {
             GeometryReader { geo in
                 ZStack(alignment: .leading) {
                     RoundedRectangle(cornerRadius: 6)
-                        .fill(Color(hex: "E3EFFC"))
+                        .fill(Color.app.primaryPale)
                         .frame(height: 8)
                     RoundedRectangle(cornerRadius: 6)
                         .fill(
                             LinearGradient(
-                                colors: [Color(hex: "4DA8F5"), Color(hex: "2B87E8")],
+                                colors: [Color.app.primary, Color.app.primaryDark],
                                 startPoint: .leading,
                                 endPoint: .trailing
                             )
@@ -787,7 +787,7 @@ struct SummaryCard: View {
             .accessibilityHidden(true)
         }
         .padding(20)
-        .background(Color("AppCardBackground"))
+        .background(Color.app.card)
         .cornerRadius(20)
         .shadow(color: .black.opacity(0.05), radius: 8, x: 0, y: 2)
     }
@@ -814,7 +814,7 @@ struct AchievementBadge: View {
     var badgeBackground: Color {
         if isCompleted { return achievement.symbolColor.opacity(0.12) }
         if isLocked { return Color(UIColor.systemGray6) }
-        return Color("AppCardBackground")
+        return Color.app.card
     }
 
     var body: some View {

@@ -75,7 +75,7 @@ struct StatsView: View {
                                 .font(.system(size: 32, weight: .bold))
                             Image(systemName: "chart.bar.fill")
                                 .font(.system(size: 26, weight: .medium))
-                                .foregroundColor(Color(hex: "4DA8F5"))
+                                .foregroundColor(Color.app.primary)
                                 .frame(width: 32, height: 32)
                         }
                         Text(L10n.statsTrends)
@@ -111,7 +111,7 @@ struct StatsView: View {
                     HStack(spacing: 12) {
                         MetricCard(
                             sfSymbol:    "drop.fill",
-                            symbolColor: Color(hex: "4DA8F5"),
+                            symbolColor: Color.app.primary,
                             value:       UnitFormatter.volumeNumber(store.avgMlPerDay),
                             unit:        UnitFormatter.volumeUnitSymbol,
                             label:       L10n.statsAvgPerDay
@@ -135,7 +135,7 @@ struct StatsView: View {
                 }
                 .padding(.bottom, 32)
             }
-            .background(Color("AppBackground"))
+            .background(Color.app.background)
             .onChange(of: scrollToTopID) { _, _ in
                 withAnimation(.easeOut(duration: 0.3)) { proxy.scrollTo("top") }
             }
@@ -293,7 +293,7 @@ private struct ChartCard: View {
             // ── Légende objectif (adaptée à la période) ──────────────────────
             HStack(spacing: 6) {
                 RoundedRectangle(cornerRadius: 2)
-                    .fill(Color(hex: "2B87E8"))
+                    .fill(Color.app.primaryDark)
                     .frame(width: 16, height: 3)
                 Text(goalLegend)
                     .font(.system(size: 12))
@@ -301,7 +301,7 @@ private struct ChartCard: View {
             }
         }
         .padding(20)
-        .background(Color("AppCardBackground"))
+        .background(Color.app.card)
         .cornerRadius(20)
         .shadow(color: .black.opacity(0.05), radius: 8, x: 0, y: 2)
         .animation(.spring(response: 0.35, dampingFraction: 0.85), value: period)
@@ -342,7 +342,7 @@ private struct PeriodTab: View {
             .background(
                 isSelected
                     ? AnyShapeStyle(LinearGradient(
-                        colors: [Color(hex: "4DA8F5"), Color(hex: "2B87E8")],
+                        colors: [Color.app.primary, Color.app.primaryDark],
                         startPoint: .topLeading,
                         endPoint: .bottomTrailing
                       ))
@@ -418,11 +418,11 @@ private struct BarColumn: View {
                         .fill(
                             goalReached
                             ? AnyShapeStyle(LinearGradient(
-                                colors: [Color(hex: "4DA8F5"), Color(hex: "2B87E8")],
+                                colors: [Color.app.primary, Color.app.primaryDark],
                                 startPoint: .top, endPoint: .bottom
                               ))
                             : AnyShapeStyle(LinearGradient(
-                                colors: [Color(hex: "B8D9F8"), Color(hex: "D6EAFC")],
+                                colors: [Color.app.primaryFaint, Color.app.primaryPastel],
                                 startPoint: .top, endPoint: .bottom
                               ))
                         )
@@ -434,7 +434,7 @@ private struct BarColumn: View {
                         .overlay(
                             bar.isToday
                                 ? RoundedRectangle(cornerRadius: 5)
-                                    .stroke(Color(hex: "4DA8F5").opacity(0.5), lineWidth: 1.5)
+                                    .stroke(Color.app.primary.opacity(0.5), lineWidth: 1.5)
                                 : nil
                         )
                 }
@@ -443,7 +443,7 @@ private struct BarColumn: View {
 
             Text(bar.label)
                 .font(.system(size: period == .all ? 9 : 11))
-                .foregroundColor(bar.isToday ? Color(hex: "2B87E8") : .secondary)
+                .foregroundColor(bar.isToday ? Color.app.primaryDark : .secondary)
                 .fontWeight(bar.isToday ? .bold : .regular)
                 .multilineTextAlignment(.center)
                 .lineLimit(2)
@@ -485,10 +485,10 @@ struct WeeklyChartCard: View {
                                     .fill(
                                         item.ml >= goal
                                         ? LinearGradient(
-                                            colors: [Color(hex: "4DA8F5"), Color(hex: "2B87E8")],
+                                            colors: [Color.app.primary, Color.app.primaryDark],
                                             startPoint: .top, endPoint: .bottom)
                                         : LinearGradient(
-                                            colors: [Color(hex: "B8D9F8"), Color(hex: "D6EAFC")],
+                                            colors: [Color.app.primaryFaint, Color.app.primaryPastel],
                                             startPoint: .top, endPoint: .bottom)
                                     )
                                     .frame(
@@ -505,7 +505,7 @@ struct WeeklyChartCard: View {
                             .font(.system(size: 12))
                             .foregroundColor(
                                 item.day == currentDayAbbr()
-                                ? Color(hex: "2B87E8") : .secondary
+                                ? Color.app.primaryDark : .secondary
                             )
                             .fontWeight(item.day == currentDayAbbr() ? .bold : .regular)
                     }
@@ -514,7 +514,7 @@ struct WeeklyChartCard: View {
 
             HStack(spacing: 6) {
                 RoundedRectangle(cornerRadius: 2)
-                    .fill(Color(hex: "2B87E8"))
+                    .fill(Color.app.primaryDark)
                     .frame(width: 16, height: 3)
                 Text(insertValue("\(Int(goal))", into: "stats.goal_label"))
                     .font(.system(size: 12))
@@ -522,7 +522,7 @@ struct WeeklyChartCard: View {
             }
         }
         .padding(20)
-        .background(Color("AppCardBackground"))
+        .background(Color.app.card)
         .cornerRadius(20)
         .shadow(color: .black.opacity(0.05), radius: 8, x: 0, y: 2)
     }
@@ -552,7 +552,7 @@ struct AlcoolAnalysisCard: View {
 
     var tendanceColor: Color {
         if weekLiters == 0  { return .green }
-        if weekLiters < 0.5 { return Color(hex: "4DA8F5") }
+        if weekLiters < 0.5 { return Color.app.primary }
         if weekLiters < 1.5 { return .orange }
         return .red
     }
@@ -591,7 +591,7 @@ struct AlcoolAnalysisCard: View {
                         StatPill(
                             label: String(localized: "stats.this_month"),
                             value: String(format: "%.2f L", monthLiters),
-                            color: Color(hex: "4DA8F5")
+                            color: Color.app.primary
                         )
                     }
                     VStack(alignment: .leading, spacing: 6) {
@@ -622,7 +622,7 @@ struct AlcoolAnalysisCard: View {
                         }
                         .frame(maxWidth: .infinity).frame(height: 50)
                         .background(LinearGradient(
-                            colors: [Color(hex: "FF8C00"), Color(hex: "E05F00")],
+                            colors: [Color.app.orange, Color.app.orangeVibrant],
                             startPoint: .topLeading, endPoint: .bottomTrailing
                         ))
                         .cornerRadius(14)
@@ -631,7 +631,7 @@ struct AlcoolAnalysisCard: View {
                 .padding(20)
             }
         }
-        .background(Color("AppCardBackground"))
+        .background(Color.app.card)
         .cornerRadius(20)
         .shadow(color: .black.opacity(0.05), radius: 8, x: 0, y: 2)
     }
@@ -685,7 +685,7 @@ struct MetricCard: View {
         }
         .frame(maxWidth: .infinity)
         .padding(.vertical, 16).padding(.horizontal, 8)
-        .background(Color("AppCardBackground"))
+        .background(Color.app.card)
         .cornerRadius(16)
         .shadow(color: .black.opacity(0.05), radius: 8, x: 0, y: 2)
         .accessibilityElement(children: .ignore)

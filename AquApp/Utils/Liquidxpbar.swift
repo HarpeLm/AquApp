@@ -16,9 +16,9 @@ struct LiquidXPBar: View {
 
     // Couleurs fixes bleu AquApp — indépendantes du niveau
     // pour garantir la lisibilité sur fond clair
-    private let fillStart  = Color(hex: "1A5FBB")  // bleu foncé
-    private let fillMid    = Color(hex: "2B87E8")  // bleu medium
-    private let fillEnd    = Color(hex: "4DA8F5")  // bleu clair
+    private let fillStart  = Color.app.primaryNavy  // bleu foncé
+    private let fillMid    = Color.app.primaryDark  // bleu medium
+    private let fillEnd    = Color.app.primary  // bleu clair
 
     // ── État interne ─────────────────────────────────────────────────────────
     @State private var shimmerOffset: CGFloat = -1.0
@@ -45,10 +45,10 @@ struct LiquidXPBar: View {
                 // ── Track ─────────────────────────────────────────────────────
                 // Fond bleu désaturé visible sur fond clair (AppCardBackground)
                 RoundedRectangle(cornerRadius: height / 2)
-                    .fill(Color(hex: "B8D9F8"))        // bleu pâle opaque
+                    .fill(Color.app.primaryFaint)        // bleu pâle opaque
                     .overlay(
                         RoundedRectangle(cornerRadius: height / 2)
-                            .stroke(Color(hex: "85B7EB"), lineWidth: 0.75)
+                            .stroke(Color.app.primarySoft, lineWidth: 0.75)
                     )
 
                 // ── Remplissage liquide ───────────────────────────────────────
@@ -194,12 +194,12 @@ struct LiquidXPBar: View {
         ForEach([0.15, 0.42, 0.68, 0.92, 1.0], id: \.self) { p in
             LiquidXPBar(
                 progress: p,
-                color:    Color(hex: "4DA8F5"),
+                color:    Color.app.primary,
                 height:   10
             )
             .padding(.horizontal)
         }
     }
     .padding(.vertical, 32)
-    .background(Color("AppBackground"))
+    .background(Color.app.background)
 }

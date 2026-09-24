@@ -14,29 +14,29 @@ struct OnboardingView: View {
         [
             OnboardingPage(
                 sfSymbol:    "drop.fill",
-                color:       Color(hex: "4DA8F5"),
-                gradient:    [Color(hex: "4DA8F5"), Color(hex: "2B87E8")],
+                color:       Color.app.primary,
+                gradient:    [Color.app.primary, Color.app.primaryDark],
                 title:       String(localized: "onboarding.page1.title"),
                 description: String(localized: "onboarding.page1.description")
             ),
             OnboardingPage(
                 sfSymbol:    "chart.bar.fill",
-                color:       Color(hex: "10B981"),
-                gradient:    [Color(hex: "10B981"), Color(hex: "059669")],
+                color:       Color.app.greenDark,
+                gradient:    [Color.app.greenDark, Color.app.greenDeep],
                 title:       String(localized: "onboarding.page2.title"),
                 description: String(localized: "onboarding.page2.description")
             ),
             OnboardingPage(
                 sfSymbol:    "trophy.fill",
-                color:       Color(hex: "F59E0B"),
-                gradient:    [Color(hex: "F59E0B"), Color(hex: "D97706")],
+                color:       Color.app.amber,
+                gradient:    [Color.app.amber, Color.app.amberBurnt],
                 title:       String(localized: "onboarding.page3.title"),
                 description: String(localized: "onboarding.page3.description")
             ),
             OnboardingPage(
                 sfSymbol:    "bell.badge.fill",
-                color:       Color(hex: "9B59B6"),
-                gradient:    [Color(hex: "9B59B6"), Color(hex: "6C3483")],
+                color:       Color.app.alcoholMid,
+                gradient:    [Color.app.alcoholMid, Color.app.alcoholDark],
                 title:       String(localized: "onboarding.page4.title"),
                 description: String(localized: "onboarding.page4.description")
             ),
@@ -45,7 +45,7 @@ struct OnboardingView: View {
 
     var body: some View {
         ZStack {
-            Color("AppBackground").ignoresSafeArea()
+            Color.app.background.ignoresSafeArea()
 
             if goToNameEntry {
                 NameEntryView(onComplete: onComplete)

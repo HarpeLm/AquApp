@@ -38,7 +38,7 @@ struct ProfileAppearanceView: View {
                     .frame(width: 180)
                 }
                 .padding(16)
-                .background(Color("AppCardBackground"))
+                .background(Color.app.card)
                 .cornerRadius(16)
                 .shadow(color: .black.opacity(0.05), radius: 8, x: 0, y: 2)
             }
@@ -52,5 +52,5 @@ struct ProfileAppearanceView: View {
         .environmentObject(StoreKitManager())
         .environmentObject(AppIconManager())
         .padding(.vertical)
-        .background(Color("AppBackground"))
+        .background(Color.app.background)
 }

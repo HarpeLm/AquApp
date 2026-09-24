@@ -10,7 +10,7 @@ struct NameEntryView: View {
 
     var body: some View {
         ZStack {
-            Color("AppBackground").ignoresSafeArea()
+            Color.app.background.ignoresSafeArea()
 
             if goToBodyProfile {
                 BodyProfileView(onComplete: onComplete)
@@ -22,22 +22,22 @@ struct NameEntryView: View {
 
                         ZStack {
                             Circle()
-                                .fill(Color(hex: "4DA8F5").opacity(0.10))
+                                .fill(Color.app.primary.opacity(0.10))
                                 .frame(width: 140, height: 140)
                             Circle()
-                                .fill(Color(hex: "4DA8F5").opacity(0.07))
+                                .fill(Color.app.primary.opacity(0.07))
                                 .frame(width: 170, height: 170)
                             ZStack {
                                 Circle()
                                     .fill(
                                         LinearGradient(
-                                            colors: [Color(hex: "4DA8F5"), Color(hex: "2B87E8")],
+                                            colors: [Color.app.primary, Color.app.primaryDark],
                                             startPoint: .topLeading,
                                             endPoint: .bottomTrailing
                                         )
                                     )
                                     .frame(width: 90, height: 90)
-                                    .shadow(color: Color(hex: "4DA8F5").opacity(0.4), radius: 15, x: 0, y: 6)
+                                    .shadow(color: Color.app.primary.opacity(0.4), radius: 15, x: 0, y: 6)
                                 Image(systemName: "person.fill")
                                     .font(.system(size: 40, weight: .medium))
                                     .foregroundColor(.white)
@@ -65,13 +65,13 @@ struct NameEntryView: View {
                                 .focused($isFocused)
                                 .font(.system(size: 17))
                                 .padding(16)
-                                .background(Color("AppCardBackground"))
+                                .background(Color.app.card)
                                 .cornerRadius(14)
                                 .shadow(color: .black.opacity(0.05), radius: 8, x: 0, y: 2)
                                 .overlay(
                                     RoundedRectangle(cornerRadius: 14)
                                         .stroke(
-                                            isFocused ? Color(hex: "4DA8F5") : Color.clear,
+                                            isFocused ? Color.app.primary : Color.clear,
                                             lineWidth: 1.5
                                         )
                                 )
@@ -90,14 +90,14 @@ struct NameEntryView: View {
                                         LinearGradient(
                                             colors: isButtonDisabled
                                                 ? [Color(UIColor.systemGray3), Color(UIColor.systemGray3)]
-                                                : [Color(hex: "4DA8F5"), Color(hex: "2B87E8")],
+                                                : [Color.app.primary, Color.app.primaryDark],
                                             startPoint: .leading,
                                             endPoint: .trailing
                                         )
                                     )
                                     .cornerRadius(16)
                                     .shadow(
-                                        color: isButtonDisabled ? .clear : Color(hex: "4DA8F5").opacity(0.4),
+                                        color: isButtonDisabled ? .clear : Color.app.primary.opacity(0.4),
                                         radius: 10, x: 0, y: 4
                                     )
                             }

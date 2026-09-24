@@ -27,9 +27,9 @@ struct BodyProfileView: View {
     var goalColor: Color {
         switch calculatedGoalMl {
         case ..<1800:     return .orange
-        case 1800..<2200: return Color(hex: "4DA8F5")
-        case 2200..<3000: return Color(hex: "10B981")
-        default:          return Color(hex: "F59E0B")
+        case 1800..<2200: return Color.app.primary
+        case 2200..<3000: return Color.app.greenDark
+        default:          return Color.app.amber
         }
     }
 
@@ -49,7 +49,7 @@ struct BodyProfileView: View {
 
     private var profileForm: some View {
         ZStack {
-            Color("AppBackground").ignoresSafeArea()
+            Color.app.background.ignoresSafeArea()
 
             ScrollView {
                 VStack(spacing: 0) {
@@ -57,19 +57,19 @@ struct BodyProfileView: View {
 
                     ZStack {
                         Circle()
-                            .fill(Color(hex: "9B59B6").opacity(0.10))
+                            .fill(Color.app.alcoholMid.opacity(0.10))
                             .frame(width: 140, height: 140)
                         ZStack {
                             Circle()
                                 .fill(
                                     LinearGradient(
-                                        colors: [Color(hex: "9B59B6"), Color(hex: "6C3483")],
+                                        colors: [Color.app.alcoholMid, Color.app.alcoholDark],
                                         startPoint: .topLeading,
                                         endPoint: .bottomTrailing
                                     )
                                 )
                                 .frame(width: 90, height: 90)
-                                .shadow(color: Color(hex: "9B59B6").opacity(0.4), radius: 15, x: 0, y: 6)
+                                .shadow(color: Color.app.alcoholMid.opacity(0.4), radius: 15, x: 0, y: 6)
                             Image(systemName: "person.fill")
                                 .font(.system(size: 40, weight: .medium))
                                 .foregroundColor(.white)
@@ -98,7 +98,7 @@ struct BodyProfileView: View {
                                 ForEach(Gender.allCases, id: \.self) { gender in
                                     GenderButton(
                                         gender: gender, isSelected: selectedGender == gender,
-                                        accentColor: Color(hex: "9B59B6")
+                                        accentColor: Color.app.alcoholMid
                                     ) {
                                         withAnimation(.spring(response: 0.25)) { selectedGender = gender }
                                     }
@@ -114,14 +114,14 @@ struct BodyProfileView: View {
                                 HStack(alignment: .lastTextBaseline, spacing: 6) {
                                     Text("\(Int(UnitFormatter.heightValue(heightCm)))")
                                         .font(.system(size: 48, weight: .bold))
-                                        .foregroundColor(Color(hex: "4DA8F5"))
+                                        .foregroundColor(Color.app.primary)
                                     Text(UnitFormatter.heightUnitSymbol)
                                         .font(.system(size: 18, weight: .medium))
                                         .foregroundColor(.secondary)
                                 }
                                 .frame(maxWidth: .infinity, alignment: .center)
                                 Slider(value: $heightCm, in: 140...220, step: 1)
-                                    .tint(Color(hex: "4DA8F5")).padding(.horizontal, 4)
+                                    .tint(Color.app.primary).padding(.horizontal, 4)
                                     .accessibilityLabel(String(localized: "body.height"))
                                     .accessibilityValue(UnitFormatter.height(heightCm))
                                 HStack {
@@ -143,14 +143,14 @@ struct BodyProfileView: View {
                                 HStack(alignment: .lastTextBaseline, spacing: 6) {
                                     Text("\(Int(UnitFormatter.weightValue(weightKg)))")
                                         .font(.system(size: 48, weight: .bold))
-                                        .foregroundColor(Color(hex: "10B981"))
+                                        .foregroundColor(Color.app.greenDark)
                                     Text(UnitFormatter.weightUnitSymbol)
                                         .font(.system(size: 18, weight: .medium))
                                         .foregroundColor(.secondary)
                                 }
                                 .frame(maxWidth: .infinity, alignment: .center)
                                 Slider(value: $weightKg, in: 30...200, step: 1)
-                                    .tint(Color(hex: "10B981")).padding(.horizontal, 4)
+                                    .tint(Color.app.greenDark).padding(.horizontal, 4)
                                     .accessibilityLabel(String(localized: "body.weight"))
                                     .accessibilityValue(UnitFormatter.weight(weightKg))
                                 HStack {
@@ -188,11 +188,11 @@ struct BodyProfileView: View {
                             }
                             .foregroundColor(.white).frame(maxWidth: .infinity).frame(height: 56)
                             .background(LinearGradient(
-                                colors: [Color(hex: "9B59B6"), Color(hex: "6C3483")],
+                                colors: [Color.app.alcoholMid, Color.app.alcoholDark],
                                 startPoint: .leading, endPoint: .trailing
                             ))
                             .cornerRadius(16)
-                            .shadow(color: Color(hex: "9B59B6").opacity(0.4), radius: 10, x: 0, y: 4)
+                            .shadow(color: Color.app.alcoholMid.opacity(0.4), radius: 10, x: 0, y: 4)
                             .accessibilityIdentifier("onboarding.body.save")
                         }
                     }

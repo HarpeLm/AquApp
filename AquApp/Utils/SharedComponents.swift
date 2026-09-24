@@ -77,7 +77,7 @@ struct GenderButton: View {
             .background(
                 isSelected
                     ? accentColor.opacity(0.06)
-                    : Color("AppCardBackground")
+                    : Color.app.card
             )
             .cornerRadius(14)
             .overlay(

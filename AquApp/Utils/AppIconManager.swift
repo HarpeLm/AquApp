@@ -40,7 +40,7 @@ enum AppIcon: String, CaseIterable, Identifiable {
         case .minuit:      return [Color(hex: "0C0C1E"), Color(hex: "0D1A3A")]
         case .givre:       return [Color(hex: "EAF4FF"), Color(hex: "C8E2F5")]
         case .lagon:       return [Color(hex: "1ECFC0"), Color(hex: "3A7BD5")]
-        case .aurora:      return [Color(hex: "FF6B6B"), Color(hex: "6B3FD4")]
+        case .aurora:      return [Color.app.coral, Color(hex: "6B3FD4")]
         case .cristal:     return [Color(hex: "F4FAFF"), Color(hex: "FFFFFF")]
         case .saphir:      return [Color(hex: "003D99"), Color(hex: "001F5C")]
         case .nuitEtoilee: return [Color(hex: "1A1A2E"), Color(hex: "16213E")]
@@ -151,7 +151,7 @@ struct AppIconPickerView: View {
             SectionHeader(
                 title:    String(localized: "profile.section.app_icon"),
                 sfSymbol: "app.badge",
-                color:    Color(hex: "4DA8F5")
+                color:    Color.app.primary
             )
             VStack(alignment: .leading, spacing: 0) {
                 Text(String(localized: "profile.app_icon.subtitle"))
@@ -194,7 +194,7 @@ struct AppIconPickerView: View {
                 }
                 Spacer().frame(height: 14)
             }
-            .background(Color("AppCardBackground"))
+            .background(Color.app.card)
             .cornerRadius(16)
             .shadow(color: .black.opacity(0.05), radius: 8, x: 0, y: 2)
             .animation(.easeInOut(duration: 0.3), value: iconManager.toastMessage != nil)
@@ -227,7 +227,7 @@ struct AppIconCell: View {
                         .overlay(
                             RoundedRectangle(cornerRadius: 14)
                                 .stroke(
-                                    isSelected ? Color(hex: "4DA8F5") : Color(UIColor.systemGray5),
+                                    isSelected ? Color.app.primary : Color(UIColor.systemGray5),
                                     lineWidth: isSelected ? 2.5 : 1
                                 )
                         )
@@ -245,7 +245,7 @@ struct AppIconCell: View {
                         .offset(x: 4, y: -4)
                     } else if isSelected {
                         ZStack {
-                            Circle().fill(Color(hex: "4DA8F5")).frame(width: 18, height: 18)
+                            Circle().fill(Color.app.primary).frame(width: 18, height: 18)
                             Image(systemName: "checkmark")
                                 .font(.system(size: 9, weight: .bold))
                                 .foregroundColor(.white)
@@ -257,7 +257,7 @@ struct AppIconCell: View {
 
                 Text(icon.localizedName)
                     .font(.system(size: 10, weight: .medium))
-                    .foregroundColor(isSelected ? Color(hex: "4DA8F5") : .secondary)
+                    .foregroundColor(isSelected ? Color.app.primary : .secondary)
                     .lineLimit(1)
                     .minimumScaleFactor(0.7)
 
@@ -268,15 +268,15 @@ struct AppIconCell: View {
                             .font(.system(size: 9, weight: .bold))
                             .padding(.horizontal, 6)
                             .padding(.vertical, 3)
-                            .background(Color(hex: "4DA8F5"))
+                            .background(Color.app.primary)
                             .clipShape(Capsule())
                     } else if !icon.isPremium {
                         Text(String(localized: "profile.app_icon.free_label"))
-                            .foregroundColor(Color(hex: "2B87E8"))
+                            .foregroundColor(Color.app.primaryDark)
                             .font(.system(size: 9, weight: .bold))
                             .padding(.horizontal, 6)
                             .padding(.vertical, 3)
-                            .background(Color(hex: "EEF4FF"))
+                            .background(Color.app.primaryLight)
                             .clipShape(Capsule())
                     } else {
                         Text(String(localized: "profile.app_icon.premium_label"))

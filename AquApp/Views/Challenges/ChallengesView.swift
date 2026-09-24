@@ -126,35 +126,35 @@ class ChallengeManager: ObservableObject {
             ),
             Challenge(
                 id: "grand_buveur",
-                sfSymbol: "drop.fill", symbolColor: Color(hex: "4DA8F5"),
+                sfSymbol: "drop.fill", symbolColor: Color.app.primary,
                 title: String(localized: "challenge.grand_buveur.title"), titleEmoji: "💪",
                 description: String(localized: "challenge.grand_buveur.desc"),
                 category: .hydration, isPro: false, targetProgress: 3000
             ),
             Challenge(
                 id: "matin_champion",
-                sfSymbol: "sun.max.fill", symbolColor: Color(hex: "F59E0B"),
+                sfSymbol: "sun.max.fill", symbolColor: Color.app.amber,
                 title: String(localized: "challenge.matin_champion.title"), titleEmoji: "🌞",
                 description: String(localized: "challenge.matin_champion.desc"),
                 category: .hydration, isPro: false, targetProgress: 1
             ),
             Challenge(
                 id: "cadence_parfaite",
-                sfSymbol: "waveform.path.ecg", symbolColor: Color(hex: "10B981"),
+                sfSymbol: "waveform.path.ecg", symbolColor: Color.app.greenDark,
                 title: String(localized: "challenge.cadence_parfaite.title"), titleEmoji: "⚡",
                 description: String(localized: "challenge.cadence_parfaite.desc"),
                 category: .hydration, isPro: false, targetProgress: 6
             ),
             Challenge(
                 id: "grand_ecart",
-                sfSymbol: "arrow.up.arrow.down", symbolColor: Color(hex: "8B5CF6"),
+                sfSymbol: "arrow.up.arrow.down", symbolColor: Color.app.alcoholLight,
                 title: String(localized: "challenge.grand_ecart.title"), titleEmoji: "🌗",
                 description: String(localized: "challenge.grand_ecart.desc"),
                 category: .hydration, isPro: false, targetProgress: 2
             ),
             Challenge(
                 id: "flash_hydrate",
-                sfSymbol: "bolt.fill", symbolColor: Color(hex: "EF4444"),
+                sfSymbol: "bolt.fill", symbolColor: Color.app.red,
                 title: String(localized: "challenge.flash_hydrate.title"), titleEmoji: "⚡",
                 description: String(localized: "challenge.flash_hydrate.desc"),
                 category: .hydration, isPro: false, targetProgress: 500
@@ -168,7 +168,7 @@ class ChallengeManager: ObservableObject {
             ),
             Challenge(
                 id: "soiree_tranquille",
-                sfSymbol: "moon.stars.fill", symbolColor: Color(hex: "6C3483"),
+                sfSymbol: "moon.stars.fill", symbolColor: Color.app.alcoholDark,
                 title: String(localized: "challenge.soiree_tranquille.title"), titleEmoji: "🌙",
                 description: String(localized: "challenge.soiree_tranquille.desc"),
                 category: .wellness, isPro: false, targetProgress: 1
@@ -182,7 +182,7 @@ class ChallengeManager: ObservableObject {
             ),
             Challenge(
                 id: "recuperation",
-                sfSymbol: "heart.fill", symbolColor: Color(hex: "EF4444"),
+                sfSymbol: "heart.fill", symbolColor: Color.app.red,
                 title: String(localized: "challenge.recuperation.title"), titleEmoji: "🏋️",
                 description: String(localized: "challenge.recuperation.desc"),
                 category: .sport, isPro: false, targetProgress: 300
@@ -535,7 +535,7 @@ struct ChallengesView: View {
                                     }
                                 }
                             }
-                            .background(Color("AppCardBackground"))
+                            .background(Color.app.card)
                             .cornerRadius(16)
                             .shadow(color: .black.opacity(0.05), radius: 8, x: 0, y: 2)
                             .padding(.horizontal)
@@ -543,7 +543,7 @@ struct ChallengesView: View {
                     }
                     .padding(.bottom, 32)
                 }
-                .background(Color("AppBackground"))
+                .background(Color.app.background)
                 .onChange(of: scrollToTopID) { _, _ in
                     withAnimation(.easeOut(duration: 0.3)) { proxy.scrollTo("top") }
                 }
@@ -601,7 +601,7 @@ struct ActiveChallengeCard: View {
         }
         .padding(20)
         .background(LinearGradient(
-            colors: [Color(hex: "4DA8F5"), Color(hex: "2B87E8")],
+            colors: [Color.app.primary, Color.app.primaryDark],
             startPoint: .topLeading, endPoint: .bottomTrailing
         ))
         .cornerRadius(20)

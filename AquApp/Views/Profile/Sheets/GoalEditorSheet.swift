@@ -15,9 +15,9 @@ struct GoalEditorSheet: View {
     private var goalColor: Color {
         switch localGoal {
         case ..<1800:     return .orange
-        case 1800..<2200: return Color(hex: "4DA8F5")
-        case 2200..<3000: return Color(hex: "10B981")
-        default:          return Color(hex: "F59E0B")
+        case 1800..<2200: return Color.app.primary
+        case 2200..<3000: return Color.app.greenDark
+        default:          return Color.app.amber
         }
     }
 
@@ -38,7 +38,7 @@ struct GoalEditorSheet: View {
                         .font(.system(size: 22, weight: .bold))
                     Image(systemName: "drop.fill")
                         .font(.system(size: 18))
-                        .foregroundColor(Color(hex: "4DA8F5"))
+                        .foregroundColor(Color.app.primary)
                 }
                 Spacer()
                 Button { isPresented = false } label: {
@@ -163,11 +163,11 @@ struct GoalEditorSheet: View {
                         .frame(maxWidth: .infinity)
                         .frame(height: 54)
                         .background(LinearGradient(
-                            colors: [Color(hex: "4DA8F5"), Color(hex: "2B87E8")],
+                            colors: [Color.app.primary, Color.app.primaryDark],
                             startPoint: .leading, endPoint: .trailing
                         ))
                         .cornerRadius(16)
-                        .shadow(color: Color(hex: "4DA8F5").opacity(0.4), radius: 10, x: 0, y: 4)
+                        .shadow(color: Color.app.primary.opacity(0.4), radius: 10, x: 0, y: 4)
                     }
                     .padding(.horizontal, 20)
                     .padding(.bottom, 32)
@@ -176,7 +176,7 @@ struct GoalEditorSheet: View {
                 .padding(.top, 8)
             }
         }
-        .background(Color("AppBackground"))
+        .background(Color.app.background)
         .ignoresSafeArea(edges: .bottom)
         .accessibilityIdentifier("sheet.goal")   // ← requis par test08
         .onAppear { localGoal = dailyGoalMl }

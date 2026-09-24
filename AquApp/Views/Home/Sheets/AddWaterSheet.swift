@@ -47,7 +47,7 @@ struct AddWaterSheet: View {
                         .font(.system(size: 22, weight: .bold))
                     Image(systemName: "drop.fill")
                         .font(.system(size: 20, weight: .medium))
-                        .foregroundColor(Color(hex: "4DA8F5"))
+                        .foregroundColor(Color.app.primary)
                         .frame(width: 24, height: 24)
                 }
                 Spacer()
@@ -95,7 +95,7 @@ struct AddWaterSheet: View {
                         } label: {
                             HStack {
                                 Image(systemName: "slider.horizontal.3")
-                                    .foregroundColor(Color(hex: "4DA8F5"))
+                                    .foregroundColor(Color.app.primary)
                                 Text(String(localized: "water.custom_quantity"))
                                     .font(.system(size: 15, weight: .semibold))
                                     .foregroundColor(.primary)
@@ -119,11 +119,11 @@ struct AddWaterSheet: View {
                                     Spacer()
                                     Text(UnitFormatter.volume(sliderValue))
                                         .font(.system(size: 20, weight: .bold))
-                                        .foregroundColor(Color(hex: "2B87E8"))
+                                        .foregroundColor(Color.app.primaryDark)
                                 }
                                 VStack(spacing: 6) {
                                     Slider(value: $sliderValue, in: UnitFormatter.waterSliderRange, step: 10)
-                                        .tint(Color(hex: "4DA8F5"))
+                                        .tint(Color.app.primary)
                                         .accessibilityLabel(String(localized: "water.quantity_label"))
                                         .accessibilityValue(UnitFormatter.volume(sliderValue))
                                         .onChange(of: sliderValue) { _, newValue in
@@ -160,7 +160,7 @@ struct AddWaterSheet: View {
                                     .frame(maxWidth: .infinity)
                                     .frame(height: 50)
                                     .background(LinearGradient(
-                                        colors: [Color(hex: "4DA8F5"), Color(hex: "2B87E8")],
+                                        colors: [Color.app.primary, Color.app.primaryDark],
                                         startPoint: .leading, endPoint: .trailing
                                     ))
                                     .cornerRadius(14)
@@ -274,7 +274,7 @@ struct AddWaterSheet: View {
                                     .fill(customAmount.isEmpty
                                           ? AnyShapeStyle(Color(UIColor.systemGray4))
                                           : AnyShapeStyle(LinearGradient(
-                                            colors: [Color(hex: "4DA8F5"), Color(hex: "2B87E8")],
+                                            colors: [Color.app.primary, Color.app.primaryDark],
                                             startPoint: .topLeading, endPoint: .bottomTrailing
                                           )))
                                     .frame(width: 52, height: 52)
@@ -339,7 +339,7 @@ struct PresetButton: View {
             VStack(spacing: 6) {
                 Image(systemName: "drop.fill")
                     .font(.system(size: dropSize * 0.6, weight: .medium))
-                    .foregroundColor(Color(hex: "4DA8F5"))
+                    .foregroundColor(Color.app.primary)
                     .frame(width: dropSize, height: dropSize)
                     .accessibilityHidden(true)
                 Text(label)
@@ -356,7 +356,7 @@ struct PresetButton: View {
             }
             .frame(maxWidth: .infinity)
             .padding(.vertical, 14)
-            .background(Color("AppCardBackground"))
+            .background(Color.app.card)
             .cornerRadius(14)
             .shadow(color: .black.opacity(0.05), radius: 6, x: 0, y: 2)
         }

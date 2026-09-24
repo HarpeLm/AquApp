@@ -136,10 +136,10 @@ struct HydrationGridView: View {
     private func color(for ratio: Double) -> Color {
         switch ratio {
         case ..<0.01: return Color.white.opacity(0.08)
-        case ..<0.34: return Color(hex: "185FA5").opacity(0.45)
-        case ..<0.67: return Color(hex: "2B87E8").opacity(0.70)
-        case ..<1.00: return Color(hex: "4DA8F5").opacity(0.90)
-        default:      return Color(hex: "4DA8F5")
+        case ..<0.34: return Color.app.primaryDeep.opacity(0.45)
+        case ..<0.67: return Color.app.primaryDark.opacity(0.70)
+        case ..<1.00: return Color.app.primary.opacity(0.90)
+        default:      return Color.app.primary
         }
     }
 
@@ -160,10 +160,10 @@ struct HydrationGridView: View {
     private func legendColor(_ i: Int) -> Color {
         switch i {
         case 0:  return Color.white.opacity(0.08)
-        case 1:  return Color(hex: "185FA5").opacity(0.45)
-        case 2:  return Color(hex: "2B87E8").opacity(0.70)
-        case 3:  return Color(hex: "4DA8F5").opacity(0.90)
-        default: return Color(hex: "4DA8F5")
+        case 1:  return Color.app.primaryDeep.opacity(0.45)
+        case 2:  return Color.app.primaryDark.opacity(0.70)
+        case 3:  return Color.app.primary.opacity(0.90)
+        default: return Color.app.primary
         }
     }
 }

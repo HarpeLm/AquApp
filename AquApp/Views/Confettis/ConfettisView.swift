@@ -31,9 +31,9 @@ struct ConfettiView: View {
     @Binding var isActive: Bool
 
     let colors: [Color] = [
-        Color(hex: "4DA8F5"), Color(hex: "FF6B6B"), Color(hex: "FFD93D"),
-        Color(hex: "6BCB77"), Color(hex: "FF922B"), Color(hex: "CC5DE8"),
-        Color(hex: "F06595"), Color(hex: "4DABF7"), Color(hex: "51CF66")
+        Color.app.primary, Color.app.coral, Color.app.yellow,
+        Color.app.greenAlt, Color.app.orangeLight, Color.app.purple,
+        Color.app.pink, Color.app.primaryMid, Color.app.green
     ]
 
     var body: some View {
@@ -198,7 +198,7 @@ struct CompletionBanner: View {
                     .foregroundColor(.green)
             }
             .padding(16)
-            .background(Color("AppCardBackground"))
+            .background(Color.app.card)
             .cornerRadius(16)
             .shadow(color: .black.opacity(0.12), radius: 12, x: 0, y: 4)
             .padding(.horizontal, 16)

@@ -23,7 +23,7 @@ struct KeyboardToolbarModifier: ViewModifier {
                         )
                     }
                     .font(.system(size: 16, weight: .semibold))
-                    .foregroundColor(Color(hex: "4DA8F5"))
+                    .foregroundColor(Color.app.primary)
                 }
             }
     }

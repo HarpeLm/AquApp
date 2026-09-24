@@ -54,7 +54,7 @@ enum ConfettiEvent {
 
     var color: Color {
         switch self {
-        case .goalReached:         return Color(hex: "4DA8F5")
+        case .goalReached:         return Color.app.primary
         case .achievementUnlocked: return .yellow
         case .challengeCompleted:  return .orange
         }

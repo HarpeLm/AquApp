@@ -29,6 +29,6 @@ struct SectionHeader: View {
 }
 
 #Preview {
-    SectionHeader(title: "Hydratation", sfSymbol: "drop.fill", color: Color(hex: "4DA8F5"))
+    SectionHeader(title: "Hydratation", sfSymbol: "drop.fill", color: Color.app.primary)
         .padding()
 }

@@ -140,7 +140,7 @@ struct WrappedView: View {
                             .padding(.vertical, 4)
                             .background(
                                 Capsule()
-                                    .fill(index == currentSlide ? Color(hex: "4DA8F5") : Color.white.opacity(0.08))
+                                    .fill(index == currentSlide ? Color.app.primary : Color.white.opacity(0.08))
                             )
                     }
                 }
@@ -380,7 +380,7 @@ struct WrappedDropletCounter: View {
                 ForEach(Array(droplets.enumerated()), id: \.element.id) { index, droplet in
                     Image(systemName: "drop.fill")
                         .font(.system(size: 14))
-                        .foregroundColor(Color(hex: "4DA8F5"))
+                        .foregroundColor(Color.app.primary)
                         .offset(y: droplet.fallen ? 30 : -30)
                         .opacity(droplet.fallen ? 0 : 1)
                         .offset(x: CGFloat(index - dropletCount / 2) * 4)
@@ -459,16 +459,16 @@ struct WrappedIntroSlide: View {
     var body: some View {
         WrappedSlideBase(
             gradientColors: [Color(hex: "050D1A"), Color(hex: "0D1A2E"), Color(hex: "0A2240")],
-            particleColors: [Color(hex: "4DA8F5"), Color(hex: "F59E0B"), Color(hex: "10B981"), Color(hex: "F06595")]
+            particleColors: [Color.app.primary, Color.app.amber, Color.app.greenDark, Color.app.pink]
         ) {
             VStack(spacing: 14) {
                 Image(systemName: "drop.fill")
                     .font(.system(size: 56))
-                    .foregroundColor(Color(hex: "4DA8F5"))
+                    .foregroundColor(Color.app.primary)
 
                 Text("AQUAPP")
                     .font(.system(size: 12, weight: .bold))
-                    .foregroundColor(Color(hex: "4DA8F5"))
+                    .foregroundColor(Color.app.primary)
                     .kerning(3)
 
                 Text(String(format: String(localized: "wrapped.intro.title"), data.year))
@@ -489,7 +489,7 @@ struct WrappedIntroSlide: View {
                     .padding(.horizontal, 24)
                     .padding(.vertical, 10)
                     .background(
-                        LinearGradient(colors: [Color(hex: "4DA8F5"), Color(hex: "2B87E8")],
+                        LinearGradient(colors: [Color.app.primary, Color.app.primaryDark],
                                        startPoint: .leading, endPoint: .trailing)
                     )
                     .clipShape(Capsule())
@@ -508,12 +508,12 @@ struct WrappedVolumeSlide: View {
     var body: some View {
         WrappedSlideBase(
             gradientColors: [Color(hex: "051828"), Color(hex: "0D1A2E")],
-            particleColors: [Color(hex: "4DA8F5"), Color(hex: "4DABF7")]
+            particleColors: [Color.app.primary, Color.app.primaryMid]
         ) {
             VStack(spacing: 10) {
                 Text(String(localized: "wrapped.volume.eyebrow"))
                     .font(.system(size: 12, weight: .bold))
-                    .foregroundColor(Color(hex: "4DA8F5"))
+                    .foregroundColor(Color.app.primary)
                     .kerning(3)
 
                 Text(String(localized: "wrapped.volume.lead"))
@@ -523,7 +523,7 @@ struct WrappedVolumeSlide: View {
 
                 Image(systemName: "drop.fill")
                     .font(.system(size: 36))
-                    .foregroundColor(Color(hex: "4DA8F5").opacity(0.3))
+                    .foregroundColor(Color.app.primary.opacity(0.3))
 
                 WrappedRevealText(
                     text: "\(Int(data.totalLiters))",
@@ -534,7 +534,7 @@ struct WrappedVolumeSlide: View {
 
                 Text(String(localized: "wrapped.volume.unit"))
                     .font(.system(size: 24, weight: .bold))
-                    .foregroundColor(Color(hex: "4DA8F5"))
+                    .foregroundColor(Color.app.primary)
                     .padding(.bottom, 18)
 
                 VStack(spacing: 2) {
@@ -547,10 +547,10 @@ struct WrappedVolumeSlide: View {
                 }
                 .padding(.vertical, 12)
                 .padding(.horizontal, 22)
-                .background(Color(hex: "4DA8F5").opacity(0.10))
+                .background(Color.app.primary.opacity(0.10))
                 .overlay(
                     RoundedRectangle(cornerRadius: 16)
-                        .stroke(Color(hex: "4DA8F5").opacity(0.2), lineWidth: 1)
+                        .stroke(Color.app.primary.opacity(0.2), lineWidth: 1)
                 )
                 .clipShape(RoundedRectangle(cornerRadius: 16))
 
@@ -574,12 +574,12 @@ struct WrappedStreakSlide: View {
     var body: some View {
         WrappedSlideBase(
             gradientColors: [Color(hex: "0A0520"), Color(hex: "1A0A30")],
-            particleColors: [Color(hex: "8B5CF6"), Color(hex: "4DA8F5"), Color(hex: "F59E0B")]
+            particleColors: [Color.app.alcoholLight, Color.app.primary, Color.app.amber]
         ) {
             VStack(spacing: 16) {
                 Text(String(localized: "wrapped.streak.eyebrow"))
                     .font(.system(size: 12, weight: .bold))
-                    .foregroundColor(Color(hex: "8B5CF6"))
+                    .foregroundColor(Color.app.alcoholLight)
                     .kerning(3)
 
                 ZStack {
@@ -589,7 +589,7 @@ struct WrappedStreakSlide: View {
                     Circle()
                         .trim(from: 0, to: active ? pct : 0)
                         .stroke(
-                            LinearGradient(colors: [Color(hex: "8B5CF6"), Color(hex: "4DA8F5")],
+                            LinearGradient(colors: [Color.app.alcoholLight, Color.app.primary],
                                            startPoint: .leading, endPoint: .trailing),
                             style: StrokeStyle(lineWidth: 8, lineCap: .round)
                         )
@@ -614,7 +614,7 @@ struct WrappedStreakSlide: View {
 
                 Text(String(localized: "wrapped.streak.goaldays"))
                     .font(.system(size: 15, weight: .semibold))
-                    .foregroundColor(Color(hex: "8B5CF6"))
+                    .foregroundColor(Color.app.alcoholLight)
 
                 HStack(spacing: 10) {
                     Image(systemName: "flame.fill")
@@ -622,19 +622,19 @@ struct WrappedStreakSlide: View {
                     VStack(alignment: .leading, spacing: 1) {
                         Text(String(format: String(localized: "wrapped.streak.best"), data.bestStreak))
                             .font(.system(size: 17, weight: .bold))
-                            .foregroundColor(Color(hex: "FCD34D"))
+                            .foregroundColor(Color.app.premiumGold)
                         Text(String(localized: "wrapped.streak.best_label"))
                             .font(.system(size: 11))
                             .foregroundColor(.white.opacity(0.4))
                     }
                 }
-                .foregroundColor(Color(hex: "FCD34D"))
+                .foregroundColor(Color.app.premiumGold)
                 .padding(.horizontal, 20)
                 .padding(.vertical, 10)
-                .background(Color(hex: "F59E0B").opacity(0.12))
+                .background(Color.app.amber.opacity(0.12))
                 .overlay(
                     RoundedRectangle(cornerRadius: 14)
-                        .stroke(Color(hex: "F59E0B").opacity(0.25), lineWidth: 1)
+                        .stroke(Color.app.amber.opacity(0.25), lineWidth: 1)
                 )
                 .clipShape(RoundedRectangle(cornerRadius: 14))
                 .padding(.top, 6)
@@ -652,18 +652,18 @@ struct WrappedSoberSlide: View {
     var body: some View {
         WrappedSlideBase(
             gradientColors: [Color(hex: "021A0F"), Color(hex: "042810")],
-            particleColors: [Color(hex: "10B981"), Color(hex: "34D399"), Color(hex: "6EE7B7")]
+            particleColors: [Color.app.greenDark, Color(hex: "34D399"), Color(hex: "6EE7B7")]
         ) {
             VStack(spacing: 10) {
                 Text(String(localized: "wrapped.sober.eyebrow"))
                     .font(.system(size: 12, weight: .bold))
-                    .foregroundColor(Color(hex: "10B981"))
+                    .foregroundColor(Color.app.greenDark)
                     .kerning(3)
                     .padding(.bottom, 14)
 
                 Image(systemName: "leaf.fill")
                     .font(.system(size: 56))
-                    .foregroundColor(Color(hex: "10B981"))
+                    .foregroundColor(Color.app.greenDark)
 
                 WrappedCountUpText(
                     target: data.soberDays, active: active,
@@ -673,7 +673,7 @@ struct WrappedSoberSlide: View {
 
                 Text(String(localized: "wrapped.sober.days"))
                     .font(.system(size: 18, weight: .bold))
-                    .foregroundColor(Color(hex: "10B981"))
+                    .foregroundColor(Color.app.greenDark)
                     .padding(.bottom, 6)
 
                 Text(String(format: String(localized: "wrapped.sober.percent"),
@@ -719,12 +719,12 @@ struct WrappedMonthSlide: View {
     var body: some View {
         WrappedSlideBase(
             gradientColors: [Color(hex: "1A0E00"), Color(hex: "251500")],
-            particleColors: [Color(hex: "F59E0B"), Color(hex: "FB923C"), Color(hex: "FCD34D")]
+            particleColors: [Color.app.amber, Color(hex: "FB923C"), Color.app.premiumGold]
         ) {
             VStack(spacing: 8) {
                 Text(String(localized: "wrapped.month.eyebrow"))
                     .font(.system(size: 12, weight: .bold))
-                    .foregroundColor(Color(hex: "F59E0B"))
+                    .foregroundColor(Color.app.amber)
                     .kerning(3)
 
                 Text(data.bestMonthName)
@@ -734,7 +734,7 @@ struct WrappedMonthSlide: View {
 
                 Text(String(format: String(localized: "wrapped.month.record"), Int(data.bestMonthLiters)))
                     .font(.system(size: 14, weight: .semibold))
-                    .foregroundColor(Color(hex: "F59E0B"))
+                    .foregroundColor(Color.app.amber)
                     .padding(.bottom, 20)
 
                 // Mini graphique 12 mois
@@ -746,7 +746,7 @@ struct WrappedMonthSlide: View {
                         VStack(spacing: 3) {
                             RoundedRectangle(cornerRadius: 3)
                                 .fill(isBest
-                                      ? AnyShapeStyle(LinearGradient(colors: [Color(hex: "F59E0B"), Color(hex: "FCD34D")], startPoint: .bottom, endPoint: .top))
+                                      ? AnyShapeStyle(LinearGradient(colors: [Color.app.amber, Color.app.premiumGold], startPoint: .bottom, endPoint: .top))
                                       : AnyShapeStyle(Color.white.opacity(0.12)))
                                 .frame(height: max(CGFloat(ratio) * 70, 4))
                         }
@@ -794,18 +794,18 @@ struct WrappedHabitsSlide: View {
     var body: some View {
         WrappedSlideBase(
             gradientColors: [Color(hex: "0D0520"), Color(hex: "180830")],
-            particleColors: [Color(hex: "4DA8F5"), Color(hex: "F06595"), Color(hex: "8B5CF6")]
+            particleColors: [Color.app.primary, Color.app.pink, Color.app.alcoholLight]
         ) {
             VStack(spacing: 8) {
                 Text(String(localized: "wrapped.habits.eyebrow"))
                     .font(.system(size: 12, weight: .bold))
-                    .foregroundColor(Color(hex: "F06595"))
+                    .foregroundColor(Color.app.pink)
                     .kerning(3)
                     .padding(.bottom, 14)
 
                 Image(systemName: "sunrise.fill")
                     .font(.system(size: 48))
-                    .foregroundColor(Color(hex: "F06595"))
+                    .foregroundColor(Color.app.pink)
 
                 WrappedCountUpText(
                     target: data.morningDays, active: active,
@@ -815,19 +815,19 @@ struct WrappedHabitsSlide: View {
 
                 Text(String(localized: "wrapped.habits.mornings"))
                     .font(.system(size: 16, weight: .bold))
-                    .foregroundColor(Color(hex: "F06595"))
+                    .foregroundColor(Color.app.pink)
                     .padding(.bottom, 20)
 
                 HStack(spacing: 10) {
                     WrappedStatCard(
                         icon: "rosette", value: "\(data.achievementsCount)",
                         label: String(localized: "wrapped.habits.achievements"),
-                        color: Color(hex: "F59E0B")
+                        color: Color.app.amber
                     )
                     WrappedStatCard(
                         icon: "bolt.fill", value: "\(data.challengesCount)",
                         label: String(localized: "wrapped.habits.challenges"),
-                        color: Color(hex: "4DA8F5")
+                        color: Color.app.primary
                     )
                 }
             }
@@ -871,22 +871,22 @@ struct WrappedXPSlide: View {
     var body: some View {
         WrappedSlideBase(
             gradientColors: [Color(hex: "0A0518"), Color(hex: "130A28")],
-            particleColors: [Color(hex: "8B5CF6"), Color(hex: "4DA8F5"), Color(hex: "F06595"), Color(hex: "F59E0B")]
+            particleColors: [Color.app.alcoholLight, Color.app.primary, Color.app.pink, Color.app.amber]
         ) {
             VStack(spacing: 14) {
                 Text(String(localized: "wrapped.xp.eyebrow"))
                     .font(.system(size: 12, weight: .bold))
-                    .foregroundColor(Color(hex: "8B5CF6"))
+                    .foregroundColor(Color.app.alcoholLight)
                     .kerning(3)
 
                 ZStack {
                     RoundedRectangle(cornerRadius: 26)
                         .fill(
-                            LinearGradient(colors: [Color(hex: "8B5CF6"), Color(hex: "4DA8F5")],
+                            LinearGradient(colors: [Color.app.alcoholLight, Color.app.primary],
                                            startPoint: .topLeading, endPoint: .bottomTrailing)
                         )
                         .frame(width: 84, height: 84)
-                        .shadow(color: Color(hex: "8B5CF6").opacity(0.5), radius: 20)
+                        .shadow(color: Color.app.alcoholLight.opacity(0.5), radius: 20)
                     Image(systemName: "drop.fill")
                         .font(.system(size: 36))
                         .foregroundColor(.white)
@@ -916,16 +916,16 @@ struct WrappedFinaleSlide: View {
     var body: some View {
         WrappedSlideBase(
             gradientColors: [Color(hex: "050D1A"), Color(hex: "0D1A2E"), Color(hex: "0A1A30")],
-            particleColors: [Color(hex: "4DA8F5"), Color(hex: "F59E0B"), Color(hex: "10B981"), Color(hex: "F06595"), Color(hex: "8B5CF6")]
+            particleColors: [Color.app.primary, Color.app.amber, Color.app.greenDark, Color.app.pink, Color.app.alcoholLight]
         ) {
             VStack(spacing: 16) {
                 Image(systemName: "drop.fill")
                     .font(.system(size: 44))
-                    .foregroundColor(Color(hex: "4DA8F5"))
+                    .foregroundColor(Color.app.primary)
 
                 Text(String(format: String(localized: "wrapped.finale.eyebrow"), data.year))
                     .font(.system(size: 12, weight: .bold))
-                    .foregroundColor(Color(hex: "4DA8F5"))
+                    .foregroundColor(Color.app.primary)
                     .kerning(3)
 
                 Text(String(format: String(localized: "wrapped.finale.title"), data.percentileTop))
@@ -936,13 +936,13 @@ struct WrappedFinaleSlide: View {
 
                 VStack(spacing: 8) {
                     WrappedSummaryRow(label: String(localized: "wrapped.finale.water"),
-                                       value: String(format: "%.0f L", data.totalLiters), color: Color(hex: "4DA8F5"))
+                                       value: String(format: "%.0f L", data.totalLiters), color: Color.app.primary)
                     WrappedSummaryRow(label: String(localized: "wrapped.finale.goaldays"),
-                                       value: "\(data.goalDays)", color: Color(hex: "8B5CF6"))
+                                       value: "\(data.goalDays)", color: Color.app.alcoholLight)
                     WrappedSummaryRow(label: String(localized: "wrapped.finale.soberdays"),
-                                       value: "\(data.soberDays)", color: Color(hex: "10B981"))
+                                       value: "\(data.soberDays)", color: Color.app.greenDark)
                     WrappedSummaryRow(label: String(localized: "wrapped.finale.beststreak"),
-                                       value: "\(data.bestStreak)", color: Color(hex: "F59E0B"))
+                                       value: "\(data.bestStreak)", color: Color.app.amber)
                 }
                 .padding(.top, 8)
 
@@ -993,19 +993,19 @@ struct WrappedLegendarySlide: View {
             )
             .ignoresSafeArea()
 
-            WrappedParticles(colors: [Color(hex: "FCD34D"), Color(hex: "F59E0B"), .white], count: 30)
+            WrappedParticles(colors: [Color.app.premiumGold, Color.app.amber, .white], count: 30)
 
             VStack(spacing: 18) {
                 Spacer()
 
                 Image(systemName: "crown.fill")
                     .font(.system(size: 52))
-                    .foregroundColor(Color(hex: "FCD34D"))
-                    .shadow(color: Color(hex: "F59E0B").opacity(0.6), radius: 16)
+                    .foregroundColor(Color.app.premiumGold)
+                    .shadow(color: Color.app.amber.opacity(0.6), radius: 16)
 
                 Text(String(localized: "wrapped.legendary.eyebrow"))
                     .font(.system(size: 12, weight: .bold))
-                    .foregroundColor(Color(hex: "FCD34D"))
+                    .foregroundColor(Color.app.premiumGold)
                     .kerning(3)
 
                 Text(String(localized: "wrapped.legendary.title"))
@@ -1015,7 +1015,7 @@ struct WrappedLegendarySlide: View {
 
                 Text(data.legendaryReason)
                     .font(.system(size: 15, weight: .semibold))
-                    .foregroundColor(Color(hex: "FCD34D"))
+                    .foregroundColor(Color.app.premiumGold)
                     .multilineTextAlignment(.center)
                     .padding(.horizontal, 20)
 
@@ -1046,7 +1046,7 @@ struct WrappedShareSlide: View {
     var body: some View {
         WrappedSlideBase(
             gradientColors: [Color(hex: "050D1A"), Color(hex: "0A1525"), Color(hex: "051020")],
-            particleColors: [Color(hex: "4DA8F5"), Color(hex: "F59E0B"), Color(hex: "F06595")]
+            particleColors: [Color.app.primary, Color.app.amber, Color.app.pink]
         ) {
             VStack(spacing: 20) {
                 // Mini aperçu de la carte
@@ -1086,8 +1086,8 @@ private struct WrappedShareButton: View {
             .foregroundColor(.white)
             .frame(maxWidth: .infinity)
             .padding(.vertical, 16)
-            .background(Color(hex: "4DA8F5").opacity(0.12))
-            .overlay(RoundedRectangle(cornerRadius: 16).stroke(Color(hex: "4DA8F5").opacity(0.25), lineWidth: 1))
+            .background(Color.app.primary.opacity(0.12))
+            .overlay(RoundedRectangle(cornerRadius: 16).stroke(Color.app.primary.opacity(0.25), lineWidth: 1))
             .clipShape(RoundedRectangle(cornerRadius: 16))
         }
     }
@@ -1099,17 +1099,17 @@ private struct WrappedShareCardPreview: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
             HStack(spacing: 6) {
-                Image(systemName: "drop.fill").font(.system(size: 14)).foregroundColor(Color(hex: "4DA8F5"))
+                Image(systemName: "drop.fill").font(.system(size: 14)).foregroundColor(Color.app.primary)
                 Text("AQUAPP \(String(data.year))")
                     .font(.system(size: 11, weight: .bold))
-                    .foregroundColor(Color(hex: "4DA8F5"))
+                    .foregroundColor(Color.app.primary)
                     .kerning(0.5)
             }
             LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 6) {
-                WrappedMiniStat(value: String(format: "%.0f L", data.totalLiters), label: String(localized: "wrapped.finale.water"), color: Color(hex: "4DA8F5"))
-                WrappedMiniStat(value: "\(data.goalDays)j", label: String(localized: "wrapped.finale.goaldays"), color: Color(hex: "8B5CF6"))
-                WrappedMiniStat(value: "\(data.soberDays)j", label: String(localized: "wrapped.finale.soberdays"), color: Color(hex: "10B981"))
-                WrappedMiniStat(value: data.xpLevelName, label: String(localized: "wrapped.xp.eyebrow"), color: Color(hex: "F59E0B"))
+                WrappedMiniStat(value: String(format: "%.0f L", data.totalLiters), label: String(localized: "wrapped.finale.water"), color: Color.app.primary)
+                WrappedMiniStat(value: "\(data.goalDays)j", label: String(localized: "wrapped.finale.goaldays"), color: Color.app.alcoholLight)
+                WrappedMiniStat(value: "\(data.soberDays)j", label: String(localized: "wrapped.finale.soberdays"), color: Color.app.greenDark)
+                WrappedMiniStat(value: data.xpLevelName, label: String(localized: "wrapped.xp.eyebrow"), color: Color.app.amber)
             }
         }
         .padding(16)
@@ -1117,7 +1117,7 @@ private struct WrappedShareCardPreview: View {
             LinearGradient(colors: [Color(hex: "0D1A2E"), Color(hex: "0A2240")],
                            startPoint: .topLeading, endPoint: .bottomTrailing)
         )
-        .overlay(RoundedRectangle(cornerRadius: 18).stroke(Color(hex: "4DA8F5").opacity(0.2), lineWidth: 1))
+        .overlay(RoundedRectangle(cornerRadius: 18).stroke(Color.app.primary.opacity(0.2), lineWidth: 1))
         .clipShape(RoundedRectangle(cornerRadius: 18))
         .frame(maxWidth: 260)
     }
@@ -1162,11 +1162,11 @@ struct WrappedShareCard: View {
 
                 Image(systemName: "drop.fill")
                     .font(.system(size: 56))
-                    .foregroundColor(Color(hex: "4DA8F5"))
+                    .foregroundColor(Color.app.primary)
 
                 Text("AQUAPP \(String(data.year))")
                     .font(.system(size: 22, weight: .bold))
-                    .foregroundColor(Color(hex: "4DA8F5"))
+                    .foregroundColor(Color.app.primary)
                     .kerning(2)
 
                 Text(String(format: String(localized: "wrapped.share.card_title"), data.userName))
@@ -1176,10 +1176,10 @@ struct WrappedShareCard: View {
                     .padding(.horizontal, 60)
 
                 VStack(spacing: 16) {
-                    WrappedExportStatRow(label: String(localized: "wrapped.finale.water"), value: String(format: "%.0f L", data.totalLiters), color: Color(hex: "4DA8F5"))
-                    WrappedExportStatRow(label: String(localized: "wrapped.finale.goaldays"), value: "\(data.goalDays) jours", color: Color(hex: "8B5CF6"))
-                    WrappedExportStatRow(label: String(localized: "wrapped.finale.soberdays"), value: "\(data.soberDays) jours", color: Color(hex: "10B981"))
-                    WrappedExportStatRow(label: String(localized: "wrapped.finale.beststreak"), value: "\(data.bestStreak) jours", color: Color(hex: "F59E0B"))
+                    WrappedExportStatRow(label: String(localized: "wrapped.finale.water"), value: String(format: "%.0f L", data.totalLiters), color: Color.app.primary)
+                    WrappedExportStatRow(label: String(localized: "wrapped.finale.goaldays"), value: "\(data.goalDays) jours", color: Color.app.alcoholLight)
+                    WrappedExportStatRow(label: String(localized: "wrapped.finale.soberdays"), value: "\(data.soberDays) jours", color: Color.app.greenDark)
+                    WrappedExportStatRow(label: String(localized: "wrapped.finale.beststreak"), value: "\(data.bestStreak) jours", color: Color.app.amber)
                 }
                 .padding(.horizontal, 60)
 

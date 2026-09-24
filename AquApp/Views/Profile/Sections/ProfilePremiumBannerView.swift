@@ -6,11 +6,11 @@ struct ProfilePremiumBannerView: View {
 
     @Environment(\.colorScheme) private var colorScheme
 
-    var bannerBackground: Color { colorScheme == .dark ? Color(hex: "2D1F00") : Color(hex: "FFF7ED") }
+    var bannerBackground: Color { colorScheme == .dark ? Color.app.premiumDark : Color.app.warmWhite }
     var bannerBorder:     Color { Color.orange.opacity(colorScheme == .dark ? 0.35 : 0.30) }
-    var titleColor:       Color { colorScheme == .dark ? Color(hex: "FCD34D") : Color(hex: "92400E") }
-    var subtitleColor:    Color { colorScheme == .dark ? Color(hex: "F59E0B").opacity(0.75) : Color(hex: "B45309") }
-    var chevronColor:     Color { colorScheme == .dark ? Color(hex: "F59E0B") : Color(hex: "B45309") }
+    var titleColor:       Color { colorScheme == .dark ? Color.app.premiumGold : Color.app.amberText }
+    var subtitleColor:    Color { colorScheme == .dark ? Color.app.amber.opacity(0.75) : Color.app.amberDeep }
+    var chevronColor:     Color { colorScheme == .dark ? Color.app.amber : Color.app.amberDeep }
 
     var body: some View {
         if isPremiumUser {
@@ -33,9 +33,9 @@ struct ProfilePremiumBannerView: View {
                             .foregroundColor(titleColor)
                         Text(String(localized: "profile.pro_label"))
                             .font(.system(size: 10, weight: .bold))
-                            .foregroundColor(colorScheme == .dark ? Color(hex: "1C1400") : .white)
+                            .foregroundColor(colorScheme == .dark ? Color.app.premiumDarker : .white)
                             .padding(.horizontal, 6).padding(.vertical, 2)
-                            .background(Color(hex: "F59E0B")).cornerRadius(6)
+                            .background(Color.app.amber).cornerRadius(6)
                     }
                     Text(L10n.premiumAllUnlocked)
                         .font(.system(size: 13))
@@ -44,7 +44,7 @@ struct ProfilePremiumBannerView: View {
                 Spacer()
                 Image(systemName: "checkmark.circle.fill")
                     .font(.system(size: 22))
-                    .foregroundColor(Color(hex: "10B981"))
+                    .foregroundColor(Color.app.greenDark)
                     .accessibilityHidden(true)
             }
             .padding(16)
@@ -97,5 +97,5 @@ struct ProfilePremiumBannerView: View {
         ProfilePremiumBannerView(isPremiumUser: true,  onTap: {})
     }
     .padding(.vertical)
-    .background(Color("AppBackground"))
+    .background(Color.app.background)
 }

@@ -19,34 +19,34 @@ struct ProfileBodyView: View {
             SectionHeader(
                 title:    String(localized: "profile.section.body"),
                 sfSymbol: "person.fill",
-                color:    Color(hex: "9B59B6")
+                color:    Color.app.alcoholMid
             )
 
             Button(action: onTap) {
                 VStack(spacing: 0) {
                     ProfileBodyRow(
                         sfSymbol: "scalemass.fill",
-                        color:    Color(hex: "10B981"),
+                        color:    Color.app.greenDark,
                         label:    String(localized: "body.weight"),
                         value:    UnitFormatter.weight(weightKg)
                     )
                     Divider().padding(.leading, 52)
                     ProfileBodyRow(
                         sfSymbol: "ruler.fill",
-                        color:    Color(hex: "4DA8F5"),
+                        color:    Color.app.primary,
                         label:    String(localized: "body.height"),
                         value:    UnitFormatter.height(heightCm)
                     )
                     Divider().padding(.leading, 52)
                     ProfileBodyRow(
                         sfSymbol:    "person.fill",
-                        color:       Color(hex: "9B59B6"),
+                        color:       Color.app.alcoholMid,
                         label:       String(localized: "body.gender"),
                         value:       genderLabel,
                         showChevron: true
                     )
                 }
-                .background(Color("AppCardBackground"))
+                .background(Color.app.card)
                 .cornerRadius(16)
                 .shadow(color: .black.opacity(0.05), radius: 8, x: 0, y: 2)
             }
@@ -121,9 +121,9 @@ struct BodyEditSheet: View {
     var goalColor: Color {
         switch calculatedGoal {
         case ..<1800:     return .orange
-        case 1800..<2200: return Color(hex: "4DA8F5")
-        case 2200..<3000: return Color(hex: "10B981")
-        default:          return Color(hex: "F59E0B")
+        case 1800..<2200: return Color.app.primary
+        case 2200..<3000: return Color.app.greenDark
+        default:          return Color.app.amber
         }
     }
 
@@ -140,7 +140,7 @@ struct BodyEditSheet: View {
                         .font(.system(size: 22, weight: .bold))
                     Image(systemName: "person.fill")
                         .font(.system(size: 20))
-                        .foregroundColor(Color(hex: "9B59B6"))
+                        .foregroundColor(Color.app.alcoholMid)
                 }
                 Spacer()
                 Button { isPresented = false } label: {
@@ -163,7 +163,7 @@ struct BodyEditSheet: View {
                             ForEach(Gender.allCases, id: \.self) { gender in
                                 GenderButton(
                                     gender: gender, isSelected: localGender == gender,
-                                    accentColor: Color(hex: "9B59B6")
+                                    accentColor: Color.app.alcoholMid
                                 ) {
                                     withAnimation(.spring(response: 0.25)) { localGender = gender }
                                 }
@@ -179,14 +179,14 @@ struct BodyEditSheet: View {
                             HStack(alignment: .lastTextBaseline, spacing: 6) {
                                 Text("\(Int(UnitFormatter.heightValue(localHeight)))")
                                     .font(.system(size: 48, weight: .bold))
-                                    .foregroundColor(Color(hex: "4DA8F5"))
+                                    .foregroundColor(Color.app.primary)
                                 Text(UnitFormatter.heightUnitSymbol)
                                     .font(.system(size: 18, weight: .medium))
                                     .foregroundColor(.secondary)
                             }
                             .frame(maxWidth: .infinity, alignment: .center)
                             Slider(value: $localHeight, in: 140...220, step: 1)
-                                .tint(Color(hex: "4DA8F5")).padding(.horizontal, 20)
+                                .tint(Color.app.primary).padding(.horizontal, 20)
                                 .accessibilityLabel(String(localized: "body.height"))
                                 .accessibilityValue(UnitFormatter.height(localHeight))
                             HStack {
@@ -207,14 +207,14 @@ struct BodyEditSheet: View {
                             HStack(alignment: .lastTextBaseline, spacing: 6) {
                                 Text("\(Int(UnitFormatter.weightValue(localWeight)))")
                                     .font(.system(size: 48, weight: .bold))
-                                    .foregroundColor(Color(hex: "10B981"))
+                                    .foregroundColor(Color.app.greenDark)
                                 Text(UnitFormatter.weightUnitSymbol)
                                     .font(.system(size: 18, weight: .medium))
                                     .foregroundColor(.secondary)
                             }
                             .frame(maxWidth: .infinity, alignment: .center)
                             Slider(value: $localWeight, in: 30...200, step: 1)
-                                .tint(Color(hex: "10B981")).padding(.horizontal, 20)
+                                .tint(Color.app.greenDark).padding(.horizontal, 20)
                                 .accessibilityLabel(String(localized: "body.weight"))
                                 .accessibilityValue(UnitFormatter.weight(localWeight))
                             HStack {
@@ -251,18 +251,18 @@ struct BodyEditSheet: View {
                         }
                         .foregroundColor(.white).frame(maxWidth: .infinity).frame(height: 54)
                         .background(LinearGradient(
-                            colors: [Color(hex: "9B59B6"), Color(hex: "6C3483")],
+                            colors: [Color.app.alcoholMid, Color.app.alcoholDark],
                             startPoint: .leading, endPoint: .trailing
                         ))
                         .cornerRadius(16)
-                        .shadow(color: Color(hex: "9B59B6").opacity(0.4), radius: 10, x: 0, y: 4)
+                        .shadow(color: Color.app.alcoholMid.opacity(0.4), radius: 10, x: 0, y: 4)
                     }
                     .padding(.horizontal, 20).padding(.bottom, 32)
                 }
                 .padding(.top, 8)
             }
         }
-        .background(Color("AppBackground"))
+        .background(Color.app.background)
         .ignoresSafeArea(edges: .bottom)
         .accessibilityIdentifier("sheet.body")
         .onAppear {
@@ -291,5 +291,5 @@ struct BodyEditSheet: View {
 #Preview {
     ProfileBodyView(weightKg: 75, heightCm: 178, genderRaw: "male") {}
         .padding(.vertical)
-        .background(Color("AppBackground"))
+        .background(Color.app.background)
 }

@@ -20,7 +20,7 @@ struct AlcoholDrink: Identifiable {
 
     static func custom(name: String, alcoholPercent: Double) -> AlcoholDrink {
         AlcoholDrink(id: "custom_\(name)_\(Int(alcoholPercent))", name: name,
-                     sfSymbol: "wineglass", symbolColor: Color(hex: "8B5CF6"),
+                     sfSymbol: "wineglass", symbolColor: Color.app.alcoholLight,
                      alcoholPercent: alcoholPercent)
     }
 }
@@ -89,11 +89,11 @@ struct AddAlcoolSheet: View {
 
     var defaultDrinks: [AlcoholDrink] {
         [
-            AlcoholDrink(id: "beer", name: String(localized: "alcohol.beer"), sfSymbol: "mug.fill", symbolColor: Color(hex: "D4A017"), alcoholPercent: 5),
-            AlcoholDrink(id: "wine", name: String(localized: "alcohol.wine"), sfSymbol: "wineglass.fill", symbolColor: Color(hex: "8B5CF6"), alcoholPercent: 12),
-            AlcoholDrink(id: "spirits", name: String(localized: "alcohol.spirits"), sfSymbol: "cylinder.fill", symbolColor: Color(hex: "EF4444"), alcoholPercent: 40),
-            AlcoholDrink(id: "champagne", name: String(localized: "alcohol.champagne"), sfSymbol: "sparkles", symbolColor: Color(hex: "F59E0B"), alcoholPercent: 12),
-            AlcoholDrink(id: "cocktail", name: String(localized: "alcohol.cocktail"), sfSymbol: "wineglass", symbolColor: Color(hex: "10B981"), alcoholPercent: 10),
+            AlcoholDrink(id: "beer", name: String(localized: "alcohol.beer"), sfSymbol: "mug.fill", symbolColor: Color.app.amberDark, alcoholPercent: 5),
+            AlcoholDrink(id: "wine", name: String(localized: "alcohol.wine"), sfSymbol: "wineglass.fill", symbolColor: Color.app.alcoholLight, alcoholPercent: 12),
+            AlcoholDrink(id: "spirits", name: String(localized: "alcohol.spirits"), sfSymbol: "cylinder.fill", symbolColor: Color.app.red, alcoholPercent: 40),
+            AlcoholDrink(id: "champagne", name: String(localized: "alcohol.champagne"), sfSymbol: "sparkles", symbolColor: Color.app.amber, alcoholPercent: 12),
+            AlcoholDrink(id: "cocktail", name: String(localized: "alcohol.cocktail"), sfSymbol: "wineglass", symbolColor: Color.app.greenDark, alcoholPercent: 10),
         ]
     }
 
@@ -135,7 +135,7 @@ struct AddAlcoolSheet: View {
                         .accessibilityAddTraits(.isHeader)
                     Image(systemName: showHistory ? "clock.arrow.circlepath" : "wineglass.fill")
                         .font(.system(size: 20))
-                        .foregroundColor(Color(hex: "8B5CF6"))
+                        .foregroundColor(Color.app.alcoholLight)
                         .accessibilityHidden(true)
                 }
                 Spacer()
@@ -162,11 +162,11 @@ struct AddAlcoolSheet: View {
                                 .font(.system(size: 12, weight: .semibold))
                         }
                     }
-                    .foregroundColor(showHistory ? .white : Color(hex: "8B5CF6"))
+                    .foregroundColor(showHistory ? .white : Color.app.alcoholLight)
                     .padding(.horizontal, 12).padding(.vertical, 7)
                     .background(showHistory
-                                ? AnyShapeStyle(Color(hex: "8B5CF6"))
-                                : AnyShapeStyle(Color(hex: "8B5CF6").opacity(0.1)))
+                                ? AnyShapeStyle(Color.app.alcoholLight)
+                                : AnyShapeStyle(Color.app.alcoholLight.opacity(0.1)))
                     .cornerRadius(20)
                 }
                 .accessibilityLabel(showHistory
@@ -194,7 +194,7 @@ struct AddAlcoolSheet: View {
                 addView.transition(.move(edge: .leading).combined(with: .opacity))
             }
         }
-        .background(Color("AppBackground"))
+        .background(Color.app.background)
     }
 
     // MARK: - Vue Historique
@@ -204,10 +204,10 @@ struct AddAlcoolSheet: View {
                 if todayDisplayEntries.isEmpty {
                     VStack(spacing: 12) {
                         ZStack {
-                            Circle().fill(Color(hex: "F3E5F5")).frame(width: 72, height: 72)
+                            Circle().fill(Color.app.alcoholPale).frame(width: 72, height: 72)
                             Image(systemName: "wineglass")
                                 .font(.system(size: 32))
-                                .foregroundColor(Color(hex: "8B5CF6").opacity(0.5))
+                                .foregroundColor(Color.app.alcoholLight.opacity(0.5))
                         }
                         .accessibilityHidden(true)
                         Text(String(localized: "alcohol.no_entries"))
@@ -222,12 +222,12 @@ struct AddAlcoolSheet: View {
                         VStack(spacing: 4) {
                             Text(UnitFormatter.volume(totalVolumeTodayMl))
                                 .font(.system(size: 20, weight: .bold))
-                                .foregroundColor(Color(hex: "8B5CF6"))
+                                .foregroundColor(Color.app.alcoholLight)
                             Text(String(localized: "alcohol.total_volume"))
                                 .font(.system(size: 12)).foregroundColor(.secondary)
                         }
                         .frame(maxWidth: .infinity).padding(.vertical, 12)
-                        .background(Color(hex: "8B5CF6").opacity(0.08)).cornerRadius(12)
+                        .background(Color.app.alcoholLight.opacity(0.08)).cornerRadius(12)
                         .accessibilityElement(children: .combine)
 
                         VStack(spacing: 4) {
@@ -246,9 +246,9 @@ struct AddAlcoolSheet: View {
                         ForEach(todayDisplayEntries) { entry in
                             HStack(spacing: 14) {
                                 ZStack {
-                                    Circle().fill(Color(hex: "F3E5F5")).frame(width: 40, height: 40)
+                                    Circle().fill(Color.app.alcoholPale).frame(width: 40, height: 40)
                                     Image(systemName: entry.sfSymbol)
-                                        .font(.system(size: 16)).foregroundColor(Color(hex: "8B5CF6"))
+                                        .font(.system(size: 16)).foregroundColor(Color.app.alcoholLight)
                                 }
                                 .accessibilityHidden(true)
                                 VStack(alignment: .leading, spacing: 2) {
@@ -271,7 +271,7 @@ struct AddAlcoolSheet: View {
                             .padding(.horizontal, 16).padding(.vertical, 10)
                         }
                     }
-                    .background(Color("AppCardBackground")).cornerRadius(16)
+                    .background(Color.app.card).cornerRadius(16)
                     .shadow(color: .black.opacity(0.05), radius: 6, x: 0, y: 2)
                     .padding(.horizontal, 20)
                 }
@@ -292,7 +292,7 @@ struct AddAlcoolSheet: View {
                         Text(feedback).font(.system(size: 13, weight: .medium)).foregroundColor(.primary)
                     }
                     .padding(12).frame(maxWidth: .infinity, alignment: .leading)
-                    .background(Color("AppCardBackground")).cornerRadius(12)
+                    .background(Color.app.card).cornerRadius(12)
                     .shadow(color: .black.opacity(0.05), radius: 4, x: 0, y: 2)
                     .padding(.horizontal, 20)
                     .transition(.move(edge: .top).combined(with: .opacity))
@@ -361,14 +361,14 @@ struct AddAlcoolSheet: View {
                         withAnimation(.spring()) { showCustomForm.toggle() }
                     } label: {
                         HStack {
-                            Image(systemName: "plus.circle.fill").foregroundColor(Color(hex: "4DA8F5"))
+                            Image(systemName: "plus.circle.fill").foregroundColor(Color.app.primary)
                             Text(String(localized: "alcohol.add_custom"))
                                 .font(.system(size: 15, weight: .semibold)).foregroundColor(.primary)
                             Spacer()
                             Image(systemName: showCustomForm ? "chevron.up" : "chevron.down")
                                 .font(.system(size: 13)).foregroundColor(.secondary)
                         }
-                        .padding(16).background(Color("AppCardBackground")).cornerRadius(14)
+                        .padding(16).background(Color.app.card).cornerRadius(14)
                         .shadow(color: .black.opacity(0.05), radius: 6, x: 0, y: 2)
                     }
 
@@ -397,14 +397,14 @@ struct AddAlcoolSheet: View {
                                     .frame(maxWidth: .infinity).frame(height: 46)
                                     .background(isCustomFormValid
                                                 ? AnyShapeStyle(LinearGradient(
-                                                    colors: [Color(hex: "4DA8F5"), Color(hex: "2B87E8")],
+                                                    colors: [Color.app.primary, Color.app.primaryDark],
                                                     startPoint: .leading, endPoint: .trailing))
                                                 : AnyShapeStyle(Color(UIColor.systemGray4)))
                                     .cornerRadius(12)
                             }
                             .disabled(!isCustomFormValid)
                         }
-                        .padding(16).background(Color("AppCardBackground")).cornerRadius(14)
+                        .padding(16).background(Color.app.card).cornerRadius(14)
                         .shadow(color: .black.opacity(0.05), radius: 6, x: 0, y: 2)
                         .transition(.move(edge: .top).combined(with: .opacity))
                     }
@@ -534,7 +534,7 @@ struct DrinkRow: View {
                 .transition(.move(edge: .top).combined(with: .opacity))
             }
         }
-        .background(Color("AppCardBackground")).cornerRadius(14)
+        .background(Color.app.card).cornerRadius(14)
         .shadow(color: .black.opacity(0.05), radius: 6, x: 0, y: 2)
         .clipped()
     }
@@ -577,7 +577,7 @@ struct CustomQuantityRow: View {
                         .fill(customMl.isEmpty
                               ? AnyShapeStyle(Color(UIColor.systemGray4))
                               : AnyShapeStyle(LinearGradient(
-                                colors: [Color(hex: "9B59B6"), Color(hex: "6C3483")],
+                                colors: [Color.app.alcoholMid, Color.app.alcoholDark],
                                 startPoint: .topLeading, endPoint: .bottomTrailing)))
                         .frame(width: 44, height: 44)
                     Image(systemName: "plus").font(.system(size: 18, weight: .bold)).foregroundColor(.white)

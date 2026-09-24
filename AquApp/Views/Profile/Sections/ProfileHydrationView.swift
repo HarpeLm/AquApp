@@ -9,13 +9,13 @@ struct ProfileHydrationView: View {
             SectionHeader(
                 title:    String(localized: "profile.section.hydration"),
                 sfSymbol: "drop.fill",
-                color:    Color(hex: "4DA8F5")
+                color:    Color.app.primary
             )
 
             Button(action: onTap) {
                 HStack {
                     Image(systemName: "target")
-                        .foregroundColor(Color(hex: "4DA8F5"))
+                        .foregroundColor(Color.app.primary)
                         .frame(width: 24)
                         .accessibilityHidden(true)
                     Text(L10n.profileDailyGoal)
@@ -31,7 +31,7 @@ struct ProfileHydrationView: View {
                         .accessibilityHidden(true)
                 }
                 .padding(16)
-                .background(Color("AppCardBackground"))
+                .background(Color.app.card)
                 .cornerRadius(16)
                 .shadow(color: .black.opacity(0.05), radius: 8, x: 0, y: 2)
             }
@@ -46,5 +46,5 @@ struct ProfileHydrationView: View {
 #Preview {
     ProfileHydrationView(dailyGoalMl: 2170, onTap: {})
         .padding(.vertical)
-        .background(Color("AppBackground"))
+        .background(Color.app.background)
 }
