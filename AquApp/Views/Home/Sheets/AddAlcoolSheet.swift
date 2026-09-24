@@ -15,6 +15,37 @@ struct AlcoholDrink: Identifiable {
     func compensationLabel(for volumeMl: Double) -> String {
         String(format: String(localized: "alcohol.compensation_label"), Int(compensation(for: volumeMl)))
     }
+
+    var isCustom: Bool { id.hasPrefix("custom_") }
+
+    static func custom(name: String, alcoholPercent: Double) -> AlcoholDrink {
+        AlcoholDrink(id: "custom_\(name)_\(Int(alcoholPercent))", name: name,
+                     sfSymbol: "wineglass", symbolColor: Color(hex: "8B5CF6"),
+                     alcoholPercent: alcoholPercent)
+    }
+}
+
+// MARK: - Boissons personnalisées (persistées dans UserDefaults : nom + degré, rien de sensible)
+
+enum CustomDrinkStore {
+    private struct Stored: Codable {
+        let name: String
+        let alcoholPercent: Double
+    }
+
+    static let key = "custom_alcohol_drinks"
+
+    static func load(from defaults: UserDefaults = .standard) -> [AlcoholDrink] {
+        guard let data = defaults.data(forKey: key),
+              let stored = try? JSONDecoder().decode([Stored].self, from: data)
+        else { return [] }
+        return stored.map { AlcoholDrink.custom(name: $0.name, alcoholPercent: $0.alcoholPercent) }
+    }
+
+    static func save(_ drinks: [AlcoholDrink], to defaults: UserDefaults = .standard) {
+        let stored = drinks.filter(\.isCustom).map { Stored(name: $0.name, alcoholPercent: $0.alcoholPercent) }
+        defaults.set(try? JSONEncoder().encode(stored), forKey: key)
+    }
 }
 
 // MARK: - AlcoholDisplayEntry
@@ -38,7 +69,7 @@ struct AddAlcoolSheet: View {
     @State private var showHistory: Bool = false
     @State private var customName: String = ""
     @State private var customAlcohol: String = ""
-    @State private var customDrinks: [AlcoholDrink] = []
+    @State private var customDrinks: [AlcoholDrink] = CustomDrinkStore.load()
     @State private var showAddedFeedback: String? = nil
 
     @FocusState private var focusedField: CustomField?
@@ -293,6 +324,18 @@ struct AddAlcoolSheet: View {
                         } onAdd: { volumeMl in
                             logDrink(drink, volumeMl: volumeMl)
                         }
+                        .contextMenu {
+                            if drink.isCustom {
+                                Button(role: .destructive) { deleteCustomDrink(drink) } label: {
+                                    Label(String(localized: "alcohol.custom.delete"), systemImage: "trash")
+                                }
+                            }
+                        }
+                        .accessibilityActions {
+                            if drink.isCustom {
+                                Button(String(localized: "alcohol.custom.delete")) { deleteCustomDrink(drink) }
+                            }
+                        }
                     }
                 }
                 .padding(.horizontal, 20)
@@ -359,7 +402,7 @@ struct AddAlcoolSheet: View {
     }
 
     var isCustomFormValid: Bool {
-        !customName.trimmingCharacters(in: .whitespaces).isEmpty && Double(customAlcohol) != nil
+        !customName.trimmingCharacters(in: .whitespaces).isEmpty && parsedCustomAlcohol != nil
     }
 
     private func logDrink(_ drink: AlcoholDrink, volumeMl: Double) {
@@ -383,17 +426,28 @@ struct AddAlcoolSheet: View {
         }
     }
 
+    /// Accepte « 12,5 » (clavier français) comme « 12.5 » ; refuse ce qui n'est pas un degré plausible.
+    private var parsedCustomAlcohol: Double? {
+        guard let value = Double(customAlcohol.replacingOccurrences(of: ",", with: ".")),
+              value > 0, value <= 100 else { return nil }
+        return value
+    }
+
+    private func deleteCustomDrink(_ drink: AlcoholDrink) {
+        withAnimation { customDrinks.removeAll { $0.id == drink.id } }
+        if expandedDrinkID == drink.id { expandedDrinkID = nil }
+        CustomDrinkStore.save(customDrinks)
+    }
+
     private func saveCustomDrink() {
-        guard let alc = Double(customAlcohol) else { return }
+        guard let alc = parsedCustomAlcohol else { return }
         let trimmedName = customName.trimmingCharacters(in: .whitespaces)
-        let newDrink = AlcoholDrink(
-            id: "custom_\(trimmedName)_\(Int(alc))",
-            name: trimmedName,
-            sfSymbol: "wineglass",
-            symbolColor: Color(hex: "8B5CF6"),
-            alcoholPercent: alc
-        )
-        withAnimation { customDrinks.append(newDrink) }
+        let newDrink = AlcoholDrink.custom(name: trimmedName, alcoholPercent: alc)
+        withAnimation {
+            customDrinks.removeAll { $0.id == newDrink.id }
+            customDrinks.append(newDrink)
+        }
+        CustomDrinkStore.save(customDrinks)
         customName = ""
         customAlcohol = ""
         showCustomForm = false

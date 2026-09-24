@@ -167,10 +167,10 @@ final class StoreKitManager: ObservableObject {
     private func formatTrialPeriod(_ period: Product.SubscriptionPeriod) -> String {
         let value = period.value
         switch period.unit {
-        case .day:   return String(format: String(localized: "storekit.trial.days"),   value)
-        case .week:  return String(format: String(localized: "storekit.trial.weeks"),  value)
-        case .month: return String(format: String(localized: "storekit.trial.months"), value)
-        case .year:  return String(format: String(localized: "storekit.trial.years"),  value)
+        case .day:   return String(localized: "storekit.trial.days \(value)")
+        case .week:  return String(localized: "storekit.trial.weeks \(value)")
+        case .month: return String(localized: "storekit.trial.months \(value)")
+        case .year:  return String(localized: "storekit.trial.years \(value)")
         @unknown default: return String(localized: "storekit.free_trial_default")
         }
     }

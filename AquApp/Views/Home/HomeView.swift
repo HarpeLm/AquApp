@@ -89,14 +89,14 @@ struct HomeView: View {
                                 symbolColor: .orange,
                                 label: L10n.homeStreakLabel,
                                 value: "\(store.currentStreak)",
-                                unit: L10n.homeDays
+                                unit: L10n.homeDays(store.currentStreak)
                             )
                             StatCard(
                                 sfSymbol: "leaf.fill",
                                 symbolColor: .green,
                                 label: L10n.homeSoberLabel,
                                 value: "\(store.soberDaysStreak)",
-                                unit: L10n.homeDays
+                                unit: L10n.homeDays(store.soberDaysStreak)
                             )
                         }
                         .padding(.horizontal)

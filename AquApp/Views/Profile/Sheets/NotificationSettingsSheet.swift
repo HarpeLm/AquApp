@@ -175,7 +175,7 @@ struct NotificationSettingsSheet: View {
                                         .font(.system(size: 13, weight: .semibold))
                                         .foregroundColor(.secondary)
                                     Spacer()
-                                    Text(String(format: String(localized: "notif.settings.count"), previewTimes.count))
+                                    Text(String(localized: "notif.settings.count \(previewTimes.count)"))
                                         .font(.system(size: 12, weight: .semibold))
                                         .foregroundColor(Color(hex: "4DA8F5"))
                                         .padding(.horizontal, 8)

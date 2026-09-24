@@ -22,7 +22,14 @@ enum L10n {
     static var homeRecentActivity: String { String(localized: "home.recent_activity") }
     static var homeNoActivity: String     { String(localized: "home.no_activity") }
     static var homeNoActivitySub: String  { String(localized: "home.no_activity_sub") }
-    static var homeDays: String           { String(localized: "home.days") }
+    /// « jour » / « jours » selon la règle de pluriel de la langue (fr : 0 et 1 au singulier).
+    /// Le catalogue exige le nombre dans une variation de pluriel : on le retire pour
+    /// n'afficher que l'unité à côté du grand chiffre.
+    static func homeDays(_ count: Int) -> String {
+        String(localized: "home.days_count \(count)")
+            .replacingOccurrences(of: String(count), with: "")
+            .trimmingCharacters(in: .whitespaces)
+    }
 
     // MARK: - Canicule / Heatwave
 
