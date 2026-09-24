@@ -4921,13 +4921,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Iron Month, Centurion and more"
+            "value" : "Iron Month, Centurion and exclusive badges"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Mois de fer, Centurion et plus"
+            "value" : "Mois de fer, Centurion et badges exclusifs"
           }
         }
       }
@@ -4937,13 +4937,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Exclusive badges"
+            "value" : "Pro achievements & badges"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Badges exclusifs"
+            "value" : "Succès & badges Pro"
           }
         }
       }
@@ -4953,13 +4953,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Trends, detailed charts"
+            "value" : "Month and year charts, alcohol analysis"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Tendances, graphiques détaillés"
+            "value" : "Graphiques sur le mois et l'année, analyse de l'alcool"
           }
         }
       }
@@ -4985,13 +4985,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Access your entire history"
+            "value" : "Without Premium, only the last 30 days are kept"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Accédez à tout votre passé"
+            "value" : "Sans Premium, seuls les 30 derniers jours sont conservés"
           }
         }
       }
@@ -5008,102 +5008,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Historique illimité"
-          }
-        }
-      }
-    },
-    "premium.feature4.subtitle" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Customize the look of the app"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Personnalisez l'apparence de l'app"
-          }
-        }
-      }
-    },
-    "premium.feature4.title" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Themes & colors"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Thèmes & couleurs"
-          }
-        }
-      }
-    },
-    "premium.feature5.subtitle" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Write your own reminders"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Écrivez vos propres rappels"
-          }
-        }
-      }
-    },
-    "premium.feature5.title" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Custom reminders"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Rappels personnalisés"
-          }
-        }
-      }
-    },
-    "premium.feature6.subtitle" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "iOS widget and multi-device sync"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Widget iOS et sync multi-appareils"
-          }
-        }
-      }
-    },
-    "premium.feature6.title" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Widgets & sync"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Widgets & synchronisation"
           }
         }
       }
@@ -5649,13 +5553,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Unlock all challenges and achievements"
+            "value" : "Unlock Pro achievements, advanced statistics and your full history"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Débloquez tous les défis et succès"
+            "value" : "Débloquez les succès Pro, les statistiques avancées et l'historique complet"
           }
         }
       }
@@ -9058,6 +8962,262 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Plus tard"
+          }
+        }
+      }
+    },
+    "intent.add_water.title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add water"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ajouter de l'eau"
+          }
+        }
+      }
+    },
+    "intent.add_water.description" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Logs water you drank in AquApp."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enregistre de l'eau bue dans AquApp."
+          }
+        }
+      }
+    },
+    "intent.add_water.short" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add water"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ajouter de l'eau"
+          }
+        }
+      }
+    },
+    "intent.add_water.done" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Added %1$d ml. You're at %2$d of %3$d ml today."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$d ml ajoutés. Tu en es à %2$d ml sur %3$d ml aujourd'hui."
+          }
+        }
+      }
+    },
+    "intent.param.amount_ml" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Amount (ml)"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Quantité (ml)"
+          }
+        }
+      }
+    },
+    "intent.add_alcohol.title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Log an alcoholic drink"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enregistrer une boisson alcoolisée"
+          }
+        }
+      }
+    },
+    "intent.add_alcohol.description" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Logs an alcoholic drink and tells you how much water to drink to make up for it."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enregistre une boisson alcoolisée et indique l'eau à boire pour compenser."
+          }
+        }
+      }
+    },
+    "intent.add_alcohol.short" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alcoholic drink"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Boisson alcoolisée"
+          }
+        }
+      }
+    },
+    "intent.add_alcohol.done" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Logged: %1$@, %2$d ml. Remember to drink %3$d ml of water to make up for it."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "C'est noté : %1$@, %2$d ml. Pense à boire %3$d ml d'eau pour compenser."
+          }
+        }
+      }
+    },
+    "intent.param.alcohol_kind" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Drink"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Boisson"
+          }
+        }
+      }
+    },
+    "intent.alcohol_kind.type" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alcoholic drink"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Boisson alcoolisée"
+          }
+        }
+      }
+    },
+    "intent.today.title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Today's progress"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Progression du jour"
+          }
+        }
+      }
+    },
+    "intent.today.description" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tells you how much you've drunk today compared with your goal."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Indique combien tu as bu aujourd'hui par rapport à ton objectif."
+          }
+        }
+      }
+    },
+    "intent.today.short" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Today's progress"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Progression du jour"
+          }
+        }
+      }
+    },
+    "intent.today.result" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You've had %1$d of %2$d ml today, that's %3$d%%."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tu as bu %1$d ml sur %2$d ml aujourd'hui, soit %3$d %%."
+          }
+        }
+      }
+    },
+    "intent.today.goal_reached" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Goal reached: %1$d of %2$d ml. Well done!"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Objectif atteint : %1$d ml sur %2$d ml. Bravo !"
           }
         }
       }

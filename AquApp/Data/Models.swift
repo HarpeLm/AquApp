@@ -39,7 +39,8 @@ final class WaterEntry {
 // La migration est gérée dans WaterAlcoholEntry.alcoholType (getter) via migratedAlcoholKind().
 // Aucun changement de schéma SwiftData n'est nécessaire — seule la valeur String change.
 
-enum AlcoholKind: String, Codable, CaseIterable {
+// nonisolated : App Intents (Siri) exige des conformités utilisables hors MainActor.
+nonisolated enum AlcoholKind: String, Codable, CaseIterable, Sendable {
     case beer     = "beer"
     case wine     = "wine"
     case spirits  = "spirits"

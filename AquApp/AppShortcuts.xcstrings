@@ -1,0 +1,118 @@
+{
+  "sourceLanguage" : "fr",
+  "version" : "1.0",
+  "strings" : {
+    "Ajoute de l'eau dans ${applicationName}" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add water in ${applicationName}"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ajoute de l'eau dans ${applicationName}"
+          }
+        }
+      }
+    },
+    "Enregistre un verre d'eau dans ${applicationName}" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Log a glass of water in ${applicationName}"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enregistre un verre d'eau dans ${applicationName}"
+          }
+        }
+      }
+    },
+    "J'ai bu un verre d'eau avec ${applicationName}" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "I drank a glass of water with ${applicationName}"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "J'ai bu un verre d'eau avec ${applicationName}"
+          }
+        }
+      }
+    },
+    "Ajoute ${kind} dans ${applicationName}" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Log ${kind} in ${applicationName}"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ajoute ${kind} dans ${applicationName}"
+          }
+        }
+      }
+    },
+    "Enregistre une boisson dans ${applicationName}" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Log a drink in ${applicationName}"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enregistre une boisson dans ${applicationName}"
+          }
+        }
+      }
+    },
+    "Où j'en suis dans ${applicationName}" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "My progress in ${applicationName}"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Où j'en suis dans ${applicationName}"
+          }
+        }
+      }
+    },
+    "Combien j'ai bu aujourd'hui dans ${applicationName}" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "How much have I drunk today in ${applicationName}"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Combien j'ai bu aujourd'hui dans ${applicationName}"
+          }
+        }
+      }
+    }
+  }
+}

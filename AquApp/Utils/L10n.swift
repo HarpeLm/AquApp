@@ -85,9 +85,6 @@ enum L10n {
             (String(localized: "premium.feature1.title"), String(localized: "premium.feature1.subtitle"), "medal.fill"),
             (String(localized: "premium.feature2.title"), String(localized: "premium.feature2.subtitle"), "chart.bar.fill"),
             (String(localized: "premium.feature3.title"), String(localized: "premium.feature3.subtitle"), "clock.fill"),
-            (String(localized: "premium.feature4.title"), String(localized: "premium.feature4.subtitle"), "paintbrush.fill"),
-            (String(localized: "premium.feature5.title"), String(localized: "premium.feature5.subtitle"), "bell.badge.fill"),
-            (String(localized: "premium.feature6.title"), String(localized: "premium.feature6.subtitle"), "widget.small.badge.plus"),
         ]
     }
 

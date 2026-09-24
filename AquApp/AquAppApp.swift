@@ -2,6 +2,7 @@ import SwiftUI
 import SwiftData
 import StoreKit
 import BackgroundTasks
+import AppIntents
 
 // MARK: - Identifiant BGTask
 
@@ -93,6 +94,9 @@ struct AquAppApp: App {
         let wm  = WeatherManager(store: s)
         let aim = AppIconManager()
         let xpm = XPManager()
+
+        // Siri / Raccourcis : les intents récupèrent le store via @Dependency.
+        AppDependencyManager.shared.add(dependency: s)
 
         s.confettiManager    = cm
         s.achievementManager = am
