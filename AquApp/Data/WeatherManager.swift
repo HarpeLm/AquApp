@@ -69,8 +69,10 @@ final class WeatherManager: NSObject, ObservableObject, CLLocationManagerDelegat
     private func fetchTemperature(lat: Double, lon: Double) {
         var comps = URLComponents(string: "https://api.open-meteo.com/v1/forecast")!
         comps.queryItems = [
-            URLQueryItem(name: "latitude",      value: String(format: "%.4f", lat)),
-            URLQueryItem(name: "longitude",     value: String(format: "%.4f", lon)),
+            // 2 décimales (~1 km) : suffisant pour la météo, et reste une « position
+            // approximative » au sens d'Apple (fiche de confidentialité, PrivacyInfo).
+            URLQueryItem(name: "latitude",      value: String(format: "%.2f", lat)),
+            URLQueryItem(name: "longitude",     value: String(format: "%.2f", lon)),
             URLQueryItem(name: "current",       value: "temperature_2m"),
             URLQueryItem(name: "forecast_days", value: "1"),
         ]
