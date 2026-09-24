@@ -124,8 +124,15 @@ final class DailyResetManager: ObservableObject {
     // 31 décembre à minuit), une seule fois par année, et seulement si
     // l'utilisateur a au moins quelques jours de données pour que le bilan
     // soit pertinent. Le flag "wrapped_shown_<year>" évite toute répétition.
+    //
+    // Désactivé en v1.0 : aucun écran ne présente encore WrappedView. Tant que
+    // c'est le cas, le déclencheur ne doit PAS consommer "wrapped_shown_<year>",
+    // sinon le bilan serait perdu pour ces utilisateurs une fois l'écran branché.
+    // Pour l'activer : présenter WrappedView sur shouldShowWrapped, puis passer à true.
+    static let isWrappedEnabled = false
 
     private func checkWrappedTrigger() {
+        guard Self.isWrappedEnabled else { return }
         let calendar = Calendar.current
         let now       = Date()
         let month     = calendar.component(.month, from: now)
@@ -151,18 +158,19 @@ final class DailyResetManager: ObservableObject {
     /// précédente n'a pas encore été montré — couvre le cas où l'app était
     /// fermée le 1er janvier.
     private func checkWrappedTriggerOnLaunch() {
+        guard Self.isWrappedEnabled else { return }
         let calendar = Calendar.current
         let now      = Date()
         let currentYear = calendar.component(.year, from: now)
         let yearToCheck = currentYear - 1
 
+        // Rattrapage limité à janvier : le bilan de l'année écoulée n'a plus de sens
+        // en milieu d'année (l'ancienne condition currentYear > yearToCheck était toujours vraie).
+        guard calendar.component(.month, from: now) == 1 else { return }
+
         let shownKey = "wrapped_shown_\(yearToCheck)"
         guard !UserDefaults.standard.bool(forKey: shownKey) else { return }
         guard let store = store, store.activeDaysTotal >= 7 else { return }
-
-        // Ne propose que si on est bien après le 1er janvier de l'année courante
-        // (évite de proposer le Wrapped de l'année en cours avant qu'elle finisse)
-        guard currentYear > yearToCheck else { return }
 
         UserDefaults.standard.set(true, forKey: shownKey)
         DispatchQueue.main.async {

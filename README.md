@@ -54,7 +54,6 @@ Captures réalisées sur iPhone — modes clair et sombre.
 * Grille annuelle inspirée des contributions GitHub
 * Analyse de la consommation d’alcool
 * Suivi de la compensation en eau
-* AquApp Wrapped : bilan annuel partageable
 
 🎨 Personnalisation
 
@@ -66,13 +65,9 @@ Captures réalisées sur iPhone — modes clair et sombre.
 
 🔌 Intégration iOS
 
-* Widgets Home Screen
-* Live Activities
-* Dynamic Island
-* Intégration Siri & Raccourcis avec App Intents
-* Intégration HealthKit (lecture pas/sommeil + écriture volumes eau)
+* Intégration HealthKit, demandée pendant l’onboarding avec explication (écriture de l’eau ; lecture des pas, entraînements et sommeil pour certains défis et succès)
 * Notifications locales
-* Support de plusieurs langues
+* Français et anglais
 
 ⸻
 
@@ -106,9 +101,6 @@ AquApp est développé nativement pour Apple avec :
 * SwiftUI
 * SwiftData
 * HealthKit
-* WidgetKit
-* ActivityKit
-* App Intents / Siri
 * StoreKit 2
 * UserNotifications
 * Keychain Services
@@ -124,17 +116,19 @@ AquApp/
 ├── AquAppApp.swift
 │
 ├── Data/
-│   ├── AppDataStore.swift
+│   ├── AppDataStore.swift      (façade exposée aux vues)
+│   ├── EntryRepository.swift   (accès SwiftData + caches)
+│   ├── StatsCalculator.swift
+│   ├── StreakEngine.swift      (séries + DayRecord)
+│   ├── WidgetBridge.swift      (App Group, prêt pour les widgets)
 │   ├── XPManager.swift
 │   └── StoreKitManager.swift
 │
-├── Models/
-│   ├── WaterEntry.swift
-│   ├── WaterAlcoholEntry.swift
-│   └── DayRecord.swift
+├── Data/Models.swift          (WaterEntry, WaterAlcoholEntry, DayRecord)
 │
 ├── Utils/
 │   ├── HealthDataManager.swift
+│   ├── HealthAuthorization.swift
 │   ├── KeychainManager.swift
 │   ├── PremiumManager.swift
 │   ├── AppIconManager.swift
@@ -146,14 +140,11 @@ AquApp/
 │   ├── Challenges/
 │   ├── Achievements/
 │   ├── Profile/
-│   ├── Wrapped/
+│   ├── Wrapped/        (prêt, activé dans une prochaine version)
 │   └── Onboarding/
 │
-├── Widgets/
-│   ├── WidgetKit
-│   └── ActivityKit
-│
 ├── Localizable.xcstrings
+├── InfoPlist.xcstrings
 │
 ├── AquAppTests/
 └── AquAppUiTests/
@@ -163,7 +154,7 @@ Principes
 * SwiftUI pour l’interface
 * SwiftData pour la persistance
 * Keychain pour les données nécessitant un stockage sécurisé
-* App Groups pour la communication avec les widgets
+* App Group préparé pour la communication avec les futurs widgets
 * Managers spécialisés pour les intégrations système
 * Logique métier testée indépendamment lorsque possible
 
@@ -234,8 +225,6 @@ Certaines fonctionnalités nécessitent les capabilities Apple correspondantes, 
 * HealthKit
 * App Groups
 * In-App Purchase
-* Widgets
-* Live Activities
 
 ⸻
 
@@ -253,10 +242,6 @@ Certaines fonctionnalités nécessitent les capabilities Apple correspondantes, 
 * Défis
 * Badges
 * Statistiques
-* Wrapped annuel
-* Widgets
-* Live Activities
-* Siri / App Intents
 * HealthKit
 * Personnalisation
 * Stockage sécurisé
@@ -266,13 +251,14 @@ Certaines fonctionnalités nécessitent les capabilities Apple correspondantes, 
 * v1.0 — Soumission App Store
 * Activation des abonnements Premium
 * Tests et optimisation finale App Store
-* Finalisation des traductions
 
 🔮 À venir
 
+* Widgets écran d’accueil
+* Live Activities et Dynamic Island
+* Siri et Raccourcis (App Intents)
+* AquApp Wrapped : bilan annuel partageable
 * Synchronisation iCloud / CloudKit
-* Nouveaux formats de widgets
-* Partage avancé du Wrapped
 * Version watchOS
 
 ⸻
