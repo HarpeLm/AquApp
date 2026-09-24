@@ -29,7 +29,7 @@ struct ProfileAppearanceView: View {
                     Text(String(localized: "profile.theme"))
                         .font(.system(size: 15))
                     Spacer()
-                    Picker("", selection: $colorSchemeRaw) {
+                    Picker(String(localized: "profile.theme"), selection: $colorSchemeRaw) {
                         Text(String(localized: "profile.system")).tag("system")
                         Text(String(localized: "profile.light")).tag("light")
                         Text(String(localized: "profile.dark")).tag("dark")

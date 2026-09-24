@@ -132,9 +132,11 @@ struct AddAlcoolSheet: View {
                          ? String(localized: "alcohol.history_title")
                          : String(localized: "alcohol.sheet.title"))
                         .font(.system(size: 22, weight: .bold))
+                        .accessibilityAddTraits(.isHeader)
                     Image(systemName: showHistory ? "clock.arrow.circlepath" : "wineglass.fill")
                         .font(.system(size: 20))
                         .foregroundColor(Color(hex: "8B5CF6"))
+                        .accessibilityHidden(true)
                 }
                 Spacer()
 
@@ -167,6 +169,9 @@ struct AddAlcoolSheet: View {
                                 : AnyShapeStyle(Color(hex: "8B5CF6").opacity(0.1)))
                     .cornerRadius(20)
                 }
+                .accessibilityLabel(showHistory
+                    ? String(localized: "alcohol.back_button")
+                    : String(localized: "a11y.alcohol.history \(todayDisplayEntries.count)"))
 
                 Button { isPresented = false } label: {
                     ZStack {
@@ -204,6 +209,7 @@ struct AddAlcoolSheet: View {
                                 .font(.system(size: 32))
                                 .foregroundColor(Color(hex: "8B5CF6").opacity(0.5))
                         }
+                        .accessibilityHidden(true)
                         Text(String(localized: "alcohol.no_entries"))
                             .font(.system(size: 17, weight: .semibold))
                         Text(String(localized: "alcohol.no_entries_sub"))
@@ -222,6 +228,7 @@ struct AddAlcoolSheet: View {
                         }
                         .frame(maxWidth: .infinity).padding(.vertical, 12)
                         .background(Color(hex: "8B5CF6").opacity(0.08)).cornerRadius(12)
+                        .accessibilityElement(children: .combine)
 
                         VStack(spacing: 4) {
                             Text(UnitFormatter.volume(totalCompensationTodayMl))
@@ -231,6 +238,7 @@ struct AddAlcoolSheet: View {
                         }
                         .frame(maxWidth: .infinity).padding(.vertical, 12)
                         .background(Color.orange.opacity(0.08)).cornerRadius(12)
+                        .accessibilityElement(children: .combine)
                     }
                     .padding(.horizontal, 20)
 
@@ -242,10 +250,12 @@ struct AddAlcoolSheet: View {
                                     Image(systemName: entry.sfSymbol)
                                         .font(.system(size: 16)).foregroundColor(Color(hex: "8B5CF6"))
                                 }
+                                .accessibilityHidden(true)
                                 VStack(alignment: .leading, spacing: 2) {
                                     Text(entry.drinkName).font(.system(size: 15, weight: .semibold))
                                     Text(UnitFormatter.volume(entry.volumeMl)).font(.system(size: 13)).foregroundColor(.secondary)
                                 }
+                                .accessibilityElement(children: .combine)
                                 Spacer()
                                 Button {
                                     store.deleteAlcohol(entry.storeRef)
@@ -255,6 +265,8 @@ struct AddAlcoolSheet: View {
                                         .font(.system(size: 14))
                                         .foregroundColor(.red.opacity(0.6)).padding(10)
                                 }
+                                .accessibilityLabel(String(format: String(localized: "accessibility.delete_entry"),
+                                                           "\(entry.drinkName), \(UnitFormatter.volume(entry.volumeMl))"))
                             }
                             .padding(.horizontal, 16).padding(.vertical, 10)
                         }
@@ -276,6 +288,7 @@ struct AddAlcoolSheet: View {
                 if let feedback = showAddedFeedback {
                     HStack(spacing: 8) {
                         Image(systemName: "checkmark.circle.fill").foregroundColor(.green)
+                            .accessibilityHidden(true)
                         Text(feedback).font(.system(size: 13, weight: .medium)).foregroundColor(.primary)
                     }
                     .padding(12).frame(maxWidth: .infinity, alignment: .leading)
@@ -291,9 +304,11 @@ struct AddAlcoolSheet: View {
                         Image(systemName: "exclamationmark.triangle.fill")
                             .font(.system(size: 15))
                             .foregroundColor(Color(hex: "F59E0B"))
+                            .accessibilityHidden(true)
                         Text(String(localized: "alcohol.warning.title"))
                             .font(.system(size: 14, weight: .bold))
                             .foregroundColor(Color(hex: "92400E"))
+                            .accessibilityAddTraits(.isHeader)
                     }
                     VStack(alignment: .leading, spacing: 6) {
                         WarningRow(symbol: "drop.fill", color: Color(hex: "4DA8F5"), text: String(localized: "alcohol.warning.hydration"))
@@ -464,25 +479,32 @@ struct DrinkRow: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            HStack(spacing: 14) {
-                ZStack {
-                    RoundedRectangle(cornerRadius: 10)
-                        .fill(drink.symbolColor.opacity(0.12)).frame(width: 44, height: 44)
-                    Image(systemName: drink.sfSymbol)
-                        .font(.system(size: 18, weight: .medium)).foregroundColor(drink.symbolColor)
+            Button(action: onTap) {
+                HStack(spacing: 14) {
+                    ZStack {
+                        RoundedRectangle(cornerRadius: 10)
+                            .fill(drink.symbolColor.opacity(0.12)).frame(width: 44, height: 44)
+                        Image(systemName: drink.sfSymbol)
+                            .font(.system(size: 18, weight: .medium)).foregroundColor(drink.symbolColor)
+                    }
+                    .accessibilityHidden(true)
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(drink.name).font(.system(size: 15, weight: .semibold)).foregroundColor(.primary)
+                        Text(String(format: String(localized: "alcohol.abv_label"), Int(drink.alcoholPercent)))
+                            .font(.system(size: 12)).foregroundColor(.secondary)
+                    }
+                    Spacer()
+                    Image(systemName: isExpanded ? "chevron.up" : "chevron.down")
+                        .font(.system(size: 13)).foregroundColor(.secondary)
+                        .accessibilityHidden(true)
                 }
-                VStack(alignment: .leading, spacing: 2) {
-                    Text(drink.name).font(.system(size: 15, weight: .semibold)).foregroundColor(.primary)
-                    Text(String(format: String(localized: "alcohol.abv_label"), Int(drink.alcoholPercent)))
-                        .font(.system(size: 12)).foregroundColor(.secondary)
-                }
-                Spacer()
-                Image(systemName: isExpanded ? "chevron.up" : "chevron.down")
-                    .font(.system(size: 13)).foregroundColor(.secondary)
+                .padding(16)
+                .contentShape(Rectangle())
             }
-            .padding(16)
-            .contentShape(Rectangle())
-            .onTapGesture { onTap() }
+            .buttonStyle(.plain)
+            .accessibilityElement(children: .combine)
+            .accessibilityValue(String(localized: isExpanded ? "a11y.expanded" : "a11y.collapsed"))
+            .accessibilityHint(String(localized: "a11y.alcohol.expand_hint"))
 
             if isExpanded {
                 VStack(spacing: 12) {
@@ -501,6 +523,9 @@ struct DrinkRow: View {
                                 .frame(maxWidth: .infinity).padding(.vertical, 10)
                                 .background(Color(UIColor.systemGray6)).cornerRadius(10)
                             }
+                            .accessibilityLabel(String(format: String(localized: "a11y.alcohol.add_preset"),
+                                                       UnitFormatter.volume(preset.ml), drink.name,
+                                                       drink.compensationLabel(for: preset.ml)))
                         }
                     }
                     CustomQuantityRow(drink: drink, onAdd: onAdd)
@@ -529,6 +554,7 @@ struct CustomQuantityRow: View {
                 .keyboardType(.numberPad).focused($isFocused)
                 .padding(10).background(Color(UIColor.systemGray6)).cornerRadius(10).font(.system(size: 14))
                 .withDoneButton() // ← BOUTON "TERMINÉ" AJOUTÉ
+                .accessibilityLabel(String(localized: "water.custom_quantity"))
 
             if let ml = Double(customMl), ml > 0 {
                 VStack(spacing: 1) {
@@ -558,6 +584,7 @@ struct CustomQuantityRow: View {
                 }
             }
             .disabled(customMl.isEmpty)
+            .accessibilityLabel(String(format: String(localized: "a11y.alcohol.add_custom"), drink.name))
         }
     }
 }
@@ -575,6 +602,7 @@ private struct WarningRow: View {
                 .foregroundColor(color)
                 .frame(width: 16)
                 .padding(.top, 1)
+                .accessibilityHidden(true)
             Text(text)
                 .font(.system(size: 12))
                 .foregroundColor(Color(hex: "92400E"))

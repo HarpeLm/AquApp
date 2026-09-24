@@ -292,6 +292,7 @@ struct AppIconCell: View {
         }
         .buttonStyle(.plain)
         .accessibilityLabel(icon.localizedName)
+        .accessibilityAddTraits(isSelected ? .isSelected : [])
         .accessibilityValue(
             isSelected  ? String(localized: "profile.app_icon.active_badge") :
             !isUnlocked ? String(localized: "profile.app_icon.unlock_hint")  : ""

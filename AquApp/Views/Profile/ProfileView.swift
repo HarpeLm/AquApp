@@ -123,6 +123,7 @@ struct ProfileView: View {
                         VStack(alignment: .leading, spacing: 4) {
                             Text("profile.title")          // → "Profil"
                                 .font(.system(size: 32, weight: .bold))
+                                .accessibilityAddTraits(.isHeader)
                             Text("profile.subtitle")       // → "Gérez vos préférences"
                                 .font(.subheadline)
                                 .foregroundColor(.secondary)
