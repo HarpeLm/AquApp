@@ -66,6 +66,7 @@ Captures réalisées sur iPhone — modes clair et sombre.
 🔌 Intégration iOS
 
 * Intégration HealthKit, demandée pendant l’onboarding avec explication (écriture de l’eau ; lecture des pas, entraînements et sommeil pour certains défis et succès)
+* Siri et Raccourcis (App Intents) : ajouter de l’eau ou une boisson, connaître sa progression
 * Notifications locales
 * Français et anglais
 
@@ -101,6 +102,7 @@ AquApp est développé nativement pour Apple avec :
 * SwiftUI
 * SwiftData
 * HealthKit
+* App Intents (Siri et Raccourcis)
 * StoreKit 2
 * UserNotifications
 * Keychain Services
@@ -243,6 +245,7 @@ Certaines fonctionnalités nécessitent les capabilities Apple correspondantes, 
 * Badges
 * Statistiques
 * HealthKit
+* Siri et Raccourcis
 * Personnalisation
 * Stockage sécurisé
 
@@ -256,7 +259,6 @@ Certaines fonctionnalités nécessitent les capabilities Apple correspondantes, 
 
 * Widgets écran d’accueil
 * Live Activities et Dynamic Island
-* Siri et Raccourcis (App Intents)
 * AquApp Wrapped : bilan annuel partageable
 * Synchronisation iCloud / CloudKit
 * Version watchOS
