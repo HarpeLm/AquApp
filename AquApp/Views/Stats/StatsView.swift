@@ -471,7 +471,7 @@ private struct BarColumn: View {
         .accessibilityValue(bar.ml == 0
             ? String(localized: "accessibility.chart_bar_empty")
             : String(format: String(localized: "accessibility.chart_bar_value"),
-                     Int(bar.ml), Int(goal), goalReached
+                     UnitFormatter.volume(bar.ml), UnitFormatter.volume(goal), goalReached
                         ? String(localized: "accessibility.chart_bar_goal_reached")
                         : ""))
     }

@@ -31,8 +31,8 @@ final class SiriIntentTests: XCTestCase {
 
         XCTAssertEqual(store.todayWaterMl, 300)
         XCTAssertEqual(store.todayWaterEntries().count, 1)
-        XCTAssertTrue(reply.contains("300"), reply)
-        XCTAssertTrue(reply.contains("2000"), "la réponse rappelle l'objectif : \(reply)")
+        XCTAssertTrue(reply.contains(UnitFormatter.volume(300)), reply)
+        XCTAssertTrue(reply.contains(UnitFormatter.volume(2000)), "la réponse rappelle l'objectif : \(reply)")
     }
 
     func testAddWater_reachingGoal_updatesStreak() {
@@ -46,7 +46,7 @@ final class SiriIntentTests: XCTestCase {
         let entry = try XCTUnwrap(store.todayAlcoholEntries().first)
         XCTAssertEqual(entry.amountMl, Double(AlcoholKind.wine.defaultServingMl))
         XCTAssertEqual(store.soberDaysStreak, 0)
-        XCTAssertTrue(reply.contains(String(Int(entry.compensationMl.rounded()))), reply)
+        XCTAssertTrue(reply.contains(UnitFormatter.volume(entry.compensationMl)), reply)
     }
 
     func testAddAlcohol_explicitAmountWins() throws {
@@ -60,6 +60,7 @@ final class SiriIntentTests: XCTestCase {
 
         store.addWater(amountMl: 1500)
         let reached = IntentActions.todayProgress(store: store)
-        XCTAssertNotEqual(reached, String(format: String(localized: "intent.today.result"), 2000, 2000, 100))
+        XCTAssertEqual(reached, String(format: String(localized: "intent.today.goal_reached"),
+                                       UnitFormatter.volume(2000), UnitFormatter.volume(2000)))
     }
 }

@@ -265,7 +265,7 @@ struct ProgressCard: View {
                 .frame(height: 8)
                 .accessibilityHidden(true)
 
-                Text(String(format: String(localized: "progress.goal_label"), Int(goal)))
+                Text(String(format: String(localized: "progress.goal_label"), UnitFormatter.volume(goal)))
                     .scaledFont(size: 12)
                     .foregroundColor(.secondary)
 
@@ -275,7 +275,7 @@ struct ProgressCard: View {
                             .scaledFont(size: 10)
                             .foregroundColor(.orange)
                             .accessibilityHidden(true)
-                        Text(String(format: String(localized: "progress.alcohol_compensation"), Int(compensation)))
+                        Text(String(format: String(localized: "progress.alcohol_compensation"), UnitFormatter.volume(compensation)))
                             .scaledFont(size: 11, weight: .medium)
                             .foregroundColor(.orange)
                     }
@@ -459,7 +459,7 @@ struct RecentActivitySection: View {
         let water = waterEntries.map {
             ActivityItem(
                 id: $0.id.uuidString,
-                label: String(format: String(localized: "activity.water_entry"), Int($0.amountMl)),
+                label: String(format: String(localized: "activity.water_entry"), UnitFormatter.volume($0.amountMl)),
                 time: timeFormatter.string(from: $0.date),
                 date: $0.date,
                 kind: .water($0)

@@ -13,7 +13,7 @@ struct AlcoholDrink: Identifiable {
     }
 
     func compensationLabel(for volumeMl: Double) -> String {
-        String(format: String(localized: "alcohol.compensation_label"), Int(compensation(for: volumeMl)))
+        String(format: String(localized: "alcohol.compensation_label"), UnitFormatter.volume(compensation(for: volumeMl)))
     }
 
     var isCustom: Bool { id.hasPrefix("custom_") }
@@ -433,7 +433,7 @@ struct AddAlcoolSheet: View {
         store.addAlcohol(amountMl: volumeMl, type: kind)
         HapticManager.shared.alcoholAdded()
         withAnimation {
-            showAddedFeedback = String(format: String(localized: "alcohol.added_feedback"), drink.name, Int(volumeMl), drink.compensationLabel(for: volumeMl))
+            showAddedFeedback = String(format: String(localized: "alcohol.added_feedback"), drink.name, UnitFormatter.volume(volumeMl), drink.compensationLabel(for: volumeMl))
         }
         expandedDrinkID = nil
         DispatchQueue.main.asyncAfter(deadline: .now() + 2.5) {
@@ -556,7 +556,7 @@ struct CustomQuantityRow: View {
                 .withDoneButton() // ← BOUTON "TERMINÉ" AJOUTÉ
                 .accessibilityLabel(String(localized: "water.custom_quantity"))
 
-            if let ml = Double(customMl), ml > 0 {
+            if let ml = UnitFormatter.volumeToMl(customMl), ml > 0 {
                 VStack(spacing: 1) {
                     Text(drink.compensationLabel(for: ml))
                         .scaledFont(size: 11, weight: .bold).foregroundColor(.orange)
@@ -566,7 +566,7 @@ struct CustomQuantityRow: View {
             }
 
             Button {
-                if let ml = Double(customMl), ml > 0, ml <= 5000 {
+                if let ml = UnitFormatter.volumeToMl(customMl), ml > 0, ml <= 5000 {
                     onAdd(ml)
                     customMl = ""
                     isFocused = false

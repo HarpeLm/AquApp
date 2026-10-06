@@ -36,21 +36,22 @@ enum IntentActions {
     static func addWater(_ amountMl: Int, store: AppDataStore) -> String {
         store.addWater(amountMl: Double(amountMl))
         return String(format: String(localized: "intent.add_water.done"),
-                      amountMl, Int(store.todayWaterMl), Int(store.effectiveGoalMl))
+                      UnitFormatter.volume(Double(amountMl)), UnitFormatter.volume(store.todayWaterMl),
+                      UnitFormatter.volume(store.effectiveGoalMl))
     }
 
     static func addAlcohol(_ kind: AlcoholKind, amountMl: Int?, store: AppDataStore) -> String {
         let amount = amountMl ?? kind.defaultServingMl
         let compensationBefore = store.todayAlcoholCompensationMl
         store.addAlcohol(amountMl: Double(amount), type: kind)
-        let toCompensate = Int((store.todayAlcoholCompensationMl - compensationBefore).rounded())
+        let toCompensate = store.todayAlcoholCompensationMl - compensationBefore
         return String(format: String(localized: "intent.add_alcohol.done"),
-                      kind.localizedName, amount, toCompensate)
+                      kind.localizedName, UnitFormatter.volume(Double(amount)), UnitFormatter.volume(toCompensate))
     }
 
     static func todayProgress(store: AppDataStore) -> String {
-        let drunk = Int(store.todayWaterMl)
-        let goal = Int(store.effectiveGoalMl)
+        let drunk = UnitFormatter.volume(store.todayWaterMl)
+        let goal = UnitFormatter.volume(store.effectiveGoalMl)
         return store.todayGoalReached
             ? String(format: String(localized: "intent.today.goal_reached"), drunk, goal)
             : String(format: String(localized: "intent.today.result"), drunk, goal, Int(store.todayProgress * 100))

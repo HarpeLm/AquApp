@@ -170,7 +170,7 @@ struct BodyProfileView: View {
                             VStack(alignment: .leading, spacing: 2) {
                                 Text(String(localized: "body.new_calculated_goal"))
                                     .scaledFont(size: 13).foregroundColor(.secondary)
-                                Text(String(format: String(localized: "body.goal_ml_per_day"), Int(calculatedGoalMl)))
+                                Text(String(format: String(localized: "body.goal_ml_per_day"), UnitFormatter.volume(calculatedGoalMl)))
                                     .scaledFont(size: 20, weight: .bold).foregroundColor(goalColor)
                             }
                             Spacer()

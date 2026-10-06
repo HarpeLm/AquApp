@@ -60,10 +60,10 @@ struct GoalEditorSheet: View {
                     // Valeur courante
                     VStack(spacing: 6) {
                         HStack(alignment: .lastTextBaseline, spacing: 6) {
-                            Text("\(Int(localGoal))")
+                            Text(UnitFormatter.volumeNumber(localGoal))
                                 .scaledFont(size: 52, weight: .bold)
                                 .foregroundColor(goalColor)
-                            Text("ml")
+                            Text(UnitFormatter.volumeUnitSymbol)
                                 .scaledFont(size: 20, weight: .medium)
                                 .foregroundColor(.secondary)
                         }
@@ -81,12 +81,12 @@ struct GoalEditorSheet: View {
                             .tint(goalColor)
                             .padding(.horizontal, 20)
                             .accessibilityLabel(String(localized: "goal.editor.title"))
-                            .accessibilityValue("\(Int(localGoal)) ml")
+                            .accessibilityValue(UnitFormatter.volume(localGoal))
                         HStack {
-                            Text("500 ml")
+                            Text(UnitFormatter.volumeSliderBound(500))
                                 .scaledFont(size: 11).foregroundColor(.secondary)
                             Spacer()
-                            Text("5000 ml")
+                            Text(UnitFormatter.volumeSliderBound(5000))
                                 .scaledFont(size: 11).foregroundColor(.secondary)
                         }
                         .padding(.horizontal, 24)
@@ -102,7 +102,7 @@ struct GoalEditorSheet: View {
                                 Button {
                                     withAnimation(.easeInOut(duration: 0.2)) { localGoal = value }
                                 } label: {
-                                    Text("\(Int(value))")
+                                    Text(UnitFormatter.volumeNumber(value))
                                         .scaledFont(size: 14, weight: .semibold)
                                         .foregroundColor(localGoal == value ? .white : goalColor)
                                         .frame(maxWidth: .infinity)

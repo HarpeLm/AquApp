@@ -83,6 +83,13 @@ enum UnitFormatter {
         preferredVolumeUnit.symbol
     }
 
+    /// Convertit une saisie faite dans l'unité affichée (ml, ou fl oz aux États-Unis) en ml.
+    /// Accepte la virgule décimale du clavier français.
+    static func volumeToMl(_ text: String) -> Double? {
+        guard let value = Double(text.replacingOccurrences(of: ",", with: ".")) else { return nil }
+        return Measurement(value: value, unit: preferredVolumeUnit).converted(to: .milliliters).value
+    }
+
     /// Placeholder pour les champs de texte de volume ("ml" ou "fl oz").
     static var volumePlaceholder: String {
         preferredVolumeUnit == .fluidOunces ? "fl oz" : "ml"

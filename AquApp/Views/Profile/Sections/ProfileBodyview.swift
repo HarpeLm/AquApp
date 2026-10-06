@@ -233,7 +233,7 @@ struct BodyEditSheet: View {
                         VStack(alignment: .leading, spacing: 2) {
                             Text(String(localized: "body.new_calculated_goal"))
                                 .scaledFont(size: 13).foregroundColor(.secondary)
-                            Text(String(format: String(localized: "body.goal_ml_per_day"), Int(calculatedGoal)))
+                            Text(String(format: String(localized: "body.goal_ml_per_day"), UnitFormatter.volume(calculatedGoal)))
                                 .scaledFont(size: 20, weight: .bold).foregroundColor(goalColor)
                         }
                         Spacer()

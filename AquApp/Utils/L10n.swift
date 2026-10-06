@@ -189,10 +189,6 @@ enum L10n {
     static var sliderHeightMax: String { String(localized: "slider.height.max") }
     static var sliderWeightMin: String { String(localized: "slider.weight.min") }
     static var sliderWeightMax: String { String(localized: "slider.weight.max") }
-    static var sliderWaterMin:  String { String(localized: "slider.water.min") }
-    static var sliderWaterMax:  String { String(localized: "slider.water.max") }
-    static var sliderGoalMin:   String { String(localized: "slider.goal.min") }
-    static var sliderGoalMax:   String { String(localized: "slider.goal.max") }
 
     // MARK: - Widget tags (11 états)
 

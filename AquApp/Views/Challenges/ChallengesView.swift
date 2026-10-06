@@ -70,15 +70,15 @@ struct Challenge: Identifiable {
         case "regulier":
             return String(format: String(localized: "challenge.progress_times"), Int(currentProgress))
         case "grand_buveur":
-            return String(format: String(localized: "challenge.progress_ml"), Int(currentProgress))          // ← Int, plus UnitFormatter.volume
+            return String(format: String(localized: "challenge.progress_ml"), UnitFormatter.volume(currentProgress), UnitFormatter.volume(targetProgress))          // ← Int, plus UnitFormatter.volume
         case "cadence_parfaite":
             return String(format: String(localized: "challenge.cadence.progress"), Int(currentProgress), Int(targetProgress))
         case "flash_hydrate":
-            return String(format: String(localized: "challenge.flash.progress"), Int(currentProgress))       // ← Int
+            return String(format: String(localized: "challenge.flash.progress"), UnitFormatter.volume(currentProgress), UnitFormatter.volume(500))       // ← Int
         case "matin_champion":
-            return String(format: String(localized: "challenge.matin.progress"), Int(currentProgress))       // ← Int
+            return String(format: String(localized: "challenge.matin.progress"), UnitFormatter.volume(currentProgress))       // ← Int
         case "recuperation":
-            return String(format: String(localized: "challenge.recuperation.progress"), Int(currentProgress)) // ← Int
+            return String(format: String(localized: "challenge.recuperation.progress"), UnitFormatter.volume(currentProgress), UnitFormatter.volume(300)) // ← Int
         default:
             return ""
         }
@@ -121,14 +121,14 @@ class ChallengeManager: ObservableObject {
                 id: "matinal",
                 sfSymbol: "sunrise.fill", symbolColor: .orange,
                 title: String(localized: "challenge.matinal.title"), titleEmoji: "🌅",
-                description: String(localized: "challenge.matinal.desc"),
+                description: String(format: String(localized: "challenge.matinal.desc"), UnitFormatter.volume(500)),
                 category: .hydration, isPro: false, targetProgress: 1
             ),
             Challenge(
                 id: "grand_buveur",
                 sfSymbol: "drop.fill", symbolColor: Color.app.primary,
                 title: String(localized: "challenge.grand_buveur.title"), titleEmoji: "💪",
-                description: String(localized: "challenge.grand_buveur.desc"),
+                description: String(format: String(localized: "challenge.grand_buveur.desc"), UnitFormatter.volume(3000)),
                 category: .hydration, isPro: false, targetProgress: 3000
             ),
             Challenge(
@@ -142,7 +142,7 @@ class ChallengeManager: ObservableObject {
                 id: "cadence_parfaite",
                 sfSymbol: "waveform.path.ecg", symbolColor: Color.app.greenDark,
                 title: String(localized: "challenge.cadence_parfaite.title"), titleEmoji: "⚡",
-                description: String(localized: "challenge.cadence_parfaite.desc"),
+                description: String(format: String(localized: "challenge.cadence_parfaite.desc"), UnitFormatter.volume(200)),
                 category: .hydration, isPro: false, targetProgress: 6
             ),
             Challenge(
@@ -156,7 +156,7 @@ class ChallengeManager: ObservableObject {
                 id: "flash_hydrate",
                 sfSymbol: "bolt.fill", symbolColor: Color.app.red,
                 title: String(localized: "challenge.flash_hydrate.title"), titleEmoji: "⚡",
-                description: String(localized: "challenge.flash_hydrate.desc"),
+                description: String(format: String(localized: "challenge.flash_hydrate.desc"), UnitFormatter.volume(500)),
                 category: .hydration, isPro: false, targetProgress: 500
             ),
             Challenge(
@@ -184,7 +184,7 @@ class ChallengeManager: ObservableObject {
                 id: "recuperation",
                 sfSymbol: "heart.fill", symbolColor: Color.app.red,
                 title: String(localized: "challenge.recuperation.title"), titleEmoji: "🏋️",
-                description: String(localized: "challenge.recuperation.desc"),
+                description: String(format: String(localized: "challenge.recuperation.desc"), UnitFormatter.volume(300)),
                 category: .sport, isPro: false, targetProgress: 300
             ),
         ]
@@ -580,7 +580,7 @@ struct ActiveChallengeCard: View {
             Text(String(localized: "challenge.card.title"))
                 .scaledFont(size: 26, weight: .bold)
                 .foregroundColor(.white)
-            Text(String(format: String(localized: "challenge.card.subtitle"), Int(goal)))
+            Text(String(format: String(localized: "challenge.card.subtitle"), UnitFormatter.volume(goal)))
                 .font(.subheadline)
                 .foregroundColor(.white.opacity(0.85))
             Spacer().frame(height: 4)
