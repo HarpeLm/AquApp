@@ -184,6 +184,7 @@ struct ProfileView: View {
 
                         // ── DEBUG : Toggle Premium (absent en build Release)
                         #if DEBUG
+                        if !DemoData.isActive {
                         Button {
                             premiumStore.set(!isPremiumUser)
                         } label: {
@@ -209,6 +210,7 @@ struct ProfileView: View {
                             )
                         }
                         .padding(.horizontal)
+                        }
                         #endif
 
                         // ── SECTION : bannière Premium (tout en bas, avant les infos)

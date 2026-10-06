@@ -1,316 +1,269 @@
-AquApp 💧
+<p align="center">
+  <img src="docs/assets/banner.svg" alt="AquApp — your daily hydration companion for iPhone" width="100%">
+</p>
 
-Votre compagnon quotidien pour mieux vous hydrater.
+<p align="center">
+  <a href="https://github.com/HarpeLm/AquApp/actions/workflows/ci.yml"><img src="https://github.com/HarpeLm/AquApp/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
+  <img src="https://img.shields.io/badge/iOS-17%2B-0A84FF?logo=apple&logoColor=white" alt="iOS 17+">
+  <img src="https://img.shields.io/badge/SwiftUI-SwiftData-F05138?logo=swift&logoColor=white" alt="SwiftUI and SwiftData">
+  <img src="https://img.shields.io/badge/Xcode-26%2B-147EFB?logo=xcode&logoColor=white" alt="Xcode 26+">
+  <img src="https://img.shields.io/badge/privacy-no%20account%20%C2%B7%20no%20tracking-34C759" alt="No account, no tracking">
+  <img src="https://img.shields.io/badge/license-MIT-lightgrey" alt="MIT license">
+  <img src="https://img.shields.io/badge/made%20in-France%20%F0%9F%87%AB%F0%9F%87%B7-1E3A8A" alt="Made in France">
+</p>
 
-AquApp est une application iOS de suivi d’hydratation conçue pour rendre la consommation d’eau simple, motivante et personnalisée.
+<p align="center">
+  <b>Track your water and alcohol, hit your daily goal, build streaks and unlock achievements —<br>
+  with no account, no server of our own and no tracking.</b>
+</p>
 
-Suivez votre eau et votre consommation d’alcool, atteignez vos objectifs, construisez vos séries, débloquez des succès et analysez vos habitudes — sans compte, sans serveur et sans tracking.
+> [!NOTE]
+> **🇫🇷 A French-speaking project.** AquApp is designed and built in French first: the app ships in **French and English**, while commit messages, code comments and the privacy policy are written in French. Issues and pull requests are welcome in either language.
 
-⸻
+---
 
-📱 Aperçu
+## 📱 Screenshots
 
-Accueil	Statistiques	Défis	Profil
-			
+The gallery follows your GitHub theme: switch to dark mode to see the dark screens.
 
-Captures réalisées sur iPhone — modes clair et sombre.
+<table>
+  <tr>
+    <td align="center"><b>Home</b></td>
+    <td align="center"><b>Statistics</b></td>
+    <td align="center"><b>Challenges</b></td>
+    <td align="center"><b>Achievements</b></td>
+    <td align="center"><b>Profile</b></td>
+  </tr>
+  <tr>
+    <td><picture><source media="(prefers-color-scheme: dark)" srcset="docs/assets/screenshots/home-dark.png"><img src="docs/assets/screenshots/home-light.png" alt="Home: daily progress ring, quick add buttons, current and sober streaks" width="180"></picture></td>
+    <td><picture><source media="(prefers-color-scheme: dark)" srcset="docs/assets/screenshots/stats-dark.png"><img src="docs/assets/screenshots/stats-light.png" alt="Statistics: 7-day chart, yearly goal grid, weekly averages" width="180"></picture></td>
+    <td><picture><source media="(prefers-color-scheme: dark)" srcset="docs/assets/screenshots/challenges-dark.png"><img src="docs/assets/screenshots/challenges-light.png" alt="Challenges: today's goal and daily challenges with progress" width="180"></picture></td>
+    <td><picture><source media="(prefers-color-scheme: dark)" srcset="docs/assets/screenshots/achievements-dark.png"><img src="docs/assets/screenshots/achievements-light.png" alt="Achievements: unlocked count and monthly challenges" width="180"></picture></td>
+    <td><picture><source media="(prefers-color-scheme: dark)" srcset="docs/assets/screenshots/profile-dark.png"><img src="docs/assets/screenshots/profile-light.png" alt="Profile: level and XP, daily goal, body profile" width="180"></picture></td>
+  </tr>
+</table>
 
-⸻
+<sub>Captured on an iPhone 17 Pro simulator with demo data (see <a href="#demo-data-for-screenshots">Demo data</a>).</sub>
 
-✨ Fonctionnalités
+---
 
-💧 Hydratation
+## ✨ Features
 
-* Ajout d’eau en un tap avec préréglages
-* Quantité personnalisée
-* Objectif quotidien personnalisé
-* Calcul basé sur le profil et le niveau d’activité
-* Ajustement de l’objectif en cas de forte chaleur
-* Rappels d’hydratation configurables
-* Suivi quotidien et historique
+<table>
+  <tr>
+    <td width="50%" valign="top">
 
-🍷 Alcool
+### 💧 Hydration
+- One-tap presets and custom amounts
+- Personal daily goal computed from your body profile
+- Goal raised automatically during heatwaves
+- Configurable reminders (never at night)
+- Today, 7-day and full history
 
-* Enregistrement des consommations
-* Compensation en eau selon le type de boisson
-* Suivi des tendances et volumes consommés
-* Séries de jours sans alcool
+</td>
+    <td width="50%" valign="top">
 
-🎮 Gamification
+### 🍷 Alcohol
+- Log drinks, including your own custom drinks
+- Water to drink to make up for each drink
+- Weekly and monthly consumption trends
+- Alcohol-free day streak, recomputed from your data
 
-* Système d’XP et 8 niveaux
-* 16 succès permanents et saisonniers
-* 10 défis quotidiens
-* Badges équipables
-* Séries d’objectifs
-* Séries de jours sans alcool
-* Animations et progression visuelle
+</td>
+  </tr>
+  <tr>
+    <td valign="top">
 
-📊 Statistiques
+### 🎮 Motivation
+- XP with **8 levels**, from *Drop* to *Aqua Legend*
+- **16 achievements**, standard and monthly
+- **10 daily challenges**
+- Goal and sober streaks, equippable badges
 
-* Historique sur 7 jours
-* Statistiques mensuelles
-* Historique complet
-* Grille annuelle inspirée des contributions GitHub
-* Analyse de la consommation d’alcool
-* Suivi de la compensation en eau
+</td>
+    <td valign="top">
 
-🎨 Personnalisation
+### 📊 Statistics
+- 7-day chart, month and all-time views (Premium)
+- GitHub-style yearly goal grid
+- Alcohol analysis (Premium) and water to make up
 
-* 8 icônes alternatives
-* Thème clair, sombre ou système
-* Photo de profil
-* Badges personnalisables
-* Fonctionnalités Premium via StoreKit
+</td>
+  </tr>
+  <tr>
+    <td valign="top">
 
-🔌 Intégration iOS
+### 🔌 iOS integration
+- **Apple Health**: writes water; reads steps, workouts and sleep for some challenges (asked during onboarding, with an explanation)
+- **Siri & Shortcuts** via App Intents
+- Local notifications
+- French and English, with proper plurals
 
-* Intégration HealthKit, demandée pendant l’onboarding avec explication (écriture de l’eau ; lecture des pas, entraînements et sommeil pour certains défis et succès)
-* Siri et Raccourcis (App Intents) : ajouter de l’eau ou une boisson, connaître sa progression
-* Notifications locales
-* Français et anglais
+</td>
+    <td valign="top">
 
-⸻
+### ♿ Accessibility & design
+- Follows the system **text size** (Dynamic Type)
+- VoiceOver labels on key screens
+- Light, dark or system theme
+- 8 alternate app icons
 
-🔒 Privacy first
+</td>
+  </tr>
+</table>
 
-AquApp est conçu autour d’un principe simple :
+### 🗣️ Siri phrases
 
-Vos données vous appartiennent.
+Available as soon as the app is installed — no setup needed.
 
-Dans la version actuelle :
+| Say | What happens |
+|---|---|
+| “Add water in AquApp” | Logs 250 ml (or the amount you choose) and tells you where you stand |
+| “Log Beer in AquApp” (or Wine, Cider…) | Logs a standard serving and tells you how much water to drink to make up for it |
+| “My progress in AquApp” | Reads out today's intake against your goal |
 
-* ❌ Aucun compte
-* ❌ Aucun serveur applicatif
-* ❌ Aucun analytics
-* ❌ Aucun tracking publicitaire
-* ❌ Aucune collecte comportementale
-* ✅ Données stockées localement
-* ✅ HealthKit utilisé après autorisation
-* ✅ Écriture HealthKit pour les données concernées
-* ✅ Données sensibles stockées dans le Keychain lorsque nécessaire
+French phrases work too: *« Ajoute de l'eau dans AquApp »*, *« Où j'en suis dans AquApp »*.
 
-L’objectif est de permettre une expérience complète sans avoir besoin d’envoyer vos habitudes d’hydratation vers un serveur.
+---
 
-⸻
+## 🔒 Privacy first
 
-🛠️ Technologies
+| | |
+|---|---|
+| ❌ | No account, no email |
+| ❌ | No server of our own, no analytics, no ads, no tracking |
+| ✅ | Your data stays on your iPhone (SwiftData, Keychain) |
+| ✅ | Apple Health data is read and used **on device only** |
+| ℹ️ | One exception, optional: an **approximate location (~1 km)** is sent to the Open-Meteo weather service to detect heatwaves |
 
-AquApp est développé nativement pour Apple avec :
+Full details in the [privacy policy](docs/PRIVACY.md) (French).
 
-* Swift
-* SwiftUI
-* SwiftData
-* HealthKit
-* App Intents (Siri et Raccourcis)
-* StoreKit 2
-* UserNotifications
-* Keychain Services
-* GitHub Actions
+---
 
-Architecture basée sur des ObservableObject injectés dans l’environnement, avec séparation entre modèles, données, managers et vues.
+## 🏗️ Architecture
 
-⸻
+Views talk to a single façade, `AppDataStore`. It runs every change (add, delete, goal change) through one pipeline and delegates the actual work to small, testable types. Siri intents go through the same façade, so a drink logged by voice updates streaks, XP and achievements exactly like one logged in the app.
 
-🏗️ Architecture
+```mermaid
+flowchart LR
+    subgraph UI["SwiftUI views"]
+        V["Home · Stats · Challenges<br/>Achievements · Profile"]
+    end
+    SIRI["Siri & Shortcuts<br/>(App Intents)"]
 
-AquApp/
-├── AquAppApp.swift
-│
-├── Data/
-│   ├── AppDataStore.swift      (façade exposée aux vues)
-│   ├── EntryRepository.swift   (accès SwiftData + caches)
-│   ├── StatsCalculator.swift
-│   ├── StreakEngine.swift      (séries + DayRecord)
-│   ├── WidgetBridge.swift      (App Group, prêt pour les widgets)
-│   ├── XPManager.swift
-│   └── StoreKitManager.swift
-│
-├── Data/Models.swift          (WaterEntry, WaterAlcoholEntry, DayRecord)
-│
-├── Utils/
-│   ├── HealthDataManager.swift
-│   ├── HealthAuthorization.swift
-│   ├── KeychainManager.swift
-│   ├── PremiumManager.swift
-│   ├── AppIconManager.swift
-│   └── HealthKitWriter.swift
-│
-├── Views/
-│   ├── Home/
-│   ├── Stats/
-│   ├── Challenges/
-│   ├── Achievements/
-│   ├── Profile/
-│   ├── Wrapped/        (prêt, activé dans une prochaine version)
-│   └── Onboarding/
-│
-├── Localizable.xcstrings
-├── InfoPlist.xcstrings
-│
-├── AquAppTests/
-└── AquAppUiTests/
+    V --> STORE
+    SIRI --> STORE
 
-Principes
+    STORE["AppDataStore<br/><i>façade + mutation pipeline</i>"]
 
-* SwiftUI pour l’interface
-* SwiftData pour la persistance
-* Keychain pour les données nécessitant un stockage sécurisé
-* App Group préparé pour la communication avec les futurs widgets
-* Managers spécialisés pour les intégrations système
-* Logique métier testée indépendamment lorsque possible
+    STORE --> REPO["EntryRepository<br/>SwiftData + day caches"]
+    STORE --> STATS["StatsCalculator<br/>charts, grid, averages"]
+    STORE --> STREAK["StreakEngine<br/>goal & sober streaks"]
+    STORE --> WIDGET["WidgetBridge<br/>App Group, ready for widgets"]
+    STORE --> MGR["XP · Achievements<br/>Challenges managers"]
 
-⸻
+    STATS --> REPO
+    STREAK --> REPO
 
-🧪 Tests & qualité
+    REPO --> DB[("SwiftData")]
+    STREAK --> KC[("Keychain")]
+    MGR --> KC
+    WIDGET --> AG[("App Group<br/>UserDefaults")]
+    STORE --> HK["HealthKit"]
+```
 
-AquApp dispose d’une suite de tests unitaires et UI couvrant notamment :
+| Folder | Contents |
+|---|---|
+| `AquApp/Data` | `AppDataStore`, `EntryRepository`, `StatsCalculator`, `StreakEngine`, `WidgetBridge`, XP, StoreKit, weather, daily reset |
+| `AquApp/Utils` | Health authorization, Keychain, reminders, `scaledFont`, demo data |
+| `AquApp/Intents` | Siri intents and App Shortcuts |
+| `AquApp/Views` | Home, Stats, Challenges, Achievements, Profile, Onboarding, Wrapped (not enabled yet) |
+| `AquApp/AppColor.swift` | `Color.app` palette, the single source of truth for colors |
+| `AquAppTests` | Unit tests |
 
-* Formules d’hydratation
-* Compensation liée à l’alcool
-* XP et progression
-* Streaks
-* Persistance SwiftData
-* Migration des données
-* Formatage des unités
-* Logique météo
-* Onboarding
-* Navigation
-* Statistiques
-* Succès
-* Premium
-* Stabilité générale
+---
 
-L’intégration continue exécute automatiquement le build et les tests sur GitHub Actions.
+## 🛠️ Tech stack
 
-Lancer les tests
+Swift · SwiftUI · SwiftData · HealthKit · App Intents · StoreKit 2 · UserNotifications · Keychain Services · String Catalogs · GitHub Actions
 
-Dans Xcode :
+---
 
-⌘U
+## 🚀 Getting started
 
-Ou en ligne de commande :
+**Requirements:** a Mac with **Xcode 26** or later, an **iOS 17+** device or simulator, and an Apple Developer account to use HealthKit and App Groups on a real device.
 
+```bash
+git clone https://github.com/HarpeLm/AquApp.git
+cd AquApp
+open AquApp.xcodeproj
+```
+
+Then select the **AquApp** target, set your Team in *Signing & Capabilities*, pick a simulator and press **⌘R**.
+
+Capabilities used: HealthKit, App Groups, In-App Purchase.
+
+---
+
+## 🧪 Tests
+
+The suite covers the hydration and alcohol formulas, streaks, statistics, SwiftData integrity, XP and achievements, Siri intents, plurals, StoreKit entitlements and performance on a year of data. Tests run on every push with GitHub Actions.
+
+```bash
 xcodebuild test \
   -scheme AquApp \
   -project AquApp.xcodeproj \
   -destination 'platform=iOS Simulator,name=iPhone 17 Pro' \
   -only-testing:AquAppTests
+```
 
-⸻
+Unit tests run inside the app on the simulator; the app's own settings and Keychain are saved before the suite and restored after it.
 
-🚀 Installation
+### Demo data for screenshots
 
-Prérequis
+Debug builds accept a `-demoData` launch argument that fills an in-memory store with 40 days of realistic data. It changes the simulator's Keychain and settings, so use a dedicated simulator:
 
-Outil	Version
-macOS	Sonoma 14+
-Xcode	15.4+
-iOS	17.0+
-Apple Developer Account	Requis pour certaines capabilities
+```bash
+xcrun simctl launch <simulator-id> com.fabian.dargaud.AquApp -demoData -AppleLanguages "(en)" -AppleLocale en_FR
+```
 
-Installation
+---
 
-git clone https://github.com/HarpeLm/AquApp.git
-cd AquApp
-open AquApp.xcodeproj
+## 🗺️ Roadmap
 
-Puis :
+| ✅ Available | 🚧 In progress | 🔮 Coming |
+|---|---|---|
+| Water and alcohol tracking | v1.0 App Store release | Home Screen widgets |
+| Personal goal and heatwave adjustment | Premium subscriptions | Live Activities and Dynamic Island |
+| Streaks, XP, achievements, challenges | Final App Store polish | AquApp Wrapped (yearly recap) |
+| Statistics and yearly grid | | iCloud sync |
+| Apple Health, Siri & Shortcuts | | Apple Watch app |
+| French and English, Dynamic Type | | |
 
-1. Sélectionnez la target AquApp
-2. Configurez votre Team dans Signing & Capabilities
-3. Sélectionnez un simulateur ou un iPhone
-4. Lancez avec ⌘R
+**Status:** pre-release. The app is free during launch; Premium features will be enabled after v1.0.
 
-Certaines fonctionnalités nécessitent les capabilities Apple correspondantes, notamment :
+---
 
-* HealthKit
-* App Groups
-* In-App Purchase
+## 🤝 Contributing
 
-⸻
+Contributions are welcome, in French or English.
 
-🗺️ Roadmap
+1. Fork the project and create a branch: `git checkout -b feature/my-feature`
+2. Make your change and add or update tests
+3. Check that the tests pass
+4. Open a pull request
 
-✅ Disponible
+---
 
-* Suivi de l’eau
-* Suivi de l’alcool
-* Compensation en eau
-* Objectifs personnalisés
-* Ajustement météo
-* XP et niveaux
-* Succès
-* Défis
-* Badges
-* Statistiques
-* HealthKit
-* Siri et Raccourcis
-* Personnalisation
-* Stockage sécurisé
+## 👤 Author
 
-🚧 En cours
+**Fabian Dargaud** — [@HarpeLm](https://github.com/HarpeLm)
 
-* v1.0 — Soumission App Store
-* Activation des abonnements Premium
-* Tests et optimisation finale App Store
+## 📄 License
 
-🔮 À venir
+AquApp is released under the [MIT license](LICENSE).
 
-* Widgets écran d’accueil
-* Live Activities et Dynamic Island
-* AquApp Wrapped : bilan annuel partageable
-* Synchronisation iCloud / CloudKit
-* Version watchOS
-
-⸻
-
-🧭 Statut
-
-Pré-release active
-
-AquApp est actuellement en préparation pour sa première publication sur l’App Store.
-
-La version pré-release est gratuite. Les fonctionnalités Premium seront activées progressivement après la sortie de la v1.0.
-
-⸻
-
-🤝 Contribuer
-
-Les contributions sont les bienvenues.
-
-1. Forkez le projet
-2. Créez une branche :
-
-git checkout -b feature/ma-fonctionnalite
-
-3. Implémentez votre modification
-4. Ajoutez ou mettez à jour les tests
-5. Vérifiez que la CI passe
-6. Ouvrez une Pull Request
-
-Merci de conserver les tests verts avant toute PR.
-
-⸻
-
-👤 Auteur
-
-Fabian Dargaud
-
-GitHub : @HarpeLm
-
-⸻
-
-📄 Licence
-
-AquApp est distribué sous licence MIT.
-
-Voir LICENSE pour plus d’informations.
-
-⸻
-
-<div align="center">
-
-💧 Fait avec Swift, SwiftUI et beaucoup d’eau.
-
-</div>
+<p align="center">
+  <img src="docs/assets/app-icon.png" alt="AquApp icon" width="64"><br>
+  <sub>Made with Swift, SwiftUI and plenty of water 💧</sub>
+</p>

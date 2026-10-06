@@ -49,8 +49,16 @@ struct AquAppApp: App {
             }
         }
 
+        var useInMemoryStore = false
+        #if DEBUG
+        if DemoData.isActive {
+            DemoData.prepareSettings()
+            useInMemoryStore = true
+        }
+        #endif
+
         let schema = Schema([WaterEntry.self, WaterAlcoholEntry.self, DayRecord.self])
-        let config = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
+        let config = ModelConfiguration(schema: schema, isStoredInMemoryOnly: useInMemoryStore)
 
         // Niveau 1 — chemin normal
         if let c = try? ModelContainer(for: schema, configurations: [config]) {
@@ -107,6 +115,10 @@ struct AquAppApp: App {
         am.xpManager         = xpm
         chm.xpManager        = xpm
         am.isPremiumUser     = PremiumManager.shared.isPremium   // ✅ corrigé (Phase 2)
+
+        #if DEBUG
+        if DemoData.isActive { DemoData.seed(s) }
+        #endif
 
         s.recalculateAllAchievementsFromHistory()
 
