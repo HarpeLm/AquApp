@@ -33,12 +33,20 @@ struct Challenge: Identifiable {
     let title: String
     let titleEmoji: String
     let description: String
+    /// Quantité citée dans la description (« Buvez %@ avant 9 h »), formatée à l'affichage
+    /// pour suivre l'unité de la région, même si elle change après le chargement des défis.
+    var descriptionVolumeMl: Double? = nil
     let category: ChallengeCategory
     let isPro: Bool
 
     var status: ChallengeStatus = .available
     var currentProgress: Double = 0
     var targetProgress: Double  = 1
+
+    var displayDescription: String {
+        guard let ml = descriptionVolumeMl else { return description }
+        return String(format: description, UnitFormatter.volume(ml))
+    }
 
     var progressRatio: Double {
         guard targetProgress > 0 else { return 0 }
@@ -70,15 +78,15 @@ struct Challenge: Identifiable {
         case "regulier":
             return String(format: String(localized: "challenge.progress_times"), Int(currentProgress))
         case "grand_buveur":
-            return String(format: String(localized: "challenge.progress_ml"), UnitFormatter.volume(currentProgress), UnitFormatter.volume(targetProgress))          // ← Int, plus UnitFormatter.volume
+            return String(format: String(localized: "challenge.progress_ml"), UnitFormatter.volume(currentProgress), UnitFormatter.volume(targetProgress))
         case "cadence_parfaite":
             return String(format: String(localized: "challenge.cadence.progress"), Int(currentProgress), Int(targetProgress))
         case "flash_hydrate":
-            return String(format: String(localized: "challenge.flash.progress"), UnitFormatter.volume(currentProgress), UnitFormatter.volume(500))       // ← Int
+            return String(format: String(localized: "challenge.flash.progress"), UnitFormatter.volume(currentProgress), UnitFormatter.volume(targetProgress))
         case "matin_champion":
-            return String(format: String(localized: "challenge.matin.progress"), UnitFormatter.volume(currentProgress))       // ← Int
+            return String(format: String(localized: "challenge.matin.progress"), UnitFormatter.volume(currentProgress))
         case "recuperation":
-            return String(format: String(localized: "challenge.recuperation.progress"), UnitFormatter.volume(currentProgress), UnitFormatter.volume(300)) // ← Int
+            return String(format: String(localized: "challenge.recuperation.progress"), UnitFormatter.volume(currentProgress), UnitFormatter.volume(targetProgress))
         default:
             return ""
         }
@@ -121,14 +129,14 @@ class ChallengeManager: ObservableObject {
                 id: "matinal",
                 sfSymbol: "sunrise.fill", symbolColor: .orange,
                 title: String(localized: "challenge.matinal.title"), titleEmoji: "🌅",
-                description: String(format: String(localized: "challenge.matinal.desc"), UnitFormatter.volume(500)),
+                description: String(localized: "challenge.matinal.desc"), descriptionVolumeMl: 500,
                 category: .hydration, isPro: false, targetProgress: 1
             ),
             Challenge(
                 id: "grand_buveur",
                 sfSymbol: "drop.fill", symbolColor: Color.app.primary,
                 title: String(localized: "challenge.grand_buveur.title"), titleEmoji: "💪",
-                description: String(format: String(localized: "challenge.grand_buveur.desc"), UnitFormatter.volume(3000)),
+                description: String(localized: "challenge.grand_buveur.desc"), descriptionVolumeMl: 3000,
                 category: .hydration, isPro: false, targetProgress: 3000
             ),
             Challenge(
@@ -142,7 +150,7 @@ class ChallengeManager: ObservableObject {
                 id: "cadence_parfaite",
                 sfSymbol: "waveform.path.ecg", symbolColor: Color.app.greenDark,
                 title: String(localized: "challenge.cadence_parfaite.title"), titleEmoji: "⚡",
-                description: String(format: String(localized: "challenge.cadence_parfaite.desc"), UnitFormatter.volume(200)),
+                description: String(localized: "challenge.cadence_parfaite.desc"), descriptionVolumeMl: 200,
                 category: .hydration, isPro: false, targetProgress: 6
             ),
             Challenge(
@@ -156,7 +164,7 @@ class ChallengeManager: ObservableObject {
                 id: "flash_hydrate",
                 sfSymbol: "bolt.fill", symbolColor: Color.app.red,
                 title: String(localized: "challenge.flash_hydrate.title"), titleEmoji: "⚡",
-                description: String(format: String(localized: "challenge.flash_hydrate.desc"), UnitFormatter.volume(500)),
+                description: String(localized: "challenge.flash_hydrate.desc"), descriptionVolumeMl: 500,
                 category: .hydration, isPro: false, targetProgress: 500
             ),
             Challenge(
@@ -184,7 +192,7 @@ class ChallengeManager: ObservableObject {
                 id: "recuperation",
                 sfSymbol: "heart.fill", symbolColor: Color.app.red,
                 title: String(localized: "challenge.recuperation.title"), titleEmoji: "🏋️",
-                description: String(format: String(localized: "challenge.recuperation.desc"), UnitFormatter.volume(300)),
+                description: String(localized: "challenge.recuperation.desc"), descriptionVolumeMl: 300,
                 category: .sport, isPro: false, targetProgress: 300
             ),
         ]
@@ -649,7 +657,7 @@ struct ChallengeRow: View {
                     }
                     if challenge.isPro { PremiumBadge() }
                 }
-                Text(challenge.description)
+                Text(challenge.displayDescription)
                     .scaledFont(size: 13).foregroundColor(.secondary)
                     .minimumScaleFactor(0.8).lineLimit(2)
 
@@ -704,8 +712,8 @@ struct ChallengeRow: View {
         switch challenge.status {
         case .locked:     return String(localized: "accessibility.locked_premium")
         case .completed:  return String(localized: "accessibility.completed")
-        case .inProgress: return challenge.progressLabel.isEmpty ? challenge.description : String(format: String(localized: "accessibility.in_progress"), challenge.progressLabel)
-        case .available:  return challenge.description
+        case .inProgress: return challenge.progressLabel.isEmpty ? challenge.displayDescription : String(format: String(localized: "accessibility.in_progress"), challenge.progressLabel)
+        case .available:  return challenge.displayDescription
         }
     }
 }

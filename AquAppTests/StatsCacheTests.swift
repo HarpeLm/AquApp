@@ -7,10 +7,14 @@ final class StatsCacheTests: XCTestCase {
 
     private var container: ModelContainer!
     private var store: AppDataStore!
+    private var originalFirstLaunchDate: Date!
 
     override func setUp() async throws {
         try await super.setUp()
         HealthDataManager.shared.resetForTests()
+        // Simulateur neuf (CI) : l'installation daterait d'aujourd'hui et la série ignorerait « hier ».
+        originalFirstLaunchDate = HealthDataManager.shared.firstLaunchDate
+        HealthDataManager.shared.setFirstLaunchDate(daysAgo(30))
         container = try ModelContainer(
             for: WaterEntry.self, WaterAlcoholEntry.self, DayRecord.self,
             configurations: ModelConfiguration(isStoredInMemoryOnly: true)
@@ -23,6 +27,7 @@ final class StatsCacheTests: XCTestCase {
     override func tearDown() async throws {
         store = nil
         container = nil
+        HealthDataManager.shared.setFirstLaunchDate(originalFirstLaunchDate)
         try await super.tearDown()
     }
 

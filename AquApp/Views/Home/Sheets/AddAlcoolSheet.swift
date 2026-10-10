@@ -548,6 +548,12 @@ struct CustomQuantityRow: View {
     @State private var customMl: String = ""
     @FocusState private var isFocused: Bool
 
+    /// Saisie convertie en ml, ou nil si vide ou hors limites (5000 ml ≈ 169 fl oz).
+    private var validMl: Double? {
+        guard let ml = UnitFormatter.volumeToMl(customMl), ml > 0, ml <= 5000 else { return nil }
+        return ml
+    }
+
     var body: some View {
         HStack(spacing: 10) {
             TextField(UnitFormatter.volumePlaceholder, text: $customMl)
@@ -556,7 +562,7 @@ struct CustomQuantityRow: View {
                 .withDoneButton() // ← BOUTON "TERMINÉ" AJOUTÉ
                 .accessibilityLabel(String(localized: "water.custom_quantity"))
 
-            if let ml = UnitFormatter.volumeToMl(customMl), ml > 0 {
+            if let ml = validMl {
                 VStack(spacing: 1) {
                     Text(drink.compensationLabel(for: ml))
                         .scaledFont(size: 11, weight: .bold).foregroundColor(.orange)
@@ -566,7 +572,7 @@ struct CustomQuantityRow: View {
             }
 
             Button {
-                if let ml = UnitFormatter.volumeToMl(customMl), ml > 0, ml <= 5000 {
+                if let ml = validMl {
                     onAdd(ml)
                     customMl = ""
                     isFocused = false
@@ -574,7 +580,7 @@ struct CustomQuantityRow: View {
             } label: {
                 ZStack {
                     RoundedRectangle(cornerRadius: 10)
-                        .fill(customMl.isEmpty
+                        .fill(validMl == nil
                               ? AnyShapeStyle(Color(UIColor.systemGray4))
                               : AnyShapeStyle(LinearGradient(
                                 colors: [Color.app.alcoholMid, Color.app.alcoholDark],
@@ -583,7 +589,7 @@ struct CustomQuantityRow: View {
                     Image(systemName: "plus").scaledFont(size: 18, weight: .bold).foregroundColor(.white)
                 }
             }
-            .disabled(customMl.isEmpty)
+            .disabled(validMl == nil)
             .accessibilityLabel(String(format: String(localized: "a11y.alcohol.add_custom"), drink.name))
         }
     }
