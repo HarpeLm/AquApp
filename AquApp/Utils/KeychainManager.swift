@@ -81,6 +81,15 @@ final class KeychainManager {
 
     // MARK: - Suppression
 
+    /// Supprime toutes les entrées d'AquApp du Trousseau (« Supprimer mes données »).
+    /// Indispensable : le Trousseau survit à la désinstallation de l'app.
+    func deleteAll() {
+        SecItemDelete([
+            kSecClass as String: kSecClassGenericPassword,
+            kSecAttrService as String: service
+        ] as CFDictionary)
+    }
+
     func delete(forKey key: String) {
         SecItemDelete([
             kSecClass as String: kSecClassGenericPassword,

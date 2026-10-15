@@ -216,6 +216,20 @@ final class HealthDataManager: ObservableObject {
         km.set(s, forKey: key)
     }
 
+    // MARK: - Effacement des données
+
+    /// Après `KeychainManager.deleteAll()` : remet l'état en mémoire à celui d'un premier
+    /// lancement, sans réécrire de valeurs dans le Trousseau (sauf la date d'installation).
+    func resetAfterErase() {
+        weightKg = 70; heightCm = 170; gender = "notSpecified"; firstName = ""
+        currentStreak = 0; totalGoalDays = 0; soberStreak = 0; xpTotal = 0
+        heatwaveDays = 0; soberDaysTotal = 0
+        totalWaterMl = 0; totalAlcoholMl = 0
+        prunedAlcoholDate = nil
+        achievementProgress = [:]; achievementCompleted = [:]; challengeCompleted = [:]
+        setFirstLaunchDate(Date())
+    }
+
     // MARK: - Tests
 
     func resetForTests() {

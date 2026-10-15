@@ -71,8 +71,8 @@ Les rappels d'hydratation sont des **notifications locales**, programmées sur v
 Conformément au RGPD :
 
 - **Accès** : toutes vos données sont visibles dans l'app.
-- **Suppression** : supprimer l'app efface sa base locale, sa photo et ses réglages. **Attention :** iOS conserve les éléments du Trousseau (profil, prénom, progression, totaux) après la désinstallation ; ils sont réutilisés si vous réinstallez l'app. Pour les effacer, contactez-nous (voir ci-dessous).
-- **Données Santé** : elles restent dans l'app Santé d'Apple et se gèrent depuis celle-ci.
+- **Suppression** : dans l'app, *Profil › Confidentialité › Supprimer mes données* efface en une fois tout ce qu'AquApp conserve sur votre iPhone : historique, profil, prénom, séries, succès, réglages, photo et rappels, y compris les éléments du Trousseau. C'est important, car iOS conserve le Trousseau même après la désinstallation de l'app. L'app revient ensuite à l'écran d'accueil du premier lancement.
+- **Données Santé** : elles restent dans l'app Santé d'Apple et se gèrent depuis celle-ci. Lors de la suppression, vous pouvez aussi choisir d'effacer l'eau qu'AquApp a enregistrée dans Santé ; les données des autres apps ne sont jamais touchées.
 
 ---
 

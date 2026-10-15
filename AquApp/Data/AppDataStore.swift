@@ -361,6 +361,24 @@ final class AppDataStore: ObservableObject {
         ))
     }
 
+    // MARK: - Effacement des données (« Supprimer mes données »)
+
+    /// Vide la base. Trousseau, réglages et fichiers sont effacés par `DataEraser`.
+    func eraseAllEntries() throws {
+        heatwaveGoalMl = nil
+        try repository.deleteAllEntries()
+    }
+
+    /// Après l'effacement complet : séries recalculées sur une base vide (comme au
+    /// premier lancement, sans créer de DayRecord) et widget remis à zéro.
+    func reloadAfterErase() {
+        repository.invalidateCaches()
+        streaks.recalculateSoberStreak()
+        streaks.recalculateGoalStreak(effectiveGoalMl: effectiveGoalMl)
+        syncWidgetData()
+        dataVersion += 1
+    }
+
     // MARK: - Reset quotidien
 
     func performMidnightReset() {

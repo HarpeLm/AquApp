@@ -383,6 +383,14 @@ final class AchievementManager: ObservableObject {
         }
     }
 
+    /// Après « Supprimer mes données » : repart de la liste vierge.
+    func reloadAfterErase() {
+        loadAchievements()
+        loadMonthlyAchievements()
+        restoreProgress()
+        updateProStatus()
+    }
+
     // MARK: - Persistence
 
     private func saveProgress() {

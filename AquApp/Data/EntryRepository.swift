@@ -56,6 +56,16 @@ final class EntryRepository {
         waterDays = nil
     }
 
+    /// « Supprimer mes données » : vide les trois tables.
+    func deleteAllEntries() throws {
+        try context.delete(model: WaterEntry.self)
+        try context.delete(model: WaterAlcoholEntry.self)
+        try context.delete(model: DayRecord.self)
+        try context.save()
+        daysToRecheck = []
+        invalidateCaches()
+    }
+
     // Eau et alcool sont rafraîchis ensemble : un seul horodatage de jour pour les deux.
     private func refreshTodayCacheIfNeeded() {
         let (start, end) = Self.dayRange(containing: Date())

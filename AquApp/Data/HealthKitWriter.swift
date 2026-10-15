@@ -115,6 +115,24 @@ final class HealthKitWriter {
         }
     }
 
+    /// « Supprimer mes données », option Santé : efface l'eau qu'AquApp a écrite dans Santé.
+    /// Les données des autres apps ne sont pas touchées (prédicat sur la source).
+    /// - Returns: le nombre d'échantillons supprimés (0 si Santé est indisponible ou refusé).
+    @discardableResult
+    func deleteAllWrittenByApp() async -> Int {
+        guard HKHealthStore.isHealthDataAvailable(),
+              authorizationStatus == .sharingAuthorized else { return 0 }
+        do {
+            return try await healthStore.deleteObjects(
+                of: waterType,
+                predicate: HKQuery.predicateForObjects(from: HKSource.default())
+            )
+        } catch {
+            print("⚠️ HealthKitWriter – deleteAll failed: \(error.localizedDescription)")
+            return 0
+        }
+    }
+
     // MARK: - Helpers privés
 
     private var authorizationStatus: HKAuthorizationStatus {

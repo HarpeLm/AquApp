@@ -213,6 +213,9 @@ struct ProfileView: View {
                         }
                         #endif
 
+                        // ── SECTION : Confidentialité (politique + « Supprimer mes données »)
+                        ProfilePrivacyView()
+
                         // ── SECTION : bannière Premium (tout en bas, avant les infos)
                         ProfilePremiumBannerView(isPremiumUser: isPremiumUser) {
                             showPremiumSheet = true

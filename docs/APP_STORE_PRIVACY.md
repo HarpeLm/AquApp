@@ -71,4 +71,3 @@ Justification : `WeatherManager` envoie la latitude et la longitude **arrondies 
 ## 5. Points à trancher avant de soumettre
 
 1. **Contact pour les demandes RGPD** : la politique renvoie vers GitHub Issues (public). Ajoute une adresse email dédiée si tu préfères que les demandes de suppression restent privées.
-2. **Suppression des données** : les éléments du Keychain survivent à la désinstallation. Un bouton « Supprimer mes données » dans l'app rendrait le droit à l'effacement effectif sans passer par toi.

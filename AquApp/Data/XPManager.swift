@@ -127,6 +127,15 @@ final class XPManager: ObservableObject {
         currentLevel = XPLevel.level(for: totalXP)
     }
 
+    /// Après « Supprimer mes données » : relit l'XP (remise à 0) et oublie les animations en attente.
+    func reloadAfterErase() {
+        totalXP      = HealthDataManager.shared.xpTotal
+        currentLevel = XPLevel.level(for: totalXP)
+        lastGain     = nil
+        lastLoss     = nil
+        didLevelUp   = false
+    }
+
     // MARK: - Barème eau (identique à XPSource.water)
 
     static func xpForAmount(_ ml: Double) -> Int {

@@ -457,6 +457,15 @@ class ChallengeManager: ObservableObject {
         }
     }
 
+    /// Après « Supprimer mes données » : défis du jour vierges.
+    func reloadAfterErase() {
+        cachedWorkoutEndDate = nil
+        workoutFetchedToday  = false
+        loadChallenges()
+        restoreProgress()
+        updateProStatus()
+    }
+
     private func saveTodayProgress() {
         for c in challenges {
             defaults.set(c.currentProgress, forKey: "progress_\(c.id)")
