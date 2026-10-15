@@ -135,9 +135,11 @@ struct OnboardingView: View {
                     .padding(.bottom, 48)
                 }
                 .transition(.move(edge: .leading).combined(with: .opacity))
+                // Plein écran pour les pages de présentation uniquement : l'écran du prénom
+                // garde les zones de sécurité (barre d'état, clavier).
+                .ignoresSafeArea()
             }
         }
-        .ignoresSafeArea()
     }
 }
 
