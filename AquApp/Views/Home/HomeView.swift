@@ -48,10 +48,13 @@ struct HomeView: View {
 
                         // MARK: Bannière canicule
                         if weatherManager.isHeatwave, let adapted = weatherManager.adaptedGoalMl {
-                            HeatwaveBanner(
-                                tempC: weatherManager.currentTemperatureC ?? 32,
-                                adaptedMl: adapted
-                            )
+                            VStack(alignment: .trailing, spacing: 6) {
+                                HeatwaveBanner(
+                                    tempC: weatherManager.currentTemperatureC ?? 32,
+                                    adaptedMl: adapted
+                                )
+                                WeatherAttributionView()
+                            }
                             .padding(.horizontal)
                             .transition(.move(edge: .top).combined(with: .opacity))
                         }

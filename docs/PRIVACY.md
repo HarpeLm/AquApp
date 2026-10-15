@@ -40,7 +40,7 @@ Ces données sont lues et utilisées **sur votre iPhone** : elles ne sont jamais
 ## 3. Données qui quittent votre appareil
 
 ### Météo (position approximative) — optionnel
-Si vous autorisez la localisation, AquApp envoie votre position **arrondie à environ 1 km** au service météo **Open-Meteo** (api.open-meteo.com) pour connaître la température locale. Aucun identifiant, nom ou donnée de santé n'accompagne cette requête. Sans autorisation de localisation, la fonction canicule est simplement désactivée.
+Si vous autorisez la localisation, AquApp envoie votre position **arrondie à environ 1 km** au service météo **WeatherKit d'Apple** pour connaître la température locale. Apple n'utilise cette position que pour fournir la météo, sans l'associer à votre identité. Aucun identifiant, nom ou donnée de santé n'accompagne cette requête. Sans autorisation de localisation, la fonction canicule est simplement désactivée.
 
 ### Siri et Raccourcis — si vous les utilisez
 Les commandes vocales sont traitées par Apple selon sa propre politique de confidentialité. AquApp reçoit seulement l'action demandée (par exemple « ajouter 250 ml d'eau »).

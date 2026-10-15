@@ -16,7 +16,7 @@
     <!-- 1. Données collectées -->
     <key>NSPrivacyCollectedDataTypes</key>
     <array>
-        <!-- Position approximative (2 décimales, ~1 km) envoyée à api.open-meteo.com
+        <!-- Position approximative (2 décimales, ~1 km) envoyée à WeatherKit (Apple)
              pour obtenir la température et adapter l'objectif en cas de canicule
              (WeatherManager). Aucun identifiant n'accompagne la requête. -->
         <dict>

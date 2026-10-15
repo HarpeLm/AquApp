@@ -7088,6 +7088,23 @@
         }
       }
     },
+    "weather.attribution.sources" : {
+      "comment" : "Lien vers les sources légales de WeatherKit, affiché sous la bannière canicule (obligatoire)",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Weather data sources"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sources des données météo"
+          }
+        }
+      }
+    },
     "widget.tag0" : {
       "comment" : "Name of a widget tag.",
       "localizations" : {

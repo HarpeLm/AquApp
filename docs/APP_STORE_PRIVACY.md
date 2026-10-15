@@ -26,9 +26,9 @@ Un seul type de données est concerné.
 | Liée à l'identité de l'utilisateur ? | **Non** |
 | Utilisée pour le suivi (tracking) ? | **Non** |
 
-Justification : `WeatherManager` envoie la latitude et la longitude **arrondies à 2 décimales (~1 km)** à `api.open-meteo.com` pour obtenir la température et adapter l'objectif en cas de canicule. Aucun identifiant n'accompagne la requête. C'est facultatif : sans autorisation de localisation, rien n'est envoyé.
+Justification : `WeatherManager` envoie la latitude et la longitude **arrondies à 2 décimales (~1 km)** au service **WeatherKit d'Apple** pour obtenir la température et adapter l'objectif en cas de canicule. Aucun identifiant n'accompagne la requête. C'est facultatif : sans autorisation de localisation, rien n'est envoyé.
 
-> Pourquoi « Oui » plutôt que « Non » : Apple exempte les données traitées en temps réel et non conservées, mais nous ne contrôlons pas la conservation côté Open-Meteo. Déclarer est la réponse prudente, et c'est cohérent avec `PrivacyInfo.xcprivacy`.
+> Pourquoi « Oui » plutôt que « Non » : Apple exempte les données traitées en temps réel et non conservées. Apple indique que WeatherKit n'utilise la position que pour fournir la météo, sans l'associer à l'identité de l'utilisateur ; mais la position quitte bien l'appareil. Déclarer reste la réponse prudente, et c'est cohérent avec `PrivacyInfo.xcprivacy`.
 
 ---
 
@@ -62,7 +62,7 @@ Justification : `WeatherManager` envoie la latitude et la longitude **arrondies 
 
 > AquApp is a hydration tracker that works fully offline, with no account.
 > • Apple Health: requested at the end of onboarding, after an explanation screen. The app writes water intake, and reads steps, workouts, sleep and water only to validate specific challenges/achievements. Health data never leaves the device.
-> • Location (optional): an approximate position (~1 km) is sent to Open-Meteo to raise the daily goal during heatwaves.
+> • Location (optional): an approximate position (~1 km) is sent to Apple's WeatherKit to raise the daily goal during heatwaves. The Apple Weather attribution and legal link are shown under the heatwave banner.
 > • Siri: App Shortcuts “Add water in AquApp”, “Log a drink in AquApp”, “My progress in AquApp”.
 > • Premium: not available for purchase in this version (the app is free at launch).
 
@@ -71,5 +71,4 @@ Justification : `WeatherManager` envoie la latitude et la longitude **arrondies 
 ## 5. Points à trancher avant de soumettre
 
 1. **Contact pour les demandes RGPD** : la politique renvoie vers GitHub Issues (public). Ajoute une adresse email dédiée si tu préfères que les demandes de suppression restent privées.
-2. **Open-Meteo** : l'API gratuite est réservée à un usage **non commercial**. Avec un abonnement Premium, il faudra un plan payant Open-Meteo ou passer à **WeatherKit** (inclus avec le compte développeur Apple, 500 000 appels/mois).
-3. **Suppression des données** : les éléments du Keychain survivent à la désinstallation. Un bouton « Supprimer mes données » dans l'app rendrait le droit à l'effacement effectif sans passer par toi.
+2. **Suppression des données** : les éléments du Keychain survivent à la désinstallation. Un bouton « Supprimer mes données » dans l'app rendrait le droit à l'effacement effectif sans passer par toi.

@@ -127,16 +127,20 @@ struct GoalEditorSheet: View {
                                 .scaledFont(size: 18)
                                 .foregroundColor(.red)
                                 .accessibilityHidden(true)
-                            VStack(alignment: .leading, spacing: 2) {
-                                Text(String(localized: "goal.editor.heatwave_note"))
-                                    .scaledFont(size: 12, weight: .semibold)
-                                Text(String(format: String(localized: "heatwave.banner_body"),
-                                            UnitFormatter.volume(heatwaveGoalMl)))
-                                    .scaledFont(size: 12)
-                                    .foregroundColor(.secondary)
+                            VStack(alignment: .leading, spacing: 6) {
+                                VStack(alignment: .leading, spacing: 2) {
+                                    Text(String(localized: "goal.editor.heatwave_note"))
+                                        .scaledFont(size: 12, weight: .semibold)
+                                    Text(String(format: String(localized: "heatwave.banner_body"),
+                                                UnitFormatter.volume(heatwaveGoalMl)))
+                                        .scaledFont(size: 12)
+                                        .foregroundColor(.secondary)
+                                }
+                                .multilineTextAlignment(.leading)
+                                .accessibilityElement(children: .combine)
+                                // Hors du bloc combiné : le lien reste activable avec VoiceOver
+                                WeatherAttributionView()
                             }
-                            .multilineTextAlignment(.leading)
-                            .accessibilityElement(children: .combine)
                             Spacer()
                         }
                         .padding(16)

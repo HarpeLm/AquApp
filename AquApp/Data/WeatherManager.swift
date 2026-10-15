@@ -3,10 +3,12 @@ import CoreLocation
 import UserNotifications
 import SwiftUI
 import Combine
+import WeatherKit
+
 
 // MARK: - WeatherManager
 // 1. Géolocalisation (CoreLocation)
-// 2. Température via Open-Meteo (gratuit, sans clé API)
+// 2. La detection de la température se fait mainteant par WeatherKit vu que l'on propose un application payante
 // 3. Détection canicule (≥ 32°C)
 // 4. Objectif adaptatif selon la chaleur (+200ml/degré au-dessus de 32°C)
 // 5. Notification canicule unique par jour
@@ -64,42 +66,26 @@ final class WeatherManager: NSObject, ObservableObject, CLLocationManagerDelegat
         }
     }
 
-    // MARK: - Fetch température avec timeout
+    // MARK: - Fetch température (WeatherKit)
+
+    /// Arrondi à 2 décimales (~1 km) : suffisant pour la météo, et reste une
+    /// « position approximative » au sens d'Apple (fiche de confidentialité, PrivacyInfo).
+    static func coarseLocation(latitude lat: Double, longitude lon: Double) -> CLLocation {
+        CLLocation(
+            latitude:  (lat * 100).rounded() / 100,
+            longitude: (lon * 100).rounded() / 100
+        )
+    }
 
     private func fetchTemperature(lat: Double, lon: Double) {
-        var comps = URLComponents(string: "https://api.open-meteo.com/v1/forecast")!
-        comps.queryItems = [
-            // 2 décimales (~1 km) : suffisant pour la météo, et reste une « position
-            // approximative » au sens d'Apple (fiche de confidentialité, PrivacyInfo).
-            URLQueryItem(name: "latitude",      value: String(format: "%.2f", lat)),
-            URLQueryItem(name: "longitude",     value: String(format: "%.2f", lon)),
-            URLQueryItem(name: "current",       value: "temperature_2m"),
-            URLQueryItem(name: "forecast_days", value: "1"),
-        ]
-        guard let url = comps.url else { return }
-
-        // ✅ Timeout réseau : 5 secondes max pour ne pas bloquer l'UI
-        var request = URLRequest(url: url)
-        request.timeoutInterval = 5
+        let coarse = Self.coarseLocation(latitude: lat, longitude: lon)
 
         Task { @MainActor in
             do {
-                let (data, response) = try await URLSession.shared.data(for: request)
-
-                // Vérifie que le serveur a répondu avec un code HTTP 200
-                guard let httpResponse = response as? HTTPURLResponse,
-                      httpResponse.statusCode == 200 else {
-                    applyTemperature(nil)
-                    return
-                }
-
-                let json = try JSONDecoder().decode(OpenMeteoResponse.self, from: data)
-                applyTemperature(json.current.temperature_2m)
-
-            } catch URLError.timedOut {
-                // Timeout silencieux — on désactive la bannière sans crasher
-                applyTemperature(nil)
+                let current = try await WeatherService.shared.weather(for: coarse, including: .current)
+                applyTemperature(current.temperature.converted(to: .celsius).value)
             } catch {
+                // Capacité non activée, hors ligne, quota… : on désactive la bannière sans crasher
                 applyTemperature(nil)
             }
         }
@@ -107,7 +93,8 @@ final class WeatherManager: NSObject, ObservableObject, CLLocationManagerDelegat
 
     // MARK: - Application de la température
 
-    private func applyTemperature(_ temp: Double?) {
+    // Interne (et non privée) pour être testable sans appel réseau
+    func applyTemperature(_ temp: Double?) {
         currentTemperatureC = temp
         let wasHeatwave = isHeatwave
 
@@ -145,9 +132,3 @@ final class WeatherManager: NSObject, ObservableObject, CLLocationManagerDelegat
     }
 }
 
-// MARK: - Décodage Open-Meteo
-
-private struct OpenMeteoResponse: Decodable {
-    struct Current: Decodable { let temperature_2m: Double }
-    let current: Current
-}
