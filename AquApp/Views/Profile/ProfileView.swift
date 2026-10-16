@@ -120,13 +120,18 @@ struct ProfileView: View {
                     VStack(spacing: 24) {
                         Color.clear.frame(height: 0).id("top")
 
-                        VStack(alignment: .leading, spacing: 4) {
-                            Text("profile.title")          // → "Profil"
-                                .scaledFont(size: 32, weight: .bold)
-                                .accessibilityAddTraits(.isHeader)
-                            Text("profile.subtitle")       // → "Gérez vos préférences"
-                                .font(.subheadline)
-                                .foregroundColor(.secondary)
+                        HStack(alignment: .top) {
+                            VStack(alignment: .leading, spacing: 4) {
+                                Text("profile.title")          // → "Profil"
+                                    .scaledFont(size: 32, weight: .bold)
+                                    .accessibilityAddTraits(.isHeader)
+                                Text("profile.subtitle")       // → "Gérez vos préférences"
+                                    .font(.subheadline)
+                                    .foregroundColor(.secondary)
+                            }
+                            Spacer()
+                            // Menu « ⋯ » : confidentialité (et futures options secondaires)
+                            ProfileMoreMenu()
                         }
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .padding(.horizontal)
@@ -213,17 +218,19 @@ struct ProfileView: View {
                         }
                         #endif
 
-                        // ── SECTION : Confidentialité (politique + « Supprimer mes données »)
-                        ProfilePrivacyView()
-
                         // ── SECTION : bannière Premium (tout en bas, avant les infos)
                         ProfilePremiumBannerView(isPremiumUser: isPremiumUser) {
                             showPremiumSheet = true
                         }
 
+                        // ── Avertissement santé (détaillé dans la politique, menu « ⋯ »)
+                        Label(String(localized: "privacy.medical_notice"), systemImage: "stethoscope")
+                            .scaledFont(size: 12)
+                            .foregroundColor(.secondary)
+                            .padding(.horizontal, 24)
+
                         // ── Info app
                         appInfoSection
-                            .padding(.top, 8)
 
                         Color.clear.frame(height: 16)
                     }

@@ -289,7 +289,7 @@ final class DataEraserTests: XCTestCase {
             let path = try XCTUnwrap(Bundle.main.path(forResource: language, ofType: "lproj"))
             let bundle = try XCTUnwrap(Bundle(path: path))
             for key in ["privacy.section.title", "privacy.policy", "privacy.erase.button",
-                        "privacy.erase.subtitle", "privacy.erase.confirm.title",
+                        "privacy.erase.confirm.title", "profile.more_options",
                         "privacy.erase.confirm.message", "privacy.erase.confirm.app_only",
                         "privacy.erase.confirm.with_health", "privacy.erase.confirm.cancel"] {
                 let value = bundle.localizedString(forKey: key, value: nil, table: "Localizable")
