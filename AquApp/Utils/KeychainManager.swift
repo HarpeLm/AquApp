@@ -33,7 +33,11 @@ final class KeychainManager {
         set(withUnsafeBytes(of: value) { Data($0) }, forKey: key)
     }
 
+    /// Nombre d'écritures depuis le lancement (diagnostic, utilisé par les tests de performance).
+    private(set) static var writeCount = 0
+
     private func set(_ data: Data, forKey key: String) {
+        Self.writeCount += 1
         let query: [String: Any] = [
             kSecClass as String: kSecClassGenericPassword,
             kSecAttrService as String: service,

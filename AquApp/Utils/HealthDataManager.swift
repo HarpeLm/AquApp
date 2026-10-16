@@ -94,49 +94,66 @@ final class HealthDataManager: ObservableObject {
     }
 
     // MARK: - Setters profil
+    // Chaque écriture dans le Trousseau coûte (suppression + ajout) : on n'écrit que
+    // si la valeur change. Ajouter de l'eau rappelle ces setters des dizaines de fois.
 
-    func setWeight(_ v: Double)    { km.set(v, forKey: "userWeightKg");  weightKg = v }
-    func setHeight(_ v: Double)    { km.set(v, forKey: "userHeightCm");  heightCm = v }
-    func setGender(_ v: String)    { km.set(v, forKey: "userGender");    gender = v }
-    func setFirstName(_ v: String) { km.set(v, forKey: "userFirstName"); firstName = v }
+    func setWeight(_ v: Double)    { guard v != weightKg  else { return }; km.set(v, forKey: "userWeightKg");  weightKg = v }
+    func setHeight(_ v: Double)    { guard v != heightCm  else { return }; km.set(v, forKey: "userHeightCm");  heightCm = v }
+    func setGender(_ v: String)    { guard v != gender    else { return }; km.set(v, forKey: "userGender");    gender = v }
+    func setFirstName(_ v: String) { guard v != firstName else { return }; km.set(v, forKey: "userFirstName"); firstName = v }
 
     // MARK: - Setters streaks/progression
 
-    func setCurrentStreak(_ v: Int)     { km.set(Double(v), forKey: "current_streak");  currentStreak = v }
-    func setTotalGoalDays(_ v: Int)     { km.set(Double(v), forKey: "total_goal_days"); totalGoalDays = v }
-    func setSoberStreak(_ v: Int)       { km.set(Double(v), forKey: "sober_streak");    soberStreak = v }
-    func setXPTotal(_ v: Int)           { km.set(Double(v), forKey: "xp_total");        xpTotal = v }
-    func setHeatwaveDays(_ v: Double)   { km.set(v, forKey: "heatwave_days");           heatwaveDays = v }
-    func setSoberDaysTotal(_ v: Double) { km.set(v, forKey: "sober_days_total");        soberDaysTotal = v }
+    func setCurrentStreak(_ v: Int)     { guard v != currentStreak  else { return }; km.set(Double(v), forKey: "current_streak");  currentStreak = v }
+    func setTotalGoalDays(_ v: Int)     { guard v != totalGoalDays  else { return }; km.set(Double(v), forKey: "total_goal_days"); totalGoalDays = v }
+    func setSoberStreak(_ v: Int)       { guard v != soberStreak    else { return }; km.set(Double(v), forKey: "sober_streak");    soberStreak = v }
+    func setXPTotal(_ v: Int)           { guard v != xpTotal        else { return }; km.set(Double(v), forKey: "xp_total");        xpTotal = v }
+    func setHeatwaveDays(_ v: Double)   { guard v != heatwaveDays   else { return }; km.set(v, forKey: "heatwave_days");           heatwaveDays = v }
+    func setSoberDaysTotal(_ v: Double) { guard v != soberDaysTotal else { return }; km.set(v, forKey: "sober_days_total");        soberDaysTotal = v }
     func setFirstLaunchDate(_ v: Date) {
         km.set(String(v.timeIntervalSince1970), forKey: "aquapp_first_launch_date")
         firstLaunchDate = v
     }
     func setPrunedAlcoholDate(_ v: Date) {
+        guard v != prunedAlcoholDate else { return }
         km.set(v.timeIntervalSince1970, forKey: "pruned_alcohol_date")
         prunedAlcoholDate = v
     }
 
     // MARK: - Setters totaux cumulatifs (O(1))
 
-    func setTotalWaterMl(_ v: Double)   { km.set(v, forKey: "total_water_ml");   totalWaterMl = v }
-    func setTotalAlcoholMl(_ v: Double) { km.set(v, forKey: "total_alcohol_ml"); totalAlcoholMl = v }
+    func setTotalWaterMl(_ v: Double)   { guard v != totalWaterMl   else { return }; km.set(v, forKey: "total_water_ml");   totalWaterMl = v }
+    func setTotalAlcoholMl(_ v: Double) { guard v != totalAlcoholMl else { return }; km.set(v, forKey: "total_alcohol_ml"); totalAlcoholMl = v }
     func addWaterMl(_ delta: Double)    { setTotalWaterMl(totalWaterMl + delta) }
     func addAlcoholMl(_ delta: Double)  { setTotalAlcoholMl(totalAlcoholMl + delta) }
 
     // MARK: - Progrès succès/défis
 
     func setAchievementProgress(_ id: String, value: Double) {
-        achievementProgress[id] = value
-        saveJSON(dict: achievementProgress, key: "ach_progress_dict")
+        setAchievementStates(progress: [id: value], completed: [:])
     }
 
     func setAchievementCompleted(_ id: String, value: Bool) {
-        achievementCompleted[id] = value
-        saveJSON(dict: achievementCompleted, key: "ach_completed_dict")
+        setAchievementStates(progress: [:], completed: [id: value])
+    }
+
+    /// Enregistre l'état de plusieurs succès en une fois : chaque dictionnaire est écrit
+    /// au plus une fois, et seulement s'il a changé.
+    func setAchievementStates(progress: [String: Double], completed: [String: Bool]) {
+        let newProgress  = achievementProgress.merging(progress) { _, new in new }
+        let newCompleted = achievementCompleted.merging(completed) { _, new in new }
+        if newProgress != achievementProgress {
+            achievementProgress = newProgress
+            saveJSON(dict: newProgress, key: "ach_progress_dict")
+        }
+        if newCompleted != achievementCompleted {
+            achievementCompleted = newCompleted
+            saveJSON(dict: newCompleted, key: "ach_completed_dict")
+        }
     }
 
     func setChallengeCompleted(_ id: String, value: Bool) {
+        guard challengeCompleted[id] != value else { return }
         challengeCompleted[id] = value
         saveJSON(dict: challengeCompleted, key: "completed_dict")
     }
@@ -174,11 +191,30 @@ final class HealthDataManager: ObservableObject {
     // MARK: - Migration UserDefaults → Keychain
 
     private func migrateIfNeeded() {
-        for key in ["userWeightKg", "userHeightCm", "userGender", "userFirstName",
-                    "current_streak", "total_goal_days", "sober_streak", "xp_total",
-                    "heatwave_days", "sober_days_total", "aquapp_first_launch_date",
-                    "total_water_ml", "total_alcohol_ml"]
-            where d.object(forKey: key) != nil { d.removeObject(forKey: key) }
+        // Valeurs lues dans l'ancien UserDefaults (init) : on les recopie dans le Trousseau
+        // AVANT d'effacer la copie plist. Les setters n'écrivent plus une valeur inchangée,
+        // donc sans cette copie elles seraient perdues au lancement suivant.
+        let legacy: [(String, () -> Void)] = [
+            ("userWeightKg",     { self.km.set(self.weightKg, forKey: "userWeightKg") }),
+            ("userHeightCm",     { self.km.set(self.heightCm, forKey: "userHeightCm") }),
+            ("userGender",       { self.km.set(self.gender, forKey: "userGender") }),
+            ("userFirstName",    { self.km.set(self.firstName, forKey: "userFirstName") }),
+            ("current_streak",   { self.km.set(Double(self.currentStreak), forKey: "current_streak") }),
+            ("total_goal_days",  { self.km.set(Double(self.totalGoalDays), forKey: "total_goal_days") }),
+            ("sober_streak",     { self.km.set(Double(self.soberStreak), forKey: "sober_streak") }),
+            ("xp_total",         { self.km.set(Double(self.xpTotal), forKey: "xp_total") }),
+            ("heatwave_days",    { self.km.set(self.heatwaveDays, forKey: "heatwave_days") }),
+            ("sober_days_total", { self.km.set(self.soberDaysTotal, forKey: "sober_days_total") }),
+            ("aquapp_first_launch_date", {
+                self.km.set(String(self.firstLaunchDate.timeIntervalSince1970), forKey: "aquapp_first_launch_date")
+            }),
+            ("total_water_ml",   { self.km.set(self.totalWaterMl, forKey: "total_water_ml") }),
+            ("total_alcohol_ml", { self.km.set(self.totalAlcoholMl, forKey: "total_alcohol_ml") }),
+        ]
+        for (key, copyToKeychain) in legacy where d.object(forKey: key) != nil {
+            copyToKeychain()
+            d.removeObject(forKey: key)
+        }
 
         var achProg = achievementProgress
         var achComp = achievementCompleted
@@ -233,10 +269,17 @@ final class HealthDataManager: ObservableObject {
     // MARK: - Tests
 
     func resetForTests() {
-        setWeight(70); setHeight(170); setGender("notSpecified"); setFirstName("")
-        setCurrentStreak(0); setTotalGoalDays(0); setSoberStreak(0); setXPTotal(0)
-        setHeatwaveDays(0); setSoberDaysTotal(0)
-        setTotalWaterMl(0); setTotalAlcoholMl(0)
+        // Écrit même si la mémoire contient déjà ces valeurs (les setters les ignoreraient)
+        km.set(70.0, forKey: "userWeightKg");          weightKg = 70
+        km.set(170.0, forKey: "userHeightCm");         heightCm = 170
+        km.set("notSpecified", forKey: "userGender");  gender = "notSpecified"
+        km.set("", forKey: "userFirstName");           firstName = ""
+        for key in ["current_streak", "total_goal_days", "sober_streak", "xp_total",
+                    "heatwave_days", "sober_days_total", "total_water_ml", "total_alcohol_ml"] {
+            km.set(0.0, forKey: key)
+        }
+        currentStreak = 0; totalGoalDays = 0; soberStreak = 0; xpTotal = 0
+        heatwaveDays = 0; soberDaysTotal = 0; totalWaterMl = 0; totalAlcoholMl = 0
         km.delete(forKey: "pruned_alcohol_date"); prunedAlcoholDate = nil
         achievementProgress = [:]; achievementCompleted = [:]; challengeCompleted = [:]
         saveJSON(dict: achievementProgress, key: "ach_progress_dict")

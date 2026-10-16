@@ -393,11 +393,14 @@ final class AchievementManager: ObservableObject {
 
     // MARK: - Persistence
 
+    /// Un seul lot : au plus deux écritures dans le Trousseau, et aucune si rien n'a changé
+    /// (auparavant : deux écritures par succès, à chaque mise à jour).
     private func saveProgress() {
-        for a in achievements + monthlyAchievements {
-            HealthDataManager.shared.setAchievementProgress(a.id, value: a.currentProgress)
-            HealthDataManager.shared.setAchievementCompleted(a.id, value: a.status == .completed)
-        }
+        let all = achievements + monthlyAchievements
+        HealthDataManager.shared.setAchievementStates(
+            progress:  Dictionary(all.map { ($0.id, $0.currentProgress) }, uniquingKeysWith: { _, last in last }),
+            completed: Dictionary(all.map { ($0.id, $0.status == .completed) }, uniquingKeysWith: { _, last in last })
+        )
     }
 
     private func restoreProgress() {
