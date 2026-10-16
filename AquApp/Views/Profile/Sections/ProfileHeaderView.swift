@@ -136,7 +136,7 @@ struct ProfileHeaderView: View {
                 )
                 Divider().frame(height: 36)
                 ProfileStatCell(
-                    value:  String(format: "%.1f L", totalWaterLiters),
+                    value:  UnitFormatter.largeVolume(totalWaterLiters * 1000),
                     label:  String(localized: "profile.stats.total_water"),
                     color:  Color.app.greenDark,
                     symbol: "drop.fill"

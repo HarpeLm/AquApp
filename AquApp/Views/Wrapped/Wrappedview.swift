@@ -686,7 +686,7 @@ struct WrappedSoberSlide: View {
                         Text(String(localized: "wrapped.sober.alcohol_consumed"))
                             .scaledFont(size: 11)
                             .foregroundColor(.white.opacity(0.3))
-                        Text(String(format: "%.1f L", data.alcoholLiters))
+                        Text(UnitFormatter.largeVolume(data.alcoholLiters * 1000))
                             .scaledFont(size: 17, weight: .bold)
                             .foregroundColor(.white.opacity(0.55))
                         if !data.topAlcoholKind.isEmpty {
@@ -936,7 +936,7 @@ struct WrappedFinaleSlide: View {
 
                 VStack(spacing: 8) {
                     WrappedSummaryRow(label: String(localized: "wrapped.finale.water"),
-                                       value: String(format: "%.0f L", data.totalLiters), color: Color.app.primary)
+                                       value: UnitFormatter.largeVolume(data.totalLiters * 1000, fractionDigits: 0), color: Color.app.primary)
                     WrappedSummaryRow(label: String(localized: "wrapped.finale.goaldays"),
                                        value: "\(data.goalDays)", color: Color.app.alcoholLight)
                     WrappedSummaryRow(label: String(localized: "wrapped.finale.soberdays"),
@@ -1106,7 +1106,7 @@ private struct WrappedShareCardPreview: View {
                     .kerning(0.5)
             }
             LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 6) {
-                WrappedMiniStat(value: String(format: "%.0f L", data.totalLiters), label: String(localized: "wrapped.finale.water"), color: Color.app.primary)
+                WrappedMiniStat(value: UnitFormatter.largeVolume(data.totalLiters * 1000, fractionDigits: 0), label: String(localized: "wrapped.finale.water"), color: Color.app.primary)
                 WrappedMiniStat(value: "\(data.goalDays)j", label: String(localized: "wrapped.finale.goaldays"), color: Color.app.alcoholLight)
                 WrappedMiniStat(value: "\(data.soberDays)j", label: String(localized: "wrapped.finale.soberdays"), color: Color.app.greenDark)
                 WrappedMiniStat(value: data.xpLevelName, label: String(localized: "wrapped.xp.eyebrow"), color: Color.app.amber)
@@ -1176,7 +1176,7 @@ struct WrappedShareCard: View {
                     .padding(.horizontal, 60)
 
                 VStack(spacing: 16) {
-                    WrappedExportStatRow(label: String(localized: "wrapped.finale.water"), value: String(format: "%.0f L", data.totalLiters), color: Color.app.primary)
+                    WrappedExportStatRow(label: String(localized: "wrapped.finale.water"), value: UnitFormatter.largeVolume(data.totalLiters * 1000, fractionDigits: 0), color: Color.app.primary)
                     WrappedExportStatRow(label: String(localized: "wrapped.finale.goaldays"), value: "\(data.goalDays) jours", color: Color.app.alcoholLight)
                     WrappedExportStatRow(label: String(localized: "wrapped.finale.soberdays"), value: "\(data.soberDays) jours", color: Color.app.greenDark)
                     WrappedExportStatRow(label: String(localized: "wrapped.finale.beststreak"), value: "\(data.bestStreak) jours", color: Color.app.amber)

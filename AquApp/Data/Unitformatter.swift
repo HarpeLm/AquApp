@@ -78,9 +78,51 @@ enum UnitFormatter {
         return f.string(from: NSNumber(value: converted.value)) ?? "\(Int(converted.value))"
     }
 
-    /// Symbole de l'unité de volume selon la locale ("ml" ou "fl oz").
+    /// Symbole de l'unité de volume, tel que la langue l'écrit ("ml" en français, "fl oz"
+    /// aux États-Unis). `UnitVolume.symbol` donnerait "mL" partout.
     static var volumeUnitSymbol: String {
-        preferredVolumeUnit.symbol
+        localizedSymbol(preferredVolumeUnit)
+    }
+
+    // MARK: - Grands volumes (litres, ou gallons aux États-Unis)
+
+    /// Ex. : 78 400 ml → "78,4 l" (FR) / "78.4 l" (en-GB) / "20.7 gal" (en-US)
+    static func largeVolume(_ ml: Double, fractionDigits: Int = 1) -> String {
+        let f = MeasurementFormatter()
+        f.unitOptions = .providedUnit
+        f.numberFormatter.minimumFractionDigits = fractionDigits
+        f.numberFormatter.maximumFractionDigits = fractionDigits
+        return f.string(from: Measurement(value: ml, unit: UnitVolume.milliliters).converted(to: largeVolumeUnit))
+    }
+
+    /// Valeur seule, avec le séparateur décimal de la langue. Ex. : 400 ml → "0,4" (FR)
+    static func largeVolumeNumber(_ ml: Double, fractionDigits: Int = 1) -> String {
+        let value = Measurement(value: ml, unit: UnitVolume.milliliters).converted(to: largeVolumeUnit).value
+        let f = NumberFormatter()
+        f.numberStyle = .decimal
+        f.minimumFractionDigits = fractionDigits
+        f.maximumFractionDigits = fractionDigits
+        return f.string(from: NSNumber(value: value)) ?? String(value)
+    }
+
+    /// "l" en français, "gal" aux États-Unis.
+    static var largeVolumeUnitSymbol: String {
+        localizedSymbol(largeVolumeUnit)
+    }
+
+    private static var largeVolumeUnit: UnitVolume {
+        preferredVolumeUnit == .fluidOunces ? .gallons : .liters
+    }
+
+    /// Symbole court localisé : on formate 0 dans l'unité et on retire le nombre.
+    private static func localizedSymbol(_ unit: UnitVolume) -> String {
+        let f = MeasurementFormatter()
+        f.unitOptions = .providedUnit
+        f.numberFormatter.maximumFractionDigits = 0
+        let zero = f.numberFormatter.string(from: 0) ?? "0"
+        return f.string(from: Measurement(value: 0, unit: unit))
+            .replacingOccurrences(of: zero, with: "")
+            .trimmingCharacters(in: .whitespaces.union(CharacterSet(charactersIn: "\u{00A0}\u{202F}")))
     }
 
     /// Convertit une saisie faite dans l'unité affichée (ml, ou fl oz aux États-Unis) en ml.

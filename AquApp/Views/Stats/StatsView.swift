@@ -126,8 +126,8 @@ struct StatsView: View {
                         MetricCard(
                             sfSymbol:    "wineglass.fill",
                             symbolColor: .purple,
-                            value:       String(format: "%.1f", store.weekAlcoholLiters),
-                            unit:        "L",
+                            value:       UnitFormatter.largeVolumeNumber(store.weekAlcoholLiters * 1000),
+                            unit:        UnitFormatter.largeVolumeUnitSymbol,
                             label:       L10n.statsAlcoholWeek
                         )
                     }
@@ -598,12 +598,12 @@ struct AlcoolAnalysisCard: View {
                     HStack(spacing: 16) {
                         StatPill(
                             label: String(localized: "stats.this_week"),
-                            value: String(format: "%.2f L", weekLiters),
+                            value: UnitFormatter.largeVolume(weekLiters * 1000, fractionDigits: 2),
                             color: .purple
                         )
                         StatPill(
                             label: String(localized: "stats.this_month"),
-                            value: String(format: "%.2f L", monthLiters),
+                            value: UnitFormatter.largeVolume(monthLiters * 1000, fractionDigits: 2),
                             color: Color.app.primary
                         )
                     }
