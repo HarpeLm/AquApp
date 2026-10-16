@@ -8,6 +8,7 @@
 
 import XCTest
 import SwiftUI
+import SwiftData
 @testable import AquApp
 
 @MainActor
@@ -231,6 +232,77 @@ final class ChallengeManagerTests: XCTestCase {
         let stamp = UserDefaults.standard.object(forKey: "challenges_last_reset") as? Date
         manager.performDailyReset() // même jour → no-op
         XCTAssertEqual(UserDefaults.standard.object(forKey: "challenges_last_reset") as? Date, stamp)
+    }
+
+    // MARK: - Nouveau jour sans relance de l'app (bug : défis de la veille encore affichés)
+
+    /// Simule une progression de la veille encore en mémoire.
+    private func leaveYesterdaysProgress() {
+        manager.onWaterUpdated(totalTodayMl: 1500, dailyGoalMl: 2000, dailyGoalReached: false,
+                               drinkCount: 4, mlBeforeNine: 200, waterEntries: [], alcoholCount: 0)
+        XCTAssertEqual(manager.ch(id: "grand_buveur").currentProgress, 1500)
+        XCTAssertEqual(manager.ch(id: "matinal").status, .completed)
+        let yesterday = Calendar.current.date(byAdding: .day, value: -1, to: Date())!
+        UserDefaults.standard.set(yesterday, forKey: "challenges_last_reset")
+    }
+
+    func testFirstWaterOfANewDay_startsFromBlankChallenges() {
+        leaveYesterdaysProgress()
+
+        let late = Calendar.current.date(bySettingHour: 10, minute: 0, second: 0, of: Date())!
+        manager.onWaterUpdated(totalTodayMl: 250, dailyGoalMl: 2000, dailyGoalReached: false,
+                               drinkCount: 1, mlBeforeNine: 0,
+                               waterEntries: [WaterEntry(amountMl: 250, date: late)], alcoholCount: 0)
+
+        XCTAssertEqual(manager.ch(id: "grand_buveur").currentProgress, 250, "seulement l'eau du jour")
+        XCTAssertNotEqual(manager.ch(id: "matinal").status, .completed, "le matinal d'hier ne compte pas")
+        XCTAssertNotEqual(manager.ch(id: "regulier").status, .completed)
+    }
+
+    func testFirstAlcoholOfANewDay_resetsChallengesToo() {
+        leaveYesterdaysProgress()
+        manager.onAlcoholUpdated(alcoholCount: 1, dailyGoalReached: false)
+        XCTAssertEqual(manager.ch(id: "grand_buveur").currentProgress, 0)
+        XCTAssertNotEqual(manager.ch(id: "matinal").status, .completed)
+    }
+
+    /// Le vrai scénario : la tâche de fond de minuit (sans ChallengeManager) a déjà marqué
+    /// `last_reset_date` ; au retour au premier plan, les défis doivent quand même repartir de zéro.
+    func testForeground_afterBackgroundMidnightTask_resetsChallenges() throws {
+        let container = try ModelContainer(
+            for: WaterEntry.self, WaterAlcoholEntry.self, DayRecord.self,
+            configurations: ModelConfiguration(isStoredInMemoryOnly: true)
+        )
+        let store = AppDataStore(modelContext: container.mainContext)
+        store.challengeManager = manager
+        let resetManager = DailyResetManager(store: store)
+
+        leaveYesterdaysProgress()
+        UserDefaults.standard.set(Calendar.current.startOfDay(for: Date()), forKey: "last_reset_date")
+
+        resetManager.handleForeground()
+
+        XCTAssertEqual(manager.ch(id: "grand_buveur").currentProgress, 0)
+        XCTAssertNotEqual(manager.ch(id: "matinal").status, .completed)
+        XCTAssertNotEqual(manager.ch(id: "regulier").status, .completed)
+        let stamp = try XCTUnwrap(UserDefaults.standard.object(forKey: "challenges_last_reset") as? Date)
+        XCTAssertTrue(Calendar.current.isDateInToday(stamp))
+    }
+
+    func testForeground_sameDay_keepsTodaysProgress() throws {
+        let container = try ModelContainer(
+            for: WaterEntry.self, WaterAlcoholEntry.self, DayRecord.self,
+            configurations: ModelConfiguration(isStoredInMemoryOnly: true)
+        )
+        let store = AppDataStore(modelContext: container.mainContext)
+        store.challengeManager = manager
+        let resetManager = DailyResetManager(store: store)
+
+        manager.onWaterUpdated(totalTodayMl: 1200, dailyGoalMl: 2000, dailyGoalReached: false,
+                               drinkCount: 2, mlBeforeNine: 0, waterEntries: [], alcoholCount: 0)
+        resetManager.handleForeground()
+
+        XCTAssertEqual(manager.ch(id: "grand_buveur").currentProgress, 1200)
     }
 
     // MARK: - Progress ratio

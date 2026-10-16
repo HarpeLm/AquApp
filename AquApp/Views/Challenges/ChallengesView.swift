@@ -252,6 +252,9 @@ class ChallengeManager: ObservableObject {
 
     // MARK: - Reset quotidien
 
+    /// Remet les défis à zéro au premier appel de chaque jour, puis ne fait plus rien.
+    /// Ne dépend que de `challenges_last_reset` : la tâche de fond de minuit (qui n'a pas
+    /// de ChallengeManager) peut marquer `last_reset_date` sans que les défis soient perdus.
     func performDailyReset() {
         let today     = Calendar.current.startOfDay(for: Date())
         let lastReset = defaults.object(forKey: "challenges_last_reset") as? Date
@@ -292,6 +295,9 @@ class ChallengeManager: ObservableObject {
         waterEntries:     [WaterEntry],
         alcoholCount:     Int
     ) {
+        // Premier ajout d'un nouveau jour : on repart de défis vierges
+        performDailyReset()
+
         if mlBeforeNine > 0 { completeChallenge(id: "matinal") }
 
         updateProgress(id: "grand_buveur", value: totalTodayMl)
@@ -324,6 +330,7 @@ class ChallengeManager: ObservableObject {
     }
 
     func onAlcoholUpdated(alcoholCount: Int, dailyGoalReached: Bool) {
+        performDailyReset()
         if alcoholCount > 0 {
             if let idx = challenges.firstIndex(where: { $0.id == "soiree_tranquille" }),
                challenges[idx].status == .completed {

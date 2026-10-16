@@ -185,6 +185,11 @@ final class DailyResetManager: ObservableObject {
         let calendar = Calendar.current
         let today    = calendar.startOfDay(for: Date())
 
+        // Défis du jour : toujours vérifiés au retour au premier plan. La tâche de fond de
+        // minuit met à jour `last_reset_date` sans pouvoir remettre les défis à zéro ;
+        // le test ci-dessous ne suffit donc pas pour eux (performDailyReset est idempotent).
+        store.challengeManager?.performDailyReset()
+
         // Reset quotidien manqué
         let lastDaily = UserDefaults.standard.object(forKey: "last_reset_date") as? Date
         if lastDaily == nil || !calendar.isDate(lastDaily!, inSameDayAs: today) {
