@@ -1179,7 +1179,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "150% de ton objectif 7 jours en juillet ou août"
+            "value" : "150% de votre objectif 7 jours en juillet ou août"
           }
         }
       }
@@ -2789,7 +2789,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Atteindre 50% de ton objectif avant midi"
+            "value" : "Atteindre 50% de votre objectif avant midi"
           }
         }
       }
@@ -3157,7 +3157,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Bravo, continue comme ça !"
+            "value" : "Bravo, continuez comme ça !"
           }
         }
       }
@@ -4069,7 +4069,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Il fait %d°C ! Ton objectif a été augmenté. Pense à bien t'hydrater."
+            "value" : "Il fait %d°C ! Votre objectif a été augmenté. Pensez à bien vous hydrater."
           }
         }
       }
@@ -4317,7 +4317,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "C'est noté : %1$@, %2$@. Pense à boire %3$@ d'eau pour compenser."
+            "value" : "C'est noté : %1$@, %2$@. Pensez à boire %3$@ d'eau pour compenser."
           }
         }
       }
@@ -4381,7 +4381,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%1$@ ajoutés. Tu en es à %2$@ sur %3$@ aujourd'hui."
+            "value" : "%1$@ ajoutés. Vous en êtes à %2$@ sur %3$@ aujourd'hui."
           }
         }
       }
@@ -4477,7 +4477,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Indique combien tu as bu aujourd'hui par rapport à ton objectif."
+            "value" : "Indique combien vous avez bu aujourd'hui par rapport à votre objectif."
           }
         }
       }
@@ -4509,7 +4509,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Tu as bu %1$@ sur %2$@ aujourd'hui, soit %3$d %%."
+            "value" : "Vous avez bu %1$@ sur %2$@ aujourd'hui, soit %3$d %%."
           }
         }
       }
@@ -6777,7 +6777,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ton historique, ton profil, tes séries, tes succès, tes réglages et ta photo seront effacés de cet iPhone. C'est définitif."
+            "value" : "Votre historique, votre profil, vos séries, vos succès, vos réglages et votre photo seront effacés de cet iPhone. C'est définitif."
           }
         }
       }
@@ -6793,7 +6793,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Supprimer toutes tes données ?"
+            "value" : "Supprimer toutes vos données ?"
           }
         }
       }
@@ -7436,7 +7436,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Bois %@ de plus pour compenser l'alcool"
+            "value" : "Buvez %@ de plus pour compenser l'alcool"
           }
         }
       }
@@ -8824,7 +8824,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Hydrate-toi"
+            "value" : "Hydratez-vous"
           }
         }
       }
@@ -9009,7 +9009,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%@, tu as trouvé un bel équilibre cette année. Bravo ! 💧"
+            "value" : "%@, vous avez trouvé un bel équilibre cette année. Bravo ! 💧"
           }
         }
       }
@@ -9041,7 +9041,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%@, ta discipline est impressionnante. Quelle sera ta prochaine série ? 🔥"
+            "value" : "%@, votre discipline est impressionnante. Quelle sera votre prochaine série ? 🔥"
           }
         }
       }
@@ -9057,7 +9057,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%@, ta santé a été ta priorité cette année. Continue ainsi ! 🌿"
+            "value" : "%@, votre santé a été votre priorité cette année. Continuez ainsi ! 🌿"
           }
         }
       }
@@ -9089,7 +9089,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "TON %d EN RÉSUMÉ"
+            "value" : "VOTRE %d EN RÉSUMÉ"
           }
         }
       }
@@ -9137,7 +9137,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Tu fais partie du top %1$d%% des utilisateurs"
+            "value" : "Vous faites partie du top %1$d%% des utilisateurs"
           }
         }
       }
@@ -9201,7 +9201,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "TES HABITUDES"
+            "value" : "VOS HABITUDES"
           }
         }
       }
@@ -9265,7 +9265,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ton %d en eau"
+            "value" : "Votre %d en eau"
           }
         }
       }
@@ -9313,7 +9313,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Tu es dans le top 1% des utilisateurs les plus assidus"
+            "value" : "Vous êtes dans le top 1% des utilisateurs les plus assidus"
           }
         }
       }
@@ -9393,7 +9393,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Tu es une légende AquApp"
+            "value" : "Vous êtes une légende AquApp"
           }
         }
       }
@@ -9441,7 +9441,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%d L — ton record de l'année"
+            "value" : "%d L — votre record de l'année"
           }
         }
       }
@@ -9458,7 +9458,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Découvre ton bilan de l'année"
+            "value" : "Découvrez votre bilan de l'année"
           }
         }
       }
@@ -9635,7 +9635,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Soit %1$d%% de ton année"
+            "value" : "Soit %1$d%% de votre année"
           }
         }
       }
@@ -9955,7 +9955,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Cette année, tu as bu…"
+            "value" : "Cette année, vous avez bu…"
           }
         }
       }
@@ -10019,7 +10019,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Atteint grâce à tes %d verres d'eau"
+            "value" : "Atteint grâce à vos %d verres d'eau"
           }
         }
       }
