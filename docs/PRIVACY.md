@@ -1,88 +1,109 @@
+<!-- Fichier généré par scripts/privacy_policy.py depuis AquApp/Localizable.xcstrings : ne pas modifier à la main. -->
+
 # Politique de confidentialité — AquApp
 
-*Dernière mise à jour : 24 septembre 2026*
+*Dernière mise à jour : 16 octobre 2026*
 
-## Résumé
-
-**AquApp n'a ni compte, ni serveur, ni publicité, ni outil d'analyse.** Vos données restent sur votre iPhone. La seule information qui quitte l'appareil est une **position approximative** (à environ 1 km près), envoyée à un service météo pour adapter votre objectif en cas de forte chaleur — et seulement si vous autorisez la localisation.
+> English version: [PRIVACY.en.md](PRIVACY.en.md)
 
 ---
 
-## 1. Données stockées sur votre appareil
+## En bref
 
-Ces données sont conservées **uniquement sur votre iPhone**, dans la base locale de l'app (SwiftData), le Trousseau iOS (Keychain) et les réglages de l'app :
+**AquApp n'a ni compte, ni serveur, ni publicité, ni outil d'analyse.** Vos données restent sur votre iPhone. La seule information qui quitte l'appareil est une **position approximative** (à environ 1 km près), envoyée au service météo d'Apple pour adapter votre objectif en cas de forte chaleur, et seulement si vous autorisez la localisation.
 
-- **Profil physique** : poids, taille, sexe (pour calculer votre objectif d'hydratation)
-- **Prénom** (pour personnaliser l'interface)
+---
+
+## Avertissement santé
+
+AquApp donne des **repères généraux**. L'objectif d'hydratation, la compensation de l'alcool et le bonus canicule sont des estimations calculées à partir de formules simples. Ils ne constituent ni un diagnostic ni un avis médical, et ne remplacent pas l'avis d'un professionnel de santé.
+
+Si vous êtes enceinte ou allaitez, suivez un traitement, avez une maladie cardiaque ou rénale, ou devez limiter vos apports en eau, demandez conseil à votre médecin avant de suivre ces objectifs.
+
+L'abus d'alcool est dangereux pour la santé. À consommer avec modération.
+
+---
+
+## Données stockées sur votre iPhone
+
+Elles sont conservées **uniquement sur votre iPhone**, dans la base locale de l'app, le Trousseau iOS et les réglages de l'app :
+
+- **Profil physique** : poids, taille et sexe, pour calculer votre objectif
+- **Prénom**, pour personnaliser l'interface
 - **Historique** : volumes d'eau et de boissons alcoolisées, avec leur heure
-- **Progression** : séries, succès, défis, XP, totaux cumulés
-- **Préférences** : objectif quotidien, rappels, thème, icône, badge, boissons personnalisées
-- **Photo de profil** (optionnelle, dans le dossier privé de l'app)
+- **Progression** : séries, succès, défis, XP et totaux cumulés
+- **Préférences** : objectif, rappels, thème, icône, badge et boissons personnalisées
+- **Photo de profil**, si vous en choisissez une
 - **Statut Premium**
 
-### Durée de conservation
-- Sans Premium, les entrées de plus de 30 jours sont supprimées automatiquement.
-- Avec Premium, l'historique est conservé tant que l'app est installée.
+---
+
+## Durée de conservation
+
+Sans Premium, les entrées de plus de 30 jours sont supprimées automatiquement. Avec Premium, l'historique est conservé tant que l'app est installée, ou jusqu'à ce que vous le supprimiez.
 
 ---
 
-## 2. Apple Santé (HealthKit) — optionnel
+## Apple Santé (facultatif)
 
 AquApp vous propose de connecter Apple Santé pendant la configuration ; vous pouvez refuser.
 
 - **Écriture** : l'eau que vous enregistrez dans AquApp est ajoutée à Santé.
-- **Lecture** : AquApp lit vos **pas**, vos **entraînements**, votre **sommeil** et l'**eau** enregistrée dans Santé, uniquement pour valider certains défis et succès (Journée active, Récupération, Sommeil hydraté, Marathonien).
+- **Lecture** : vos **pas**, vos **entraînements**, votre **sommeil** et l'**eau** enregistrée dans Santé, uniquement pour valider certains défis et succès.
 
-Ces données sont lues et utilisées **sur votre iPhone** : elles ne sont jamais envoyées ailleurs, ni utilisées à des fins publicitaires. Vous pouvez modifier ces autorisations à tout moment dans *Réglages › Santé › Accès aux données › AquApp*.
-
----
-
-## 3. Données qui quittent votre appareil
-
-### Météo (position approximative) — optionnel
-Si vous autorisez la localisation, AquApp envoie votre position **arrondie à environ 1 km** au service météo **WeatherKit d'Apple** pour connaître la température locale. Apple n'utilise cette position que pour fournir la météo, sans l'associer à votre identité. Aucun identifiant, nom ou donnée de santé n'accompagne cette requête. Sans autorisation de localisation, la fonction canicule est simplement désactivée.
-
-### Siri et Raccourcis — si vous les utilisez
-Les commandes vocales sont traitées par Apple selon sa propre politique de confidentialité. AquApp reçoit seulement l'action demandée (par exemple « ajouter 250 ml d'eau »).
-
-### Achats (StoreKit)
-Les achats Premium sont traités par l'App Store d'Apple. AquApp ne reçoit aucune information de paiement ; il vérifie seulement, sur l'appareil, si un abonnement est actif.
+Ces données sont utilisées **sur votre iPhone** : elles ne sont jamais envoyées ailleurs ni utilisées à des fins publicitaires. Vous pouvez modifier ces autorisations à tout moment dans *Réglages › Santé › Accès aux données*.
 
 ---
 
-## 4. Ce que nous ne faisons pas
+## Données qui quittent votre iPhone
 
-❌ Aucun compte ni adresse email  
-❌ Aucun serveur appartenant à AquApp  
-❌ Aucun outil d'analyse, de mesure d'audience ou de publicité  
-❌ Aucun suivi entre apps, aucun identifiant publicitaire  
-❌ Aucune vente ni partage de vos données  
+- **Météo (facultatif)** : si vous autorisez la localisation, votre position **arrondie à environ 1 km** est envoyée au service **WeatherKit d'Apple** pour connaître la température locale. Apple n'utilise cette position que pour fournir la météo, sans l'associer à votre identité. Aucun identifiant ni donnée de santé ne l'accompagne.
+- **Siri et Raccourcis** : les commandes vocales sont traitées par Apple selon sa propre politique de confidentialité. AquApp reçoit seulement l'action demandée, par exemple « ajouter 250 ml d'eau ».
+- **Achats** : ils sont traités par l'App Store d'Apple. AquApp ne reçoit aucune information de paiement.
 
 ---
 
-## 5. Notifications
+## Pourquoi ces données sont utilisées
 
-Les rappels d'hydratation sont des **notifications locales**, programmées sur votre iPhone. Aucun service de notification à distance n'est utilisé.
-
----
-
-## 6. Vos droits
-
-Conformément au RGPD :
-
-- **Accès** : toutes vos données sont visibles dans l'app.
-- **Suppression** : dans l'app, *Profil › Confidentialité › Supprimer mes données* efface en une fois tout ce qu'AquApp conserve sur votre iPhone : historique, profil, prénom, séries, succès, réglages, photo et rappels, y compris les éléments du Trousseau. C'est important, car iOS conserve le Trousseau même après la désinstallation de l'app. L'app revient ensuite à l'écran d'accueil du premier lancement.
-- **Données Santé** : elles restent dans l'app Santé d'Apple et se gèrent depuis celle-ci. Lors de la suppression, vous pouvez aussi choisir d'effacer l'eau qu'AquApp a enregistrée dans Santé ; les données des autres apps ne sont jamais touchées.
+- **Fonctionnement de l'app** (profil, historique, progression, réglages) : nécessaire pour vous fournir le service que vous utilisez (RGPD, art. 6.1.b).
+- **Données de santé** (Apple Santé, consommation d'eau et d'alcool) : votre **consentement explicite** (art. 9.2.a), donné dans la fenêtre d'autorisation d'iOS et retirable à tout moment.
+- **Position approximative** : votre **consentement** (art. 6.1.a), donné dans la fenêtre d'autorisation de localisation d'iOS et retirable dans *Réglages › Confidentialité et sécurité › Service de localisation*.
+- **Rappels** : votre consentement, via l'autorisation des notifications. Ce sont des notifications locales, programmées sur votre iPhone.
 
 ---
 
-## 7. Modifications
+## Ce que nous ne faisons pas
 
-Cette politique peut évoluer avec l'app. Toute modification sera publiée sur cette page avec une nouvelle date de mise à jour.
+- Aucun compte, aucune adresse e-mail demandée
+- Aucun serveur appartenant à AquApp
+- Aucun outil d'analyse, de mesure d'audience ou de publicité
+- Aucun suivi entre apps, aucun identifiant publicitaire
+- Aucune vente ni aucun partage de vos données
 
 ---
 
-## 8. Contact
+## Âge minimum
 
-**Fabian Dargaud**  
-GitHub Issues : [github.com/HarpeLm/AquApp/issues](https://github.com/HarpeLm/AquApp/issues)
+AquApp s'adresse aux personnes de **15 ans et plus**, âge à partir duquel on peut consentir seul au traitement de ses données en France. Les fonctions liées à l'alcool sont destinées aux personnes ayant l'âge légal pour en consommer dans leur pays.
+
+---
+
+## Vos droits
+
+Vous pouvez accéder à vos données, les rectifier, les effacer et en limiter l'usage, et retirer votre consentement à tout moment.
+
+- **Accès et rectification** : toutes vos données sont visibles et modifiables dans l'app.
+- **Effacement** : *Profil › Confidentialité › Supprimer mes données* efface en une fois tout ce qu'AquApp conserve sur votre iPhone, y compris le Trousseau, qu'iOS garde même après la désinstallation. Vous pouvez aussi effacer l'eau qu'AquApp a enregistrée dans Santé.
+- **Réclamation** : si vous estimez que vos droits ne sont pas respectés, vous pouvez saisir la **CNIL** ([cnil.fr](https://www.cnil.fr)) ou l'autorité de protection des données de votre pays.
+
+---
+
+## Modifications
+
+Cette politique peut évoluer avec l'app. Toute modification est publiée avec une nouvelle date de mise à jour.
+
+---
+
+## Responsable et contact
+
+Le responsable du traitement est **Fabian Dargaud**, développeur d'AquApp. Pour toute question ou demande concernant vos données : [github.com/HarpeLm/AquApp/issues](https://github.com/HarpeLm/AquApp/issues).

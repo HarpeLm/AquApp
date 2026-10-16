@@ -243,6 +243,14 @@ struct BodyEditSheet: View {
                     .padding(.horizontal, 20)
                     .animation(.easeInOut, value: calculatedGoal)
 
+                    // Avertissement santé : l'objectif calculé n'est qu'un repère
+                    Label(String(localized: "medical.disclaimer.short"), systemImage: "stethoscope")
+                        .scaledFont(size: 12)
+                        .foregroundColor(.secondary)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding(.horizontal, 24)
+                        .padding(.top, -12)
+
                     Button { save() } label: {
                         HStack(spacing: 8) {
                             Image(systemName: "checkmark.circle.fill").scaledFont(size: 18)

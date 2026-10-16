@@ -179,6 +179,13 @@ struct BodyProfileView: View {
                         .overlay(RoundedRectangle(cornerRadius: 14).stroke(goalColor.opacity(0.2), lineWidth: 1))
                         .animation(.easeInOut, value: calculatedGoalMl)
 
+                        // Avertissement santé : l'objectif calculé n'est qu'un repère
+                        Label(String(localized: "medical.disclaimer.short"), systemImage: "stethoscope")
+                            .scaledFont(size: 12)
+                            .foregroundColor(.secondary)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .padding(.top, -12)
+
                         // Bouton
                         Button { saveAndContinue() } label: {
                             HStack(spacing: 8) {

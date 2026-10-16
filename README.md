@@ -136,7 +136,7 @@ French phrases work too: *« Ajoute de l'eau dans AquApp »*, *« Où j'en suis 
 | ✅ | Apple Health data is read and used **on device only** |
 | ℹ️ | One exception, optional: an **approximate location (~1 km)** is sent to Apple's WeatherKit service to detect heatwaves |
 
-Full details in the [privacy policy](docs/PRIVACY.md) (French).
+Full details in the [privacy policy](docs/PRIVACY.en.md) ([French version](docs/PRIVACY.md)).
 
 ---
 

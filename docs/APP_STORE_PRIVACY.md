@@ -1,6 +1,6 @@
 # App Store Connect — réponses de confidentialité (v1.0)
 
-À recopier dans **App Store Connect › ton app › Confidentialité de l'app**. Ces réponses doivent rester alignées avec `AquApp/PrivacyInfo.xcprivacy` et `docs/PRIVACY.md` : si le code change ce qui quitte l'iPhone, mets à jour les trois.
+À recopier dans **App Store Connect › ton app › Confidentialité de l'app**. Ces réponses doivent rester alignées avec `AquApp/PrivacyInfo.xcprivacy` et la politique (clés `policy.*` de `Localizable.xcstrings`, d'où `scripts/privacy_policy.py` génère `docs/PRIVACY.md` et `docs/PRIVACY.en.md`) : si le code change ce qui quitte l'iPhone, mets à jour les trois.
 
 Rappel de la règle d'Apple : une donnée est **« collectée »** seulement si elle est **transmise hors de l'appareil**. Ce qui reste sur l'iPhone (SwiftData, Keychain, HealthKit lu localement) n'est pas collecté.
 
@@ -8,9 +8,16 @@ Rappel de la règle d'Apple : une donnée est **« collectée »** seulement si 
 
 ## 1. URL de la politique de confidentialité
 
-`https://github.com/HarpeLm/AquApp/blob/main/docs/PRIVACY.md`
+Une URL par langue (App Store Connect › Informations sur l'app › URL de la politique de confidentialité) :
 
-(Une page web dédiée est plus agréable pour les utilisateurs, mais cette URL est acceptée.)
+| Langue | URL |
+|---|---|
+| Français | `https://github.com/HarpeLm/AquApp/blob/main/docs/PRIVACY.md` |
+| Anglais | `https://github.com/HarpeLm/AquApp/blob/main/docs/PRIVACY.en.md` |
+
+La même politique est lisible dans l'app (*Profil › Confidentialité › Politique de confidentialité*). Pour la modifier : change les clés `policy.*` dans `Localizable.xcstrings`, puis lance `python3 scripts/privacy_policy.py`.
+
+(Une page web dédiée, par exemple sur aquapp.fr, sera plus agréable pour les utilisateurs, mais ces URL sont acceptées.)
 
 ---
 
