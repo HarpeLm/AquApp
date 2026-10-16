@@ -1,6 +1,18 @@
 {
   "sourceLanguage" : "fr",
   "strings" : {
+    "CFBundleName" : {
+      "comment" : "Bundle name",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "AquApp"
+          }
+        }
+      }
+    },
     "NSHealthShareUsageDescription" : {
       "comment" : "Info.plist NSHealthShareUsageDescription",
       "extractionState" : "manual",

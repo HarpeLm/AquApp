@@ -1,55 +1,6 @@
 {
   "sourceLanguage" : "fr",
-  "version" : "1.0",
   "strings" : {
-    "Ajoute de l'eau dans ${applicationName}" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Add water in ${applicationName}"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ajoute de l'eau dans ${applicationName}"
-          }
-        }
-      }
-    },
-    "Enregistre un verre d'eau dans ${applicationName}" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Log a glass of water in ${applicationName}"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Enregistre un verre d'eau dans ${applicationName}"
-          }
-        }
-      }
-    },
-    "J'ai bu un verre d'eau avec ${applicationName}" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "I drank a glass of water with ${applicationName}"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "J'ai bu un verre d'eau avec ${applicationName}"
-          }
-        }
-      }
-    },
     "Ajoute ${kind} dans ${applicationName}" : {
       "localizations" : {
         "en" : {
@@ -66,7 +17,58 @@
         }
       }
     },
+    "Ajoute de l'eau dans ${applicationName}" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add water in ${applicationName}"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ajoute de l'eau dans ${applicationName}"
+          }
+        }
+      }
+    },
+    "Combien j'ai bu aujourd'hui dans ${applicationName}" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "How much have I drunk today in ${applicationName}"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Combien j'ai bu aujourd'hui dans ${applicationName}"
+          }
+        }
+      }
+    },
+    "Enregistre un verre d'eau dans ${applicationName}" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Log a glass of water in ${applicationName}"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enregistre un verre d'eau dans ${applicationName}"
+          }
+        }
+      }
+    },
     "Enregistre une boisson dans ${applicationName}" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -78,6 +80,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Enregistre une boisson dans ${applicationName}"
+          }
+        }
+      }
+    },
+    "J'ai bu un verre d'eau avec ${applicationName}" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "I drank a glass of water with ${applicationName}"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "J'ai bu un verre d'eau avec ${applicationName}"
           }
         }
       }
@@ -97,22 +116,7 @@
           }
         }
       }
-    },
-    "Combien j'ai bu aujourd'hui dans ${applicationName}" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "How much have I drunk today in ${applicationName}"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Combien j'ai bu aujourd'hui dans ${applicationName}"
-          }
-        }
-      }
     }
-  }
+  },
+  "version" : "1.0"
 }
