@@ -88,7 +88,7 @@ struct AddWaterSheet: View {
                     // Slider personnalisé
                     VStack(alignment: .leading, spacing: 12) {
                         Button {
-                            withAnimation(.spring()) {
+                            withAnimation(Motion.animation(.spring())) {
                                 showSlider.toggle()
                                 if showSlider { showRemove = false }
                             }
@@ -170,7 +170,7 @@ struct AddWaterSheet: View {
                             .background(Color(UIColor.systemBackground))
                             .cornerRadius(14)
                             .shadow(color: .black.opacity(0.05), radius: 6, x: 0, y: 2)
-                            .transition(.move(edge: .top).combined(with: .opacity))
+                            .transition(.motionAware(.move(edge: .top).combined(with: .opacity)))
                         }
                     }
                     .padding(.horizontal, 20)
@@ -178,7 +178,7 @@ struct AddWaterSheet: View {
                     // Retirer de l'eau
                     VStack(alignment: .leading, spacing: 12) {
                         Button {
-                            withAnimation(.spring()) {
+                            withAnimation(Motion.animation(.spring())) {
                                 showRemove.toggle()
                                 if showRemove { showSlider = false }
                             }
@@ -246,7 +246,7 @@ struct AddWaterSheet: View {
                             .background(Color(UIColor.systemBackground))
                             .cornerRadius(14)
                             .shadow(color: .black.opacity(0.05), radius: 6, x: 0, y: 2)
-                            .transition(.move(edge: .top).combined(with: .opacity))
+                            .transition(.motionAware(.move(edge: .top).combined(with: .opacity)))
                         }
                     }
                     .padding(.horizontal, 20)

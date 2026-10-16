@@ -162,7 +162,7 @@ struct ProfileView: View {
                                 withAnimation { showBadgePicker = false }
                             }
                             .padding(.horizontal)
-                            .transition(.move(edge: .top).combined(with: .opacity))
+                            .transition(.motionAware(.move(edge: .top).combined(with: .opacity)))
                         }
 
                         // ── SECTION : Hydratation (objectif quotidien)

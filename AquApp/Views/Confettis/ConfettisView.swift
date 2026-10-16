@@ -59,8 +59,12 @@ struct ConfettiView: View {
     }
 
     private func triggerConfetti(in size: CGSize) {
-        generateParticles(in: size)
-        withAnimation { animating = true }
+        // « Réduire les animations » : pas de pluie de confettis ; la carte du
+        // message (ConfettiOverlayView) et le retour haptique suffisent.
+        if !Motion.isReduced {
+            generateParticles(in: size)
+            withAnimation { animating = true }
+        }
 
         // Délègue tous les haptiques à HapticManager dont les générateurs
         // sont préchauffés au lancement — évite la latence et respecte
@@ -207,7 +211,7 @@ struct CompletionBanner: View {
             Spacer()
         }
         .onAppear {
-            withAnimation(.spring(response: 0.5, dampingFraction: 0.7)) {
+            withAnimation(Motion.animation(.spring(response: 0.5, dampingFraction: 0.7))) {
                 offset = 60
             }
             DispatchQueue.main.asyncAfter(deadline: .now() + 3.0) {

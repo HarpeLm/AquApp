@@ -56,7 +56,7 @@ struct HomeView: View {
                                 WeatherAttributionView()
                             }
                             .padding(.horizontal)
-                            .transition(.move(edge: .top).combined(with: .opacity))
+                            .transition(.motionAware(.move(edge: .top).combined(with: .opacity)))
                         }
 
                         // MARK: Carte progression
@@ -420,7 +420,7 @@ struct SwipeToDeleteView<Content: View>: View {
                         }
                         .onEnded { value in
                             guard abs(value.translation.width) > abs(value.translation.height) * 1.5 else {
-                                withAnimation(.spring()) { offset = 0 }
+                                withAnimation(Motion.animation(.spring())) { offset = 0 }
                                 return
                             }
                             if value.translation.width < -80 {
@@ -434,7 +434,7 @@ struct SwipeToDeleteView<Content: View>: View {
                                     }
                                 }
                             } else {
-                                withAnimation(.spring()) {
+                                withAnimation(Motion.animation(.spring())) {
                                     offset = 0
                                 }
                             }

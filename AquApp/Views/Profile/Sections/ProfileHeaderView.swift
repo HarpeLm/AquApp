@@ -73,7 +73,7 @@ struct ProfileHeaderView: View {
                     }
 
                     Button {
-                        withAnimation(.spring()) { showBadgePicker.toggle() }
+                        withAnimation(Motion.animation(.spring())) { showBadgePicker.toggle() }
                     } label: {
                         HStack(spacing: 4) {
                             Image(systemName: "medal.fill")
@@ -276,12 +276,12 @@ private struct XPProgressBlock: View {
             }
         }
         .onAppear {
-            withAnimation(.spring(response: 1.0, dampingFraction: 0.8).delay(0.2)) {
+            withAnimation(Motion.animation(.spring(response: 1.0, dampingFraction: 0.8).delay(0.2))) {
                 animatedProgress = xp.progressRatio
             }
         }
         .onChange(of: xp.progressRatio) { _, newValue in
-            withAnimation(.spring(response: 0.7, dampingFraction: 0.75)) {
+            withAnimation(Motion.animation(.spring(response: 0.7, dampingFraction: 0.75))) {
                 animatedProgress = newValue
             }
         }
@@ -289,7 +289,7 @@ private struct XPProgressBlock: View {
             guard leveledUp else { return }
             withAnimation(.easeOut(duration: 0.15)) { animatedProgress = 0 }
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
-                withAnimation(.spring(response: 0.8, dampingFraction: 0.7)) {
+                withAnimation(Motion.animation(.spring(response: 0.8, dampingFraction: 0.7))) {
                     animatedProgress = xp.progressRatio
                 }
             }

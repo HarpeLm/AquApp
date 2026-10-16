@@ -13,7 +13,7 @@ struct NameEntryView: View {
 
             if goToBodyProfile {
                 BodyProfileView(onComplete: onComplete)
-                    .transition(.move(edge: .trailing).combined(with: .opacity))
+                    .transition(.motionAware(.move(edge: .trailing).combined(with: .opacity)))
             } else {
                 // iOS gère le clavier (zone de sécurité) : le contenu se centre dans l'espace
                 // restant, sous la barre d'état et au-dessus du clavier.
@@ -34,7 +34,7 @@ struct NameEntryView: View {
                     .scrollBounceBehavior(.basedOnSize)
                     .scrollDismissesKeyboard(.interactively)
                 }
-                .transition(.move(edge: .leading).combined(with: .opacity))
+                .transition(.motionAware(.move(edge: .leading).combined(with: .opacity)))
                 .onAppear { isFocused = true }
             }
         }

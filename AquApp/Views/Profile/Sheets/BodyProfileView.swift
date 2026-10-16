@@ -37,13 +37,13 @@ struct BodyProfileView: View {
         switch step {
         case .form:
             profileForm
-                .transition(.move(edge: .leading).combined(with: .opacity))
+                .transition(.motionAware(.move(edge: .leading).combined(with: .opacity)))
         case .health:
             HealthPermissionView { go(to: .reminders) }
-                .transition(.move(edge: .trailing).combined(with: .opacity))
+                .transition(.motionAware(.move(edge: .trailing).combined(with: .opacity)))
         case .reminders:
             ReminderPermissionView(onFinish: completeOnboarding)
-                .transition(.move(edge: .trailing).combined(with: .opacity))
+                .transition(.motionAware(.move(edge: .trailing).combined(with: .opacity)))
         }
     }
 
@@ -100,7 +100,7 @@ struct BodyProfileView: View {
                                         gender: gender, isSelected: selectedGender == gender,
                                         accentColor: Color.app.alcoholMid
                                     ) {
-                                        withAnimation(.spring(response: 0.25)) { selectedGender = gender }
+                                        withAnimation(Motion.animation(.spring(response: 0.25))) { selectedGender = gender }
                                     }
                                 }
                             }

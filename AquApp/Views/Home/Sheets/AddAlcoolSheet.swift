@@ -141,7 +141,7 @@ struct AddAlcoolSheet: View {
                 Spacer()
 
                 Button {
-                    withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) {
+                    withAnimation(Motion.animation(.spring(response: 0.4, dampingFraction: 0.8))) {
                         showHistory.toggle()
                         if showHistory { expandedDrinkID = nil; showCustomForm = false }
                     }
@@ -189,9 +189,9 @@ struct AddAlcoolSheet: View {
             .padding(.bottom, 16)
 
             if showHistory {
-                historyView.transition(.move(edge: .trailing).combined(with: .opacity))
+                historyView.transition(.motionAware(.move(edge: .trailing).combined(with: .opacity)))
             } else {
-                addView.transition(.move(edge: .leading).combined(with: .opacity))
+                addView.transition(.motionAware(.move(edge: .leading).combined(with: .opacity)))
             }
         }
         .background(Color.app.background)
@@ -295,7 +295,7 @@ struct AddAlcoolSheet: View {
                     .background(Color.app.card).cornerRadius(12)
                     .shadow(color: .black.opacity(0.05), radius: 4, x: 0, y: 2)
                     .padding(.horizontal, 20)
-                    .transition(.move(edge: .top).combined(with: .opacity))
+                    .transition(.motionAware(.move(edge: .top).combined(with: .opacity)))
                 }
 
                 // Avertissement santé
@@ -333,7 +333,7 @@ struct AddAlcoolSheet: View {
                             isExpanded: expandedDrinkID == drink.id,
                             presets: quantityPresets
                         ) {
-                            withAnimation(.spring()) {
+                            withAnimation(Motion.animation(.spring())) {
                                 expandedDrinkID = expandedDrinkID == drink.id ? nil : drink.id
                             }
                         } onAdd: { volumeMl in
@@ -358,7 +358,7 @@ struct AddAlcoolSheet: View {
                 // Formulaire boisson custom
                 VStack(alignment: .leading, spacing: 12) {
                     Button {
-                        withAnimation(.spring()) { showCustomForm.toggle() }
+                        withAnimation(Motion.animation(.spring())) { showCustomForm.toggle() }
                     } label: {
                         HStack {
                             Image(systemName: "plus.circle.fill").foregroundColor(Color.app.primary)
@@ -406,7 +406,7 @@ struct AddAlcoolSheet: View {
                         }
                         .padding(16).background(Color.app.card).cornerRadius(14)
                         .shadow(color: .black.opacity(0.05), radius: 6, x: 0, y: 2)
-                        .transition(.move(edge: .top).combined(with: .opacity))
+                        .transition(.motionAware(.move(edge: .top).combined(with: .opacity)))
                     }
                 }
                 .padding(.horizontal, 20)
@@ -531,7 +531,7 @@ struct DrinkRow: View {
                     CustomQuantityRow(drink: drink, onAdd: onAdd)
                 }
                 .padding(.horizontal, 16).padding(.bottom, 16)
-                .transition(.move(edge: .top).combined(with: .opacity))
+                .transition(.motionAware(.move(edge: .top).combined(with: .opacity)))
             }
         }
         .background(Color.app.card).cornerRadius(14)

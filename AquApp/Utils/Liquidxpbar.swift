@@ -122,6 +122,8 @@ struct LiquidXPBar: View {
             }
             .frame(height: height)
             .onAppear {
+                // « Réduire les animations » : remplissage fixe, sans reflet, vague ni bulles
+                guard !Motion.isReduced else { return }
                 startShimmer()
                 startBubbles(in: geo.size)
                 startWave()
@@ -133,11 +135,12 @@ struct LiquidXPBar: View {
                 bubblesTimer = nil
             }
             .onChange(of: progress) { _, _ in
+                guard !Motion.isReduced else { return }
                 spawnBurstBubbles(in: geo.size, count: 4)
             }
         }
         .frame(height: height)
-        .animation(.spring(response: 0.8, dampingFraction: 0.75), value: progress)
+        .animation(Motion.animation(.spring(response: 0.8, dampingFraction: 0.75)), value: progress)
     }
 
     // MARK: - Animations

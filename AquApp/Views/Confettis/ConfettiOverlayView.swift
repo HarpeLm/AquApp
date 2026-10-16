@@ -30,11 +30,11 @@ struct ConfettiOverlayView: View {
                         .padding(.top, 80)
                     Spacer()
                 }
-                .transition(.move(edge: .top).combined(with: .opacity))
+                .transition(.motionAware(.move(edge: .top).combined(with: .opacity)))
                 .allowsHitTesting(false)
             }
         }
-        .animation(.spring(response: 0.4, dampingFraction: 0.75), value: confettiManager.isActive)
+        .animation(Motion.animation(.spring(response: 0.4, dampingFraction: 0.75)), value: confettiManager.isActive)
         .onChange(of: confettiManager.isActive) { _, newValue in
             if newValue {
                 confettiManager.autoDismiss(after: 3.0)

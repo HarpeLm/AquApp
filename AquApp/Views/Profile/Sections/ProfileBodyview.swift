@@ -165,7 +165,7 @@ struct BodyEditSheet: View {
                                     gender: gender, isSelected: localGender == gender,
                                     accentColor: Color.app.alcoholMid
                                 ) {
-                                    withAnimation(.spring(response: 0.25)) { localGender = gender }
+                                    withAnimation(Motion.animation(.spring(response: 0.25))) { localGender = gender }
                                 }
                             }
                         }

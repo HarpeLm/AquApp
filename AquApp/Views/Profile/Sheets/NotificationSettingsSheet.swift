@@ -148,7 +148,7 @@ struct NotificationSettingsSheet: View {
                                 HStack(spacing: 8) {
                                     ForEach(intervals, id: \.self) { value in
                                         Button {
-                                            withAnimation(.spring()) { localInterval = value }
+                                            withAnimation(Motion.animation(.spring())) { localInterval = value }
                                         } label: {
                                             Text(String(format: String(localized: "notif.hours_format"), value))
                                                 .scaledFont(size: 14, weight: .semibold)

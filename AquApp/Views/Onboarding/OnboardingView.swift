@@ -49,7 +49,7 @@ struct OnboardingView: View {
 
             if goToNameEntry {
                 NameEntryView(onComplete: onComplete)
-                    .transition(.move(edge: .trailing).combined(with: .opacity))
+                    .transition(.motionAware(.move(edge: .trailing).combined(with: .opacity)))
             } else {
                 VStack(spacing: 0) {
 
@@ -74,7 +74,7 @@ struct OnboardingView: View {
                                           ? pages[currentPage].color
                                           : Color(UIColor.systemGray4))
                                     .frame(width: index == currentPage ? 24 : 8, height: 8)
-                                    .animation(.spring(response: 0.3), value: currentPage)
+                                    .animation(Motion.animation(.spring(response: 0.3)), value: currentPage)
                             }
                         }
 
@@ -134,7 +134,7 @@ struct OnboardingView: View {
                     .padding(.horizontal, 28)
                     .padding(.bottom, 48)
                 }
-                .transition(.move(edge: .leading).combined(with: .opacity))
+                .transition(.motionAware(.move(edge: .leading).combined(with: .opacity)))
                 // Plein écran pour les pages de présentation uniquement : l'écran du prénom
                 // garde les zones de sécurité (barre d'état, clavier).
                 .ignoresSafeArea()

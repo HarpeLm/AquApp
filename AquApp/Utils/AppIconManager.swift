@@ -233,7 +233,7 @@ struct AppIconCell: View {
                         )
                         .opacity(isUnlocked ? 1.0 : 0.55)
                         .scaleEffect(isChanging ? 0.94 : 1.0)
-                        .animation(.spring(response: 0.25), value: isChanging)
+                        .animation(Motion.animation(.spring(response: 0.25)), value: isChanging)
 
                     if !isUnlocked {
                         ZStack {

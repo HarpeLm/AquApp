@@ -94,7 +94,7 @@ struct StatsView: View {
                             if period.isPro && !isPremiumUser {
                                 showPremiumSheet = true
                             } else {
-                                withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
+                                withAnimation(Motion.animation(.spring(response: 0.3, dampingFraction: 0.8))) {
                                     selectedPeriod = period
                                 }
                             }
@@ -317,7 +317,7 @@ private struct ChartCard: View {
         .background(Color.app.card)
         .cornerRadius(20)
         .shadow(color: .black.opacity(0.05), radius: 8, x: 0, y: 2)
-        .animation(.spring(response: 0.35, dampingFraction: 0.85), value: period)
+        .animation(Motion.animation(.spring(response: 0.35, dampingFraction: 0.85)), value: period)
     }
 }
 
