@@ -63,6 +63,7 @@ struct AlcoholDisplayEntry: Identifiable {
 struct AddAlcoolSheet: View {
     @Binding var isPresented: Bool
     @EnvironmentObject var store: AppDataStore
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
     @State private var expandedDrinkID: String? = nil
     @State private var showCustomForm: Bool = false
@@ -132,13 +133,18 @@ struct AddAlcoolSheet: View {
                          ? String(localized: "alcohol.history_title")
                          : String(localized: "alcohol.sheet.title"))
                         .scaledFont(size: 22, weight: .bold)
+                        .fixedSize(horizontal: false, vertical: true)
                         .accessibilityAddTraits(.isHeader)
-                    Image(systemName: showHistory ? "clock.arrow.circlepath" : "wineglass.fill")
-                        .scaledFont(size: 20)
-                        .foregroundColor(Color.app.alcoholLight)
-                        .accessibilityHidden(true)
+                    if !dynamicTypeSize.isAccessibilitySize {
+                        Image(systemName: showHistory ? "clock.arrow.circlepath" : "wineglass.fill")
+                            .scaledFont(size: 20)
+                            .foregroundColor(Color.app.alcoholLight)
+                            .accessibilityHidden(true)
+                    }
                 }
-                Spacer()
+                // Le titre passe en priorité : très grand texte, il ne doit pas être coupé au milieu d'un mot
+                .layoutPriority(1)
+                Spacer(minLength: 8)
 
                 Button {
                     withAnimation(Motion.animation(.spring(response: 0.4, dampingFraction: 0.8))) {
@@ -149,7 +155,13 @@ struct AddAlcoolSheet: View {
                     HStack(spacing: 6) {
                         Image(systemName: showHistory ? "arrow.left" : "clock.arrow.circlepath")
                             .scaledFont(size: 13, weight: .semibold)
-                        if !showHistory {
+                        // Très grand texte : icône (et compteur) seulement, pour laisser la place au titre
+                        if dynamicTypeSize.isAccessibilitySize {
+                            if !showHistory && !todayDisplayEntries.isEmpty {
+                                Text("\(todayDisplayEntries.count)")
+                                    .scaledFont(size: 12, weight: .bold)
+                            }
+                        } else if !showHistory {
                             if !todayDisplayEntries.isEmpty {
                                 Text("\(todayDisplayEntries.count)")
                                     .scaledFont(size: 12, weight: .bold)

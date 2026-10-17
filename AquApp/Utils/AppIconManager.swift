@@ -266,6 +266,8 @@ struct AppIconCell: View {
                         Text(String(localized: "profile.app_icon.active_badge"))
                             .foregroundColor(.white)
                             .scaledFont(size: 9, weight: .bold)
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.6)   // très grand texte : le badge reste sur une ligne
                             .padding(.horizontal, 6)
                             .padding(.vertical, 3)
                             .background(Color.app.primary)
@@ -274,6 +276,8 @@ struct AppIconCell: View {
                         Text(String(localized: "profile.app_icon.free_label"))
                             .foregroundColor(Color.app.primaryDark)
                             .scaledFont(size: 9, weight: .bold)
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.6)   // très grand texte : le badge reste sur une ligne
                             .padding(.horizontal, 6)
                             .padding(.vertical, 3)
                             .background(Color.app.primaryLight)
@@ -282,6 +286,8 @@ struct AppIconCell: View {
                         Text(String(localized: "profile.app_icon.premium_label"))
                             .foregroundColor(isUnlocked ? .orange : Color(UIColor.systemGray3))
                             .scaledFont(size: 9, weight: .bold)
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.6)   // très grand texte : le badge reste sur une ligne
                             .padding(.horizontal, 6)
                             .padding(.vertical, 3)
                             .background(isUnlocked ? Color.orange.opacity(0.12) : Color(UIColor.systemGray6))
