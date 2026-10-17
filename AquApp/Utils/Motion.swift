@@ -8,12 +8,15 @@ import UIKit
 
 enum Motion {
 
-    /// Remplace la valeur système dans les tests.
+    /// Remplace la valeur système dans les tests unitaires.
     static var reduceOverride: Bool?
+
+    /// Argument de lancement des tests d'interface (le réglage iOS ne se force pas au lancement).
+    private static let launchedWithReducedMotion = ProcessInfo.processInfo.arguments.contains("-reduceMotion")
 
     /// Vrai si l'utilisateur a activé « Réduire les animations ».
     static var isReduced: Bool {
-        reduceOverride ?? UIAccessibility.isReduceMotionEnabled
+        reduceOverride ?? (launchedWithReducedMotion || UIAccessibility.isReduceMotionEnabled)
     }
 
     /// L'animation demandée, ou un fondu court si les animations sont réduites.

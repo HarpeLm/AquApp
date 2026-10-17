@@ -200,8 +200,9 @@ struct BodyProfileView: View {
                             ))
                             .cornerRadius(16)
                             .shadow(color: Color.app.alcoholMid.opacity(0.4), radius: 10, x: 0, y: 4)
-                            .accessibilityIdentifier("onboarding.body.save")
                         }
+                        // Sur le bouton (et non son libellé) : sinon XCUI ne le trouve pas
+                        .accessibilityIdentifier("onboarding.body.save")
                     }
                     .padding(.horizontal, 28)
                     .padding(.bottom, keyboardHeight)

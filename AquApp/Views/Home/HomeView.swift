@@ -74,13 +74,15 @@ struct HomeView: View {
                             ActionButton(
                                 label: L10n.homeAddWater,
                                 sfSymbol: "drop.fill",
-                                gradient: [Color.app.primary, Color.app.primaryDark]
+                                gradient: [Color.app.primary, Color.app.primaryDark],
+                                identifier: "home.add_water"
                             ) { showAddWater = true }
 
                             ActionButton(
                                 label: L10n.homeAddAlcohol,
                                 sfSymbol: "wineglass.fill",
-                                gradient: [Color.app.alcoholMid, Color.app.alcoholDark]
+                                gradient: [Color.app.alcoholMid, Color.app.alcoholDark],
+                                identifier: "home.add_alcohol"
                             ) { showAddAlcool = true }
                         }
                         .padding(.horizontal)
@@ -300,6 +302,7 @@ struct ActionButton: View {
     let label: String
     let sfSymbol: String
     let gradient: [Color]
+    var identifier: String = ""
     let action: () -> Void
 
     var body: some View {
@@ -327,6 +330,7 @@ struct ActionButton: View {
         }
         .accessibilityLabel(String(format: String(localized: "accessibility.add_label"), label))
         .accessibilityHint(String(localized: "accessibility.add_hint"))
+        .accessibilityIdentifier(identifier)
     }
 }
 

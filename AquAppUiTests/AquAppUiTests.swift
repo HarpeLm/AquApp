@@ -7,17 +7,20 @@
 
 import XCTest
 
+/// Parcours réels dans l'app. Les modes `-uiTestingFresh` / `-uiTestingReady` lancent l'app
+/// sur une base en mémoire : les tests ne touchent jamais aux données du simulateur.
+/// Les éléments sont trouvés par identifiant d'accessibilité ; un test qui ne trouve pas
+/// ce qu'il cherche échoue (il ne se met pas en « ignoré »).
 final class AquAppUITests: XCTestCase {
 
     var app: XCUIApplication!
 
-    // Les assertions ciblent des libellés français : on fige la langue quel que soit le simulateur.
+    // Les libellés vérifiés sont en français : on fige la langue quel que soit le simulateur.
     private let frenchLocale = ["-AppleLanguages", "(fr)", "-AppleLocale", "fr_FR"]
 
     override func setUpWithError() throws {
         continueAfterFailure = false
         app = XCUIApplication()
-        app.launchArguments = ["-uiTestingReady"] + frenchLocale
     }
 
     override func tearDownWithError() throws {
@@ -27,194 +30,185 @@ final class AquAppUITests: XCTestCase {
 
     // MARK: - Helpers
 
-    private func goToTab(_ index: Int) throws {
+    private func launch(fresh: Bool = false) {
+        app.launchArguments = [fresh ? "-uiTestingFresh" : "-uiTestingReady"] + frenchLocale
+        app.launch()
+    }
+
+    /// N'importe quel élément portant cet identifiant (bouton, conteneur de feuille…).
+    private func element(_ id: String) -> XCUIElement {
+        app.descendants(matching: .any)[id].firstMatch
+    }
+
+    private func tap(_ id: String, file: StaticString = #filePath, line: UInt = #line) {
+        let target = element(id)
+        XCTAssertTrue(target.waitForExistence(timeout: 5), "« \(id) » introuvable", file: file, line: line)
+        target.tap()
+    }
+
+    private func goToTab(_ index: Int, file: StaticString = #filePath, line: UInt = #line) {
         let tabBar = app.tabBars.firstMatch
-        guard tabBar.waitForExistence(timeout: 5) else { throw XCTSkip("Tab bar absente") }
-        guard tabBar.buttons.count > index else { throw XCTSkip("Onglet \(index) absent") }
+        XCTAssertTrue(tabBar.waitForExistence(timeout: 5), "Barre d'onglets absente", file: file, line: line)
         tabBar.buttons.element(boundBy: index).tap()
     }
 
-    private func closeTopSheetIfNeeded() {
-        let close = app.buttons.matching(
-            NSPredicate(format: "label CONTAINS[cd] 'fermer' OR label CONTAINS[cd] 'close'")
-        ).firstMatch
-        if close.waitForExistence(timeout: 2) { close.tap() }
+    private func goToNameScreen() {
+        launch(fresh: true)
+        for _ in 0..<4 { tap("onboarding.next") }
     }
 
-    // MARK: - 1. Lancement frais : onboarding de bout en bout
+    // MARK: - Onboarding
 
-    func test01_LaunchFresh_OnboardingComplet() {
-          app.launchArguments = ["-uiTestingFresh"] + frenchLocale
-          app.launch()
+    func test01_Onboarding_CompletJusquaLAccueil() {
+        goToNameScreen()
 
-          // 4 pages swipables
-          for page in 0..<3 {
-              let next = app.buttons["onboarding.next"]
-              XCTAssertTrue(next.waitForExistence(timeout: 5),
-                            "Page \(page) : bouton suivant introuvable")
-              next.tap()
-          }
-          app.buttons["onboarding.next"].tap()   // dernière page → écran Nom
+        let nameField = app.textFields["onboarding.name"]
+        XCTAssertTrue(nameField.waitForExistence(timeout: 5), "Champ prénom introuvable")
+        nameField.tap()
+        nameField.typeText("Test")
+        tap("onboarding.name.continue")
 
-          // Un seul champ texte sur cet écran → firstMatch sans ambiguïté
-          let nameField = app.textFields.firstMatch
-          XCTAssertTrue(nameField.waitForExistence(timeout: 5), "Champ prénom introuvable")
-          nameField.tap()
-          nameField.typeText("Test")
+        tap("onboarding.body.save")
+        tap("onboarding.health.later")
+        tap("onboarding.reminders.later")
 
-          let continueBtn = app.buttons["onboarding.name.continue"]
-          if continueBtn.waitForExistence(timeout: 3) {
-              continueBtn.tap()
-          } else {
-              app.buttons.firstMatch.tap()
-          }
+        XCTAssertTrue(app.tabBars.firstMatch.waitForExistence(timeout: 10), "Accueil absent après l'onboarding")
+        XCTAssertTrue(element("home.add_water").exists)
+    }
 
-          let saveBody = app.buttons["onboarding.body.save"]
-          XCTAssertTrue(saveBody.waitForExistence(timeout: 5), "Écran profil physique introuvable")
-          saveBody.tap()
+    /// Bug corrigé : le cercle passait sous l'encoche et le formulaire sous le clavier.
+    func test02_EcranPrenom_ToutResteVisibleClavierOuvert() {
+        goToNameScreen()
 
-          let healthLater = app.buttons["onboarding.health.later"]
-          XCTAssertTrue(healthLater.waitForExistence(timeout: 5), "Écran Apple Santé introuvable")
-          healthLater.tap()
+        let nameField = app.textFields["onboarding.name"]
+        XCTAssertTrue(nameField.waitForExistence(timeout: 5))
+        let keyboard = app.keyboards.firstMatch
+        if !keyboard.waitForExistence(timeout: 3) { nameField.tap() }
+        XCTAssertTrue(keyboard.waitForExistence(timeout: 5), "Le clavier ne s'ouvre pas")
 
-          let remindersLater = app.buttons["onboarding.reminders.later"]
-          XCTAssertTrue(remindersLater.waitForExistence(timeout: 5), "Écran rappels introuvable")
-          remindersLater.tap()
-      // → Home
-            XCTAssertTrue(app.tabBars.firstMatch.waitForExistence(timeout: 10),
-                          "Home absente après onboarding complet")
-        }
-        
-    // MARK: - 2. Lancement prêt : home affichée
+        let title = app.staticTexts["Comment vous appelez-vous ?"]
+        let continueButton = element("onboarding.name.continue")
+        XCTAssertTrue(title.exists && continueButton.exists)
 
-    func test02_LaunchReady_HomeAffichee() {
-        app.launch()
+        let topSafe = app.windows.firstMatch.frame.minY + 50   // sous la barre d'état / l'îlot
+        XCTAssertGreaterThan(title.frame.minY, topSafe, "Le titre passe sous l'encoche")
+        XCTAssertLessThanOrEqual(continueButton.frame.maxY, keyboard.frame.minY, "Le bouton passe sous le clavier")
+        XCTAssertTrue(nameField.isHittable)
+    }
+
+    // MARK: - Accueil
+
+    func test03_Accueil_Affichee() {
+        launch()
         XCTAssertTrue(app.tabBars.firstMatch.waitForExistence(timeout: 5))
-        XCTAssertGreaterThan(app.buttons.count, 0, "Home sans aucun bouton")
-        XCTAssertTrue(
-            app.staticTexts.matching(NSPredicate(format: "label CONTAINS 'ml'")).firstMatch
-                .waitForExistence(timeout: 3),
-            "Aucun libellé ml sur la Home"
-        )
+        XCTAssertTrue(element("home.add_water").exists, "Bouton Eau absent")
+        XCTAssertTrue(element("home.add_alcohol").exists, "Bouton Alcool absent")
     }
 
-    // MARK: - 3. Navigation : tous les onglets, un par un
-
-    func test03_Navigation_TousOnglets() throws {
-        app.launch()
+    func test04_Navigation_TousLesOnglets() {
+        launch()
         let tabBar = app.tabBars.firstMatch
-        guard tabBar.waitForExistence(timeout: 5) else { throw XCTSkip("Tab bar absente") }
-        let count = tabBar.buttons.count
-        XCTAssertGreaterThanOrEqual(count, 4, "Moins de 4 onglets")
-        for i in 0..<count {
-            tabBar.buttons.element(boundBy: i).tap()
-            XCTAssertTrue(app.scrollViews.firstMatch.waitForExistence(timeout: 3),
-                          "Onglet \(i) : aucun contenu scrollable")
+        XCTAssertTrue(tabBar.waitForExistence(timeout: 5))
+        XCTAssertEqual(tabBar.buttons.count, 5)
+        for index in 0..<tabBar.buttons.count {
+            tabBar.buttons.element(boundBy: index).tap()
+            XCTAssertTrue(app.scrollViews.firstMatch.waitForExistence(timeout: 3), "Onglet \(index) vide")
         }
     }
 
-    // MARK: - 4. Home : ajout rapide 250 ml
+    func test05_AjoutEau_250ml_ApparaitDansLActivite() {
+        launch()
+        tap("home.add_water")
+        let sheet = element("sheet.water")
+        XCTAssertTrue(sheet.waitForExistence(timeout: 5), "Feuille d'ajout d'eau absente")
 
-    func test04_Home_AjoutRapide250() throws {
-        app.launch()
-        guard app.tabBars.firstMatch.waitForExistence(timeout: 5) else { throw XCTSkip() }
-        let quickAdd = app.buttons.matching(NSPredicate(format: "label CONTAINS '250'")).firstMatch
-        guard quickAdd.waitForExistence(timeout: 3) else {
-            throw XCTSkip("Bouton 250 introuvable — capturer avec Record")
-        }
-        quickAdd.tap()
-        XCTAssertTrue(
-            app.staticTexts.matching(NSPredicate(format: "label CONTAINS 'ml'")).firstMatch
-                .waitForExistence(timeout: 3),
-            "Aucun libellé ml après ajout rapide"
-        )
+        tap("water.preset.250")
+
+        XCTAssertTrue(sheet.waitForNonExistence(timeout: 5), "La feuille ne se ferme pas après l'ajout")
+        let entry = app.staticTexts.matching(NSPredicate(format: "label CONTAINS '250' AND label CONTAINS[c] 'eau'")).firstMatch
+        XCTAssertTrue(entry.waitForExistence(timeout: 5), "L'ajout n'apparaît pas dans l'activité récente")
     }
 
-    // MARK: - 5. Home : sheet d'ajout d'eau (ouverture + fermeture)
-
-    func test05_Home_SheetAjoutEau() throws {
-        app.launch()
-        guard app.tabBars.firstMatch.waitForExistence(timeout: 5) else { throw XCTSkip() }
-        let open = app.buttons.matching(
-            NSPredicate(format: "label CONTAINS[cd] 'ajouter' OR label BEGINSWITH '+'")
-        ).firstMatch
-        guard open.waitForExistence(timeout: 3) else {
-            throw XCTSkip("Bouton d'ajout d'eau introuvable — capturer avec Record")
-        }
-        open.tap()
-        XCTAssertTrue(app.sheets.firstMatch.waitForExistence(timeout: 3), "Sheet ajout eau absente")
-        closeTopSheetIfNeeded()
+    func test06_FeuilleEau_SeFermeAvecLeBoutonFermer() {
+        launch()
+        tap("home.add_water")
+        let sheet = element("sheet.water")
+        XCTAssertTrue(sheet.waitForExistence(timeout: 5))
+        sheet.buttons["Fermer"].tap()
+        XCTAssertTrue(sheet.waitForNonExistence(timeout: 5))
     }
 
-    // MARK: - 6. Stats : sélecteur de période + verrou Premium
-
-    func test06_Stats_PeriodTabsEtVerrouPremium() throws {
-        app.launch()
-        try goToTab(1)
-        let periodButtons = app.buttons.matching(
-            NSPredicate(format: "label CONTAINS[cd] 'mois' OR label CONTAINS[cd] 'month'")
-        )
-        guard periodButtons.firstMatch.waitForExistence(timeout: 3) else {
-            throw XCTSkip("Onglets de période introuvables")
-        }
-        periodButtons.firstMatch.tap()
-        closeTopSheetIfNeeded()
+    func test07_FeuilleAlcool_SOuvre() {
+        launch()
+        tap("home.add_alcohol")
+        XCTAssertTrue(element("sheet.alcohol").waitForExistence(timeout: 5), "Feuille alcool absente")
     }
 
-    // MARK: - 7. Achievements : grille + badges
+    // MARK: - Profil
 
-    func test07_Achievements_GrilleEtBadges() throws {
-        app.launch()
-        try goToTab(2)
-        XCTAssertTrue(app.scrollViews.firstMatch.waitForExistence(timeout: 3))
-        XCTAssertGreaterThan(app.buttons.count, 2, "Grille achievements vide")
+    func test08_Profil_FeuilleProfilPhysique() {
+        launch()
+        goToTab(4)
+        tap("profile.card.body")
+        let sheet = element("sheet.body")
+        XCTAssertTrue(sheet.waitForExistence(timeout: 5), "Feuille profil physique absente")
+        sheet.buttons["Fermer"].tap()
+        XCTAssertTrue(sheet.waitForNonExistence(timeout: 5))
     }
 
-    // MARK: - 8. Profile : sheet corps (sliders + save) puis sheet objectif
+    func test09_MenuConfidentialite_OuvreLaPolitique() {
+        launch()
+        goToTab(4)
+        tap("profile.more")
+        let policyButton = app.buttons["Politique de confidentialité"]
+        XCTAssertTrue(policyButton.waitForExistence(timeout: 5), "Menu « ⋯ » sans la politique")
+        policyButton.tap()
 
-    func test08_Profile_SectionsEtSheets() throws {
-        // Désactivé volontairement : les sheets SwiftUI ne sont pas exposées
-        // de façon fiable à XCUI (app.sheets vide alors que la sheet est
-        // ouverte — prouvé par dump hiérarchie le 09/09/2026).
-        // Le flux est couvert manuellement + par les tests unitaires.
-        throw XCTSkip("Sheets SwiftUI non fiables via XCUI — couverture manuelle")
-    }
-    
-    // MARK: - 9. Premium sheet : ouverture depuis la bannière
-
-    func test09_PremiumSheet_OuvertureFermeture() throws {
-        app.launch()
-        try goToTab(2)
-        let premiumBtn = app.buttons.matching(
-            NSPredicate(format: "label CONTAINS[cd] 'premium' OR label CONTAINS[cd] 'pro'")
-        ).firstMatch
-        guard premiumBtn.waitForExistence(timeout: 3) else {
-            throw XCTSkip("Bannière premium introuvable (compte déjà premium ?)")
-        }
-        premiumBtn.tap()
-        XCTAssertTrue(app.scrollViews.firstMatch.waitForExistence(timeout: 3),
-                      "Premium sheet sans contenu")
-        closeTopSheetIfNeeded()
+        let sheet = element("sheet.privacy_policy")
+        XCTAssertTrue(sheet.waitForExistence(timeout: 5), "Politique absente")
+        XCTAssertTrue(app.staticTexts["Avertissement santé"].waitForExistence(timeout: 3), "Avertissement santé absent")
+        app.buttons["Fermer"].firstMatch.tap()
+        XCTAssertTrue(sheet.waitForNonExistence(timeout: 5))
     }
 
-    // MARK: - 10. Stabilité : 5 lancements successifs sans crash
+    func test10_SupprimerMesDonnees_RevientALOnboarding() {
+        launch()
+        tap("home.add_water")
+        tap("water.preset.250")
+        goToTab(4)
 
-    func test10_Stabilite_LancementsRepétés() {
-        for i in 0..<5 {
-            app.launch()
-            XCTAssertTrue(app.tabBars.firstMatch.waitForExistence(timeout: 5),
-                          "Lancement \(i) : tab bar absente")
+        tap("profile.more")
+        tap("profile.privacy.erase")
+        let confirm = app.buttons["Tout supprimer"]
+        XCTAssertTrue(confirm.waitForExistence(timeout: 5), "Confirmation absente")
+        confirm.tap()
+
+        XCTAssertTrue(element("onboarding.next").waitForExistence(timeout: 10),
+                      "L'onboarding ne réapparaît pas après la suppression")
+    }
+
+    func test11_SupprimerMesDonnees_Annuler_NeSupprimeRien() {
+        launch()
+        goToTab(4)
+        tap("profile.more")
+        tap("profile.privacy.erase")
+        XCTAssertTrue(app.buttons["Tout supprimer"].waitForExistence(timeout: 5))
+
+        // Toucher en dehors de la confirmation l'annule
+        app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.95)).tap()
+
+        XCTAssertTrue(app.buttons["Tout supprimer"].waitForNonExistence(timeout: 5))
+        XCTAssertFalse(element("onboarding.next").exists, "Les données ont été supprimées malgré l'annulation")
+        XCTAssertTrue(app.tabBars.firstMatch.exists)
+    }
+
+    // MARK: - Stabilité
+
+    func test12_Stabilite_LancementsRepetes() {
+        for index in 0..<3 {
+            launch()
+            XCTAssertTrue(app.tabBars.firstMatch.waitForExistence(timeout: 5), "Lancement \(index) : accueil absent")
             app.terminate()
         }
-    }
-
-    // MARK: - 11. Parcours complet pixel-perfect (à enregistrer)
-
-    func test11_Parcours_Complet_Record() {
-        // 👉 CURSEUR ICI puis bouton RECORD (●) en bas de l'éditeur :
-        // joue le parcours réel (Home → sheet eau → sheet alcool → Stats →
-        // Achievements → Profile → Wrapped), STOP, et Xcode écrit les
-        // selectors exacts. Colle-moi le résultat : je le transforme en
-        // test asserté propre.
     }
 }

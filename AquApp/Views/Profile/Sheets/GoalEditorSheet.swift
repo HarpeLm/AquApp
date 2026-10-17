@@ -182,6 +182,7 @@ struct GoalEditorSheet: View {
         }
         .background(Color.app.background)
         .ignoresSafeArea(edges: .bottom)
+        .accessibilityElement(children: .contain)
         .accessibilityIdentifier("sheet.goal")   // ← requis par test08
         .onAppear { localGoal = dailyGoalMl }
     }

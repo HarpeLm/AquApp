@@ -272,6 +272,7 @@ struct BodyEditSheet: View {
         }
         .background(Color.app.background)
         .ignoresSafeArea(edges: .bottom)
+        .accessibilityElement(children: .contain)
         .accessibilityIdentifier("sheet.body")
         .onAppear {
             localWeight = weightKg

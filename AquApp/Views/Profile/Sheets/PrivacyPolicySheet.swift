@@ -56,6 +56,7 @@ struct PrivacyPolicySheet: View {
                 }
             }
         }
+        .accessibilityElement(children: .contain)
         .accessibilityIdentifier("sheet.privacy_policy")
     }
 }

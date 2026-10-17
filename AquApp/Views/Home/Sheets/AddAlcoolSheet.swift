@@ -195,6 +195,8 @@ struct AddAlcoolSheet: View {
             }
         }
         .background(Color.app.background)
+        .accessibilityElement(children: .contain)
+        .accessibilityIdentifier("sheet.alcohol")
     }
 
     // MARK: - Vue Historique

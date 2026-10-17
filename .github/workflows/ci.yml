@@ -80,11 +80,25 @@ jobs:
             -only-testing:AquAppTests \
             -resultBundlePath TestResults.xcresult
 
+      # Parcours réels dans l'app (base en mémoire). La visite des écrans
+      # (ScreenshotTourTests) ne tourne que sur demande : elle n'est pas lancée ici.
+      - name: Run UI tests
+        run: |
+          set -o pipefail
+          xcodebuild test-without-building \
+            -scheme "$SCHEME" \
+            -project "$PROJECT" \
+            -destination "platform=iOS Simulator,name=${{ steps.sim.outputs.name }}" \
+            -only-testing:AquAppTestsUi/AquAppUITests \
+            -resultBundlePath UITestResults.xcresult
+
       - name: Upload test results
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: test-results
-          path: TestResults.xcresult
+          path: |
+            TestResults.xcresult
+            UITestResults.xcresult
           retention-days: 14
           if-no-files-found: warn

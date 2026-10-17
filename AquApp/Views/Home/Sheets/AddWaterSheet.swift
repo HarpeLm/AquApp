@@ -291,6 +291,8 @@ struct AddWaterSheet: View {
             }
         }
         .background(Color(UIColor.systemGroupedBackground))
+        .accessibilityElement(children: .contain)
+        .accessibilityIdentifier("sheet.water")
     }
 
     private func addWater(ml: Double) {
@@ -362,5 +364,6 @@ struct PresetButton: View {
         }
         .accessibilityLabel("\(sublabel), \(label)")
         .accessibilityHint(String(format: String(localized: "water.preset.accessibility_hint"), UnitFormatter.volume(ml)))
+        .accessibilityIdentifier("water.preset.\(Int(ml))")
     }
 }

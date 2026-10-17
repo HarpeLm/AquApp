@@ -42,6 +42,9 @@ struct AquAppApp: App {
                 .removePersistentDomain(forName: "group.com.fabian.dargaud.AquApp")
             PremiumManager.shared.set(false)
             HealthDataManager.shared.resetForTests()
+            // Vraie première installation : sinon une vieille date du Trousseau du simulateur
+            // débloque des succès de série au lancement (et leurs confettis gênent les tests).
+            HealthDataManager.shared.setFirstLaunchDate(Date())
             if args.contains("-uiTestingReady") {
                 UserDefaults.standard.set(true, forKey: "onboardingCompleted")
                 UserDefaults.standard.set(true, forKey: HealthAuthorization.offeredKey)
@@ -49,7 +52,8 @@ struct AquAppApp: App {
             }
         }
 
-        var useInMemoryStore = false
+        // Tests d'interface : base en mémoire, pour ne jamais toucher aux données du simulateur
+        var useInMemoryStore = args.contains("-uiTestingFresh") || args.contains("-uiTestingReady")
         #if DEBUG
         if DemoData.isActive {
             DemoData.prepareSettings()
